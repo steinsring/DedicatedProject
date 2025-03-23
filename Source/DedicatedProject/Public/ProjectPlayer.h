@@ -27,6 +27,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
+	//카메라 관련
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArmComp; //카메라 암 위치
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -45,18 +46,35 @@ public:
 	//상하 회전 입력 처리
 	void LookUp(const struct FInputActionValue& inputValue);
 
+	//이동 관련
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_Move;
-	//이동 속도
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
 	float walkSpeed = 600;
 	//이동방향
 	FVector direction;
-
 	void Move(const struct FInputActionValue& inputValue);
 
+	//점프 입력 이벤트 처리
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_Jump;
-	//점프 입력 이벤트 처리
 	void InputJump(const struct FInputActionValue& inputValue);
+
+	//캐릭터 스탯 관련
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Data", meta = (AllowPrivateAccess = "true"))
+	class UDataTable* CharacterDataTable; //블루프린트에서 데이터 테이블을 직접 참조
+	struct FPE_CharacterStats* CharacterStats; // 데이터 테이블에서 단일 행을 참조해 캐릭터 스탯으로 사용
+	void UpdateCharacterStats(int32 CharacterLevel);
+	FORCEINLINE FPE_CharacterStats* GetCharacterStats() const { return CharacterStats; } //스탯 구조체를 위한 Getter함수
+
+	//달리기 관련
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	class UInputAction* ia_Sprint;
+	UFUNCTION(Server, Reliable)
+	void SprintStart_Server();
+	UFUNCTION(Server, Reliable)
+	void SprintEnd_Server();
+	void SprintStart(const struct FInputActionValue& inputValue);
+	void SprintEnd(const struct FInputActionValue& inputValue);
+
 };

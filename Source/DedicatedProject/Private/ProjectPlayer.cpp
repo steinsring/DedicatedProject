@@ -6,6 +6,9 @@
 #include <Camera/CameraComponent.h> // 카메라
 #include "EnhancedInputSubsystems.h" //EnhancedInput 사용을 위함
 #include "EnhancedInputComponent.h"
+#include "PE_CharacterStats.h"
+#include "Engine/DataTable.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 // Sets default values
@@ -61,6 +64,8 @@ void AProjectPlayer::BeginPlay()
 			subsystem->AddMappingContext(imc_ProjectPlayer, 0); //입력 컨텍스트에 등록한다.
 		}
 	}
+
+	UpdateCharacterStats(1); //캐릭터 스탯 설정
 	
 }
 
@@ -94,6 +99,8 @@ void AProjectPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		PlayerInput->BindAction(ia_LookUp, ETriggerEvent::Triggered, this, &AProjectPlayer::LookUp);
 		PlayerInput->BindAction(ia_Move, ETriggerEvent::Triggered, this, &AProjectPlayer::Move);
 		PlayerInput->BindAction(ia_Jump, ETriggerEvent::Started, this, &AProjectPlayer::InputJump);
+		PlayerInput->BindAction(ia_Sprint, ETriggerEvent::Started, this, &AProjectPlayer::SprintStart);
+		PlayerInput->BindAction(ia_Sprint, ETriggerEvent::Completed, this, &AProjectPlayer::SprintEnd);
 	}
 }
 
@@ -123,3 +130,49 @@ void AProjectPlayer::InputJump(const struct FInputActionValue& inputValue)
 {
 	Jump();
 }
+ 
+void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {
+	// 캐릭터가 달리는중 스탯이 변경되는경우 걷기속도로 되돌아가는 문제를 해결하기 위함
+	auto IsSprinting = false;
+	if (GetCharacterStats())
+		IsSprinting = GetCharacterMovement()->MaxWalkSpeed == GetCharacterStats()->SprintSpeed;
+
+	if (CharacterDataTable) //데이터 테이블이 참조돼었는지 확인
+	{
+		TArray<FPE_CharacterStats*> CharacterStatsRows;
+		CharacterDataTable->GetAllRows<FPE_CharacterStats>(TEXT("ProjectPlayer"), CharacterStatsRows); //테이블의 모든 행을 지역배열로 가져온다.
+
+		if (CharacterStatsRows.Num() > 0) //데이터 테이블에 행이 하나 이상이면
+		{
+			const auto NewCharacterLevel = FMath::Clamp(CharacterLevel, 1, CharacterStatsRows.Num()); // 캐릭터 레벨에서 1을 뺀 행을 가져온다. Clamp()로 사용가능한 행보다 높은 값을 가져오지 않게함.
+			CharacterStats = CharacterStatsRows[NewCharacterLevel - 1];
+
+			GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->WalkSpeed; //WalkSpeed 열의 값을가져와 캐릭터의 MaxWalkSpeed프로퍼티에 할당
+
+			if (IsSprinting)
+				SprintStart_Server(); //달리는중 올바르게 업데이트하기 위함
+		}
+	}
+}
+void AProjectPlayer::SprintStart(const struct FInputActionValue& inputValue)
+{
+	SprintStart_Server();
+}
+
+void AProjectPlayer::SprintEnd(const struct FInputActionValue& inputValue)
+{
+	SprintEnd_Server();
+}
+
+void AProjectPlayer::SprintStart_Server_Implementation()
+{
+	if (GetCharacterStats())
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->SprintSpeed;
+}
+
+void AProjectPlayer::SprintEnd_Server_Implementation()
+{
+	if (GetCharacterStats())
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->WalkSpeed;
+}
+

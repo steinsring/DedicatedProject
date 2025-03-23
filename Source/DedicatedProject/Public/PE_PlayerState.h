@@ -14,7 +14,7 @@ class DEDICATEDPROJECT_API APE_PlayerState : public APlayerState
 {
 	GENERATED_BODY()
 	
-	
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, ReplicatedUsing = )
 	
 	
 };
