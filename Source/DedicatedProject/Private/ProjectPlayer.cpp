@@ -29,6 +29,14 @@ AProjectPlayer::AProjectPlayer()
 		//마찬가지로 Mesh의 위치와 회전을 설정해 준다.
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
 
+		//ProjectPlayer 불루프린트 클래스에 애니메이션 블루프린트를 세팅해준다.
+		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		static ConstructorHelpers::FClassFinder<UAnimInstance> PlayerAnim(TEXT("/Game/BluePrints/AB_AnimBlueprint.AB_AnimBlueprint_C"));
+		if (PlayerAnim.Succeeded())
+		{
+			GetMesh()->SetAnimInstanceClass(PlayerAnim.Class);
+		}
+
 		//이렇게 하면 블루프린트에 오류가 생겨 삭제하고 재생성했을때 자동으로 설정해준다.
 
 		// 3. TPS 카메라를 붙인다.
