@@ -176,11 +176,24 @@ void AProjectPlayer::SprintStart_Server_Implementation()
 {
 	if (GetCharacterStats())
 		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->SprintSpeed;
+	SprintStart_Client();
+}
+
+void AProjectPlayer::SprintStart_Client_Implementation()
+{
+	if (GetCharacterStats())
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->SprintSpeed;
 }
 
 void AProjectPlayer::SprintEnd_Server_Implementation()
 {
 	if (GetCharacterStats())
 		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->WalkSpeed;
+	SprintEnd_Client();
 }
 
+void AProjectPlayer::SprintEnd_Client_Implementation()
+{
+	if (GetCharacterStats())
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->WalkSpeed;
+}

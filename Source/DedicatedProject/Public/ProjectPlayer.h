@@ -77,4 +77,8 @@ public:
 	void SprintStart(const struct FInputActionValue& inputValue);
 	void SprintEnd(const struct FInputActionValue& inputValue);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void SprintStart_Client();
+	UFUNCTION(NetMulticast, Reliable)
+	void SprintEnd_Client();
 };
