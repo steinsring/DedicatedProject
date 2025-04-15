@@ -1,0 +1,57 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#include "Components/BoxComponent.h"
+#include "PE_MapGenerator.h"
+
+
+// Sets default values
+APE_MapGenerator::APE_MapGenerator()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	// 맵을 생성할 위치 설정
+	GenerateArea = CreateDefaultSubobject<UBoxComponent>(TEXT("Generate Area"));
+	GenerateArea->SetupAttachment(RootComponent);
+	GenerateArea->SetBoxExtent(FVector(10000.0f, 10000.0f, 3333.3f));
+
+}
+
+// Called when the game starts or when spawned
+void APE_MapGenerator::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (GeneratableMaps.IsEmpty())
+		return;
+	
+	if (GetLocalRole() != ROLE_Authority)
+		return;
+
+	for (int32 i = 0; i < NumMapsAtStart; i++)
+		GenerateMap();
+}
+
+// Called every frame
+void APE_MapGenerator::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+void APE_MapGenerator::GenerateMap() {
+	FActorSpawnParameters SpawnParams; // Actor를 생성할 때 사용할 파라미터를 담는 구조체
+	//SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding; // 스폰하려는 레벨의 다른 오브젝트가 있다면 위치를 조정. 그래도 충돌하면 스폰하지 않음.
+
+	auto Map = GeneratableMaps[FMath::RandRange(0, GeneratableMaps.Num() - 1)]; // 저장된 배열안의 StaticMesh중 랜덤하게 하나 골라서
+
+	// GenerateArea 영역 안의 랜덤 위치에 랜덤 방향으로 Spawn
+	const auto Rotation = FRotator(0.0f, FMath::RandRange(0.0f, 360.0f), 0.0f); //Z축(Yaw) 회전을 랜덤하게
+	const auto Location = GenerateArea->GetComponentLocation() +
+		FVector(FMath::RandRange(-GenerateArea->GetScaledBoxExtent().X, GenerateArea->GetScaledBoxExtent().X),
+				FMath::RandRange(-GenerateArea->GetScaledBoxExtent().Y, GenerateArea->GetScaledBoxExtent().Y),
+				0.0f); // 박스 콜라이더 범위 내 랜덤한 X, Y좌표를 생성
+
+	GetWorld()->SpawnActor<AActor>(Map, Location, Rotation, SpawnParams); // Actor를 맵에 Spawn
+}
+

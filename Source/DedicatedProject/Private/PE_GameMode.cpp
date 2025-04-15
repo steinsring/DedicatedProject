@@ -6,6 +6,7 @@
 #include "PE_PlayerController.h"
 #include "PE_PlayerState.h"
 #include "ProjectPlayer.h"
+#include "PE_MapGenerator.h"
 #include "UObject/ConstructorHelpers.h"
 
 APE_GameMode::APE_GameMode() { //생성자
@@ -17,6 +18,14 @@ APE_GameMode::APE_GameMode() { //생성자
 	static ConstructorHelpers::FClassFinder<APawn>PlayerPawnBPClass(TEXT("/Game/BluePrints/BP_ProjectPlayer"));
 	if (PlayerPawnBPClass.Class != nullptr) {
 		DefaultPawnClass = PlayerPawnBPClass.Class;
+	}
+
+	if (HasAuthority()) // 서버에서만 실행!
+	{
+		UE_LOG(LogTemp, Warning, TEXT("서버에서 던전 생성 시작"));
+
+		// 맵 생성기 생성
+		TObjectPtr<class APE_MapGenerator> MapGenerator = GetWorld()->SpawnActor<APE_MapGenerator>();
 	}
 }
 
