@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Components/BoxComponent.h"
 #include "PE_MapGenerator.h"
+#include "Components/BoxComponent.h"
 
 
 // Sets default values
