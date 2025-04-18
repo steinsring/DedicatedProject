@@ -3,7 +3,6 @@
 #include "PE_MapGenerator.h"
 #include "Components/BoxComponent.h"
 
-
 // Sets default values
 APE_MapGenerator::APE_MapGenerator()
 {
@@ -13,7 +12,7 @@ APE_MapGenerator::APE_MapGenerator()
 	// 맵을 생성할 위치 설정
 	GenerateArea = CreateDefaultSubobject<UBoxComponent>(TEXT("Generate Area"));
 	GenerateArea->SetupAttachment(RootComponent);
-	GenerateArea->SetBoxExtent(FVector(10000.0f, 10000.0f, 3333.3f));
+	GenerateArea->SetBoxExtent(FVector(MapSizeX, MapSizeY, MapSizeZ));
 
 }
 
@@ -28,6 +27,9 @@ void APE_MapGenerator::BeginPlay()
 	if (GetLocalRole() != ROLE_Authority)
 		return;
 
+	TSharedPtr<FBSPNode> RootNode = MakeBSPNode();
+	RootNode->Split(RootNode, MaxRoomSize);
+
 	for (int32 i = 0; i < NumMapsAtStart; i++)
 		GenerateMap();
 }
@@ -37,6 +39,14 @@ void APE_MapGenerator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+TSharedPtr<FBSPNode> APE_MapGenerator::MakeBSPNode() {
+	FVector WorldLocation = GenerateArea->GetComponentLocation(); // boxcomponent transform
+	FVector2D MapMinCoordinate = FVector2D(WorldLocation.X - MapSizeX, WorldLocation.Y - MapSizeY);
+	FVector2D MapMaxCoordinate = FVector2D(WorldLocation.X + MapSizeX, WorldLocation.Y + MapSizeY);
+	TSharedPtr<FBSPNode> Node = MakeShared<FBSPNode>(FBSPNode{ MapMinCoordinate, MapMaxCoordinate });
+	return Node;
 }
 
 void APE_MapGenerator::GenerateMap() {
