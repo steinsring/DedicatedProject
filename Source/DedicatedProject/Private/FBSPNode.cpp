@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "FBSPNode.h"
 
 bool FBSPNode::Split(const TSharedPtr<FBSPNode> Node, const FVector2D MaxRoomSize) // 현재 노드 , 최대 방 크기
@@ -13,7 +12,8 @@ bool FBSPNode::Split(const TSharedPtr<FBSPNode> Node, const FVector2D MaxRoomSiz
     bool bSplitHorizontally = Size.X < Size.Y;  
 
     // 최소비율과 최소크기 조건 확인
-    float Ratio = FMath::FRandRange(0.3f, 0.7f); // 30% ~ 70% 사이 분할
+    //float Ratio = FMath::FRandRange(0.3f, 0.7f); // 30% ~ 70% 사이 분할
+    float Ratio = 0.5f; // 실험용 반만 분할
 
     if (bSplitHorizontally)
     {// 가로분할
@@ -27,8 +27,13 @@ bool FBSPNode::Split(const TSharedPtr<FBSPNode> Node, const FVector2D MaxRoomSiz
         Node->Left = MakeShared<FBSPNode>(FBSPNode{ Node->MinCoordinate, FVector2D(SplitX, Node->MaxCoordinate.Y) });
         Node->Right = MakeShared<FBSPNode>(FBSPNode{ FVector2D(SplitX, Node->MinCoordinate.Y), Node->MaxCoordinate });
     }
+    //PRINT_LOG(TEXT("My Log : %s %s, %s %s"), TEXT("min : "), *Node->MinCoordinate.ToString(), TEXT("max : "), *Node->MaxCoordinate.ToString());
 
-    return Split(Node->Left, MaxRoomSize) && Split(Node->Right, MaxRoomSize); //양쪽 자식노드 분할
+    //양쪽 자식노드 분할
+    bool bLeft = Split(Node->Left, MaxRoomSize);
+    bool bRight = Split(Node->Right, MaxRoomSize);
+
+    return bLeft && bRight;
 }
 
 /*

@@ -30,6 +30,12 @@ protected:
 
 	TSharedPtr<FBSPNode> MakeBSPNode();
 
+	TSharedPtr<FBSPNode> RootNode;
+
+	TArray<TSharedPtr<FBSPNode>> LeavesList;
+
+	void CollectLeaves(const TSharedPtr<FBSPNode>& Node, TArray<TSharedPtr<FBSPNode>>& OutLeaves);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -41,12 +47,12 @@ public:
 	int32 NumMapsAtStart = 5; // 만들어질 방의 개수
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
-	double MapSizeX = 5000.0f; // 전체 맵 크기 반지름
+	double MapSizeX = 30000.0f; // 전체 맵 크기 반지름
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
-	double MapSizeY = 5000.0f; // 전체 맵 크기 반지름
+	double MapSizeY = 30000.0f; // 전체 맵 크기 반지름
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
 	double MapSizeZ = 1500.0f; // 전체 맵 크기 반지름
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
-	FVector2D MaxRoomSize = FVector2D (200.0f, 200.0f); // 최대 방 크기
+	FVector2D MaxRoomSize = FVector2D (5000.0f, 5000.0f); // 최대 방 크기
 };

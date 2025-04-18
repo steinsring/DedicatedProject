@@ -11,7 +11,7 @@ struct FBSPNode
 	GENERATED_BODY()
 public:
 	UPROPERTY()
-	FVector2D MinCoordinate; // int32값으로 이루어진 2D좌표 구조체
+	FVector2D MinCoordinate; // double값으로 이루어진 2D좌표 구조체
 	UPROPERTY()
 	FVector2D MaxCoordinate;
 
