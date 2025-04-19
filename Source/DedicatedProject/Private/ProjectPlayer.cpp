@@ -9,6 +9,7 @@
 #include "PE_CharacterStats.h"
 #include "Engine/DataTable.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "PE_AIController.h"
 
 
 // Sets default values
@@ -53,6 +54,10 @@ AProjectPlayer::AProjectPlayer()
 		tpsCamComp->bUsePawnControlRotation = false;//입력의 회전 설정
 
 		bUseControllerRotationYaw = true;//입력의 회전 설정
+
+		//ai controller 세팅(만약 플레이어가 조종하지 않는 캐릭터라면 ai_controller의 지배를 받게 된다.)
+		AIControllerClass = APE_AIController::StaticClass();
+		AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	}
 }
 
