@@ -16,4 +16,7 @@ class DEDICATEDPROJECT_API APE_GameMode : public AGameMode
 	
 public:
 	APE_GameMode(); //게임모드 생성자
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 };

@@ -12,8 +12,8 @@ bool FBSPNode::Split(const TSharedPtr<FBSPNode> Node, const FVector2D MaxRoomSiz
     bool bSplitHorizontally = Size.X < Size.Y;  
 
     // 최소비율과 최소크기 조건 확인
-    //float Ratio = FMath::FRandRange(0.3f, 0.7f); // 30% ~ 70% 사이 분할
-    float Ratio = 0.5f; // 실험용 반만 분할
+    float Ratio = FMath::FRandRange(0.3f, 0.7f); // 30% ~ 70% 사이 분할
+    //float Ratio = 0.5f; // 실험용 반만 분할
 
     if (bSplitHorizontally)
     {// 가로분할

@@ -43,13 +43,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
 	TArray<TSubclassOf<class AActor>> GeneratableMaps; // 만들어질 방들 배열
 
+	/*
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
 	int32 NumMapsAtStart = 5; // 만들어질 방의 개수
+	*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
-	double MapSizeX = 30000.0f; // 전체 맵 크기 반지름
+	double MapSizeX = 10000.0f; // 전체 맵 크기 반지름
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
-	double MapSizeY = 30000.0f; // 전체 맵 크기 반지름
+	double MapSizeY = 10000.0f; // 전체 맵 크기 반지름
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
 	double MapSizeZ = 1500.0f; // 전체 맵 크기 반지름
 

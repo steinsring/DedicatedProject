@@ -21,7 +21,7 @@ void UPE_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (::IsValid(Pawn))
 	{
 		CurrentPawnSpeed = Pawn->GetVelocity().Size();
-		UE_LOG(LogTemp, Log, TEXT("Speed : %f"), CurrentPawnSpeed);
+		//UE_LOG(LogTemp, Log, TEXT("Speed : %f"), CurrentPawnSpeed);
 		auto Character = Cast<ACharacter>(Pawn);
 		if (Character)
 		{

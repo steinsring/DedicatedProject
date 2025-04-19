@@ -12,9 +12,12 @@ APE_MapGenerator::APE_MapGenerator()
 
 	// 맵을 생성할 위치 설정
 	GenerateArea = CreateDefaultSubobject<UBoxComponent>(TEXT("Generate Area"));
+	RootComponent = GenerateArea;
 	GenerateArea->SetupAttachment(RootComponent);
 	GenerateArea->SetBoxExtent(FVector(MapSizeX, MapSizeY, MapSizeZ));
 
+	static ConstructorHelpers::FClassFinder<AActor>BPMapClass(TEXT("/Game/BluePrints/BP_Hallway"));
+	GeneratableMaps.Add(BPMapClass.Class);
 }
 
 // Called when the game starts or when spawned
@@ -74,10 +77,9 @@ void APE_MapGenerator::GenerateMap() {
 
 	auto Map = GeneratableMaps[FMath::RandRange(0, GeneratableMaps.Num() - 1)]; // 저장된 배열안의 StaticMesh중 랜덤하게 하나 골라서
 
-	// GenerateArea 영역 안의 랜덤 위치에 랜덤 방향으로 Spawn
-	const auto Rotation = FRotator(0.0f, FMath::RandRange(0.0f, 360.0f), 0.0f); //Z축(Yaw) 회전을 랜덤하게
-
 	for (auto& Leaf : LeavesList) {
+		// GenerateArea 영역 안의 노드 위치에 랜덤 방향으로 Spawn
+		const auto Rotation = FRotator(0.0f, FMath::RandRange(0.0f, 360.0f), 0.0f); //Z축(Yaw) 회전을 랜덤하게
 		const auto Center = FVector((Leaf->MaxCoordinate + Leaf->MinCoordinate) * 0.5f, 0.0f);
 		const auto Location = Center;
 		PRINT_LOG(TEXT("My Log : %s "), *Center.ToString());
