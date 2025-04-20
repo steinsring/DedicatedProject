@@ -2,9 +2,12 @@
 
 
 #include "PE_AIController.h"
-//#include "BehaviorTree/BehaviorTree.h"
-//#include "BehaviorTree/BlackboardData.h"
-//#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardData.h"
+#include "BehaviorTree/BlackboardComponent.h"
+
+const FName APE_AIController::HomePosKey(TEXT("HomePos"));
+const FName APE_AIController::PatrolPosKey(TEXT("PatrolPos"));
 
 APE_AIController::APE_AIController()
 {
@@ -19,17 +22,20 @@ APE_AIController::APE_AIController()
 	{
 		BTAsset = BTObject.Object;
 	}
+
+	BBComp = GetBlackboardComponent();
 }
 
 void APE_AIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 	
-	/*if (UseBlackboard(BBAsset, Blackboard))
+	if (UseBlackboard(BBAsset, BBComp))
 	{
+		BBComp->SetValueAsVector(HomePosKey, InPawn->GetActorLocation());
 		if (!RunBehaviorTree(BTAsset))
 		{
 
 		}
-	}*/
+	}
 }
