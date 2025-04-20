@@ -6,11 +6,13 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "NavigationSystem.h"
 
+//이 클래스를 통해 BehaviorTree에 FindPatrolPos라는 태스크(노드)가 만들어짐
 UBTTask_FindPatrolPos::UBTTask_FindPatrolPos()
 {
 	NodeName = TEXT("FindPatrolPos");
 }
 
+//태스크는 Update처럼 ExecuteTask함수가 계속 실행되며 그때마다 Failed, Inprogress, Succeeded를 반환한다.
 EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);

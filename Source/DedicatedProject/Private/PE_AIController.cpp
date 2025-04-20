@@ -35,7 +35,7 @@ void APE_AIController::OnPossess(APawn* InPawn)
 		BBComp->SetValueAsVector(HomePosKey, InPawn->GetActorLocation());
 		if (!RunBehaviorTree(BTAsset))
 		{
-
+			//
 		}
 	}
 }
