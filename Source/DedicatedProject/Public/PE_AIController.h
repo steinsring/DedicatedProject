@@ -23,6 +23,7 @@ public:
 	//Blackboard에 선언된 vector 키들의 string값
 	static const FName HomePosKey;
 	static const FName PatrolPosKey;
+	static const FName TargetKey;
 	
 private:
 	UPROPERTY()

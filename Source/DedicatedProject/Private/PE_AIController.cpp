@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "PE_AIController.h"
@@ -8,6 +8,7 @@
 
 const FName APE_AIController::HomePosKey(TEXT("HomePos"));
 const FName APE_AIController::PatrolPosKey(TEXT("PatrolPos"));
+const FName APE_AIController::TargetKey(TEXT("Target"));
 
 APE_AIController::APE_AIController()
 {
@@ -32,6 +33,7 @@ void APE_AIController::OnPossess(APawn* InPawn)
 	
 	if (UseBlackboard(BBAsset, BBComp))
 	{
+		//AIController가 Pawn을 소유했을때, HomePos의 위치를 Pawn의 위치로 세팅해준다.
 		BBComp->SetValueAsVector(HomePosKey, InPawn->GetActorLocation());
 		if (!RunBehaviorTree(BTAsset))
 		{

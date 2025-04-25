@@ -35,7 +35,7 @@ void APE_MapGenerator::BeginPlay()
 	RootNode = MakeBSPNode();
 	RootNode->Split(RootNode, MaxRoomSize);
 
-	GenerateMap();
+	//GenerateMap();
 }
 
 // Called every frame

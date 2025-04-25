@@ -28,6 +28,7 @@ EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& O
 	FVector Origin = OwnerComp.GetBlackboardComponent()->GetValueAsVector(APE_AIController::HomePosKey);
 	FNavLocation NextPatrol;
 
+	//origin으로부터 반경 500에 랜덤한 포인트가 NextPatrol이 된다.
 	//500.0f는 ai가 움직일 반경의 크기(에디터에서 NavMeshBoundsVolume의 크기를 생각해서 세팅해줘야해)
 	if (NavSystem->GetRandomPointInNavigableRadius(Origin, 500.0f, NextPatrol))
 	{
