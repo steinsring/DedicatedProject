@@ -42,6 +42,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
 	TArray<TSubclassOf<class AActor>> GeneratableMaps; // 만들어질 방들 배열
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
+	TArray<TSubclassOf<class AActor>> GeneratableBridges; // 만들어질 방들 배열
 
 	/*
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
