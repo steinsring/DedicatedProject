@@ -28,6 +28,11 @@ protected:
 	UFUNCTION()
 	void GenerateMap();
 
+	UFUNCTION()
+	TArray<USceneComponent*> FindSceneCompList(AActor* Actor);
+
+	void SpawnHallway(USceneComponent* Comp, TSharedPtr<FBSPNode> Leaf);
+
 	TSharedPtr<FBSPNode> MakeBSPNode();
 
 	TSharedPtr<FBSPNode> RootNode;
