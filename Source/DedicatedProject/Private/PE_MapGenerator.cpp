@@ -23,8 +23,7 @@ APE_MapGenerator::APE_MapGenerator()
 	GeneratableMaps.Add(BPMapClass.Class);
 	*/
 	TArray<FString> BPRoomPaths = {
-		TEXT("/Game/Asset/HomeMade/BP_Room1.BP_Room1_C"),
-		TEXT("/Game/Asset/HomeMade/BP_ControlRoom1.BP_ControlRoom1_C")
+		TEXT("/Game/Asset/HomeMade/BP_RoomNode1.BP_RoomNode1_C")
 	};
 
 	for (const FString& Path : BPRoomPaths)
@@ -34,11 +33,14 @@ APE_MapGenerator::APE_MapGenerator()
 			GeneratableMaps.Add(LoadedClass);
 	}
 
-	TArray<FString> BPHallwayPaths = {
-		TEXT("/Game/Asset/HomeMade/BP_HallwayConnectBridge1.BP_HallwayConnectBridge1_C")
+	TArray<FString> BPBridgePaths = {
+		TEXT("/Game/Asset/HomeMade/BP_HallwayConnectBridge1.BP_HallwayConnectBridge1_C"),
+		TEXT("/Game/Asset/HomeMade/BP_Hallway1-2.BP_Hallway1-2_C"),
+		TEXT("/Game/Asset/HomeMade/BP_Hallway1-3.BP_Hallway1-3_C"),
+		TEXT("/Game/Asset/HomeMade/BP_Hallway1-4.BP_Hallway1-4_C")
 	};
 
-	for (const FString& Path : BPHallwayPaths)
+	for (const FString& Path : BPBridgePaths)
 	{
 		UClass* LoadedClass = LoadClass<AActor>(nullptr, *Path);
 		if (LoadedClass)
@@ -61,7 +63,7 @@ void APE_MapGenerator::BeginPlay()
 	RootNode = MakeBSPNode();
 	RootNode->Split(RootNode, MaxRoomSize);
 
-	//GenerateMap();
+	GenerateMap();
 }
 
 // Called every frame
@@ -101,75 +103,90 @@ void APE_MapGenerator::GenerateMap() {
 
 	CollectLeaves(RootNode, LeavesList);
 
-	for (auto& Leaf : LeavesList) {
-		auto Map = GeneratableMaps[FMath::RandRange(0, GeneratableMaps.Num() - 1)]; // 저장된 배열안의 StaticMesh중 랜덤하게 하나 골라서
+	for (TSharedPtr<FBSPNode> Leaf : LeavesList) {
+		TSubclassOf<AActor> Map = GeneratableMaps[FMath::RandRange(0, GeneratableMaps.Num() - 1)]; // 저장된 배열안의 StaticMesh중 랜덤하게 하나 골라서
 		// GenerateArea 영역 안의 노드 위치에 랜덤 방향으로 Spawn
 		float RandomAngle = 90 * FMath::RandRange(0, 3);
-		const auto Rotation = FRotator(0.0f, RandomAngle, 0.0f); //Z축(Yaw) 회전을 랜덤하게
-		const auto Center = FVector((Leaf->MaxCoordinate + Leaf->MinCoordinate) * 0.5f, 0.0f);
-		const auto Location = Center;
+		const FRotator Rotation = FRotator(0.0f, RandomAngle, 0.0f); //Z축(Yaw) 회전을 랜덤하게
+		const FVector Center = FVector((Leaf->MaxCoordinate + Leaf->MinCoordinate) * 0.5f, 0.0f);
+		const FVector Location = Center;
 		//PRINT_LOG(TEXT("My Log : %s "), *Center.ToString());
 
 		AActor* Room = GetWorld()->SpawnActor<AActor>(Map, Location, Rotation, SpawnParams); // Actor를 맵에 Spawn
-
+		/*
 		// 연결 브릿지 블루프린트 스폰
 		if (Room) { 
-			USceneComponent* RootComp = Cast<USceneComponent>(Room->GetRootComponent());
-			TArray<USceneComponent*> RootCompChildren;
-			RootComp->GetChildrenComponents(true, RootCompChildren); // 방의 루트 컴포넌트의 자식들
-
 			// 방의 루트 컴포넌트의 자식들에서 Socket만 분리
-			TArray<USceneComponent*> RoomSceneCompList;
-			for (USceneComponent* Comp : RootCompChildren) { 
-				if (Comp && Comp->GetName().Contains(TEXT("Socket")))
-					RoomSceneCompList.Add(Comp);
-			}
+			TArray<USceneComponent*> RoomSceneCompList = FindSceneCompList(Room);
 
 			// 방의 모든 소켓의 위치에 브릿지 스폰
-			for (auto* Comp : RoomSceneCompList) { 
+			for (USceneComponent* Comp : RoomSceneCompList) { 
 				if (Comp) {
-					// 브릿지를 방의 소켓에 스폰
-					FTransform RoomSocketTransform = Comp->GetComponentTransform();
-					FVector BridgeLocation = RoomSocketTransform.GetLocation();
-					FRotator BridgeRotation = RoomSocketTransform.GetRotation().Rotator();
-					AActor* Bridge = GetWorld()->SpawnActor<AActor>(GeneratableBridges[0], BridgeLocation, BridgeRotation);
 
-					if (Bridge) {
-						// 브릿지의 소켓과 방의 소켓의 위치를 일치
-						USceneComponent* BridgeRootComp = Cast<USceneComponent>(Bridge->GetRootComponent());
-						TArray<USceneComponent*> BridgeRootCompChildren;
-						BridgeRootComp->GetChildrenComponents(true, BridgeRootCompChildren); // 브릿지의 루트 컴포넌트의 자식들
-
-						// 방의 소켓에 붙일 브릿지의 소켓 찾기
-						USceneComponent* ExitSocketComp = nullptr;
-						for (USceneComponent* HComp : BridgeRootCompChildren) {
-							if (HComp && HComp->GetName().Contains(TEXT("ExitSocket"))) 
-							{
-								ExitSocketComp = HComp;
-								break; // 하나만 찾으면 됨
-							}
-						}
-
-						// 브릿지 위치 조정
-						if (ExitSocketComp) {
-							FTransform BridgeEntryTransform = ExitSocketComp->GetComponentTransform();
-							FTransform BridgeActorTransform = Bridge->GetActorTransform();
-							FTransform ExitSocketRelativeTransform = BridgeEntryTransform.GetRelativeTransform(BridgeActorTransform);
-
-							FTransform NewBridgeTransform = ExitSocketRelativeTransform.Inverse() * RoomSocketTransform;
-							Bridge->SetActorTransform(NewBridgeTransform);
-						}
-					}
-					else
-						PRINT_LOG(TEXT("My Log : %s "), TEXT("null ConnectSceneComponent"));
+					SpawnHallway(Comp, Leaf);
 				}
 				else
 					PRINT_LOG(TEXT("My Log : %s "), TEXT("null SceneComponent"));
 			}
 		}
 		else
-			PRINT_LOG(TEXT("My Log : %s "), TEXT("null Blueprint Room"));
+			PRINT_LOG(TEXT("My Log : %s "), TEXT("null RoomActor"));
+		*/
 	}
 	
+}
+
+TArray<USceneComponent*> APE_MapGenerator::FindSceneCompList(AActor* Actor) {
+	USceneComponent* RootComp = Cast<USceneComponent>(Actor->GetRootComponent());
+	TArray<USceneComponent*> RootCompChildren;
+	RootComp->GetChildrenComponents(true, RootCompChildren); // 루트 컴포넌트의 자식들
+
+	// 루트 컴포넌트의 자식들에서 Socket만 분리
+	TArray<USceneComponent*> SceneCompList;
+	for (USceneComponent* Comp : RootCompChildren) {
+		if (Comp && Comp->GetName().Contains(TEXT("Socket")))
+			SceneCompList.Add(Comp);
+	}
+
+	return SceneCompList;
+}
+
+//소켓에 hallway를 스폰 및 위치조정
+void APE_MapGenerator::SpawnHallway(USceneComponent* ParentExitComp, TSharedPtr<FBSPNode> Leaf) {
+	
+	// 브릿지를 Exit에 스폰
+	FTransform RoomSocketTransform = ParentExitComp->GetComponentTransform();
+	int32 i = FMath::RandRange(0, GeneratableBridges.Num() - 1);
+	AActor* Hallway = GetWorld()->SpawnActor<AActor>(GeneratableBridges[i], RoomSocketTransform);
+
+	if (Hallway) {
+		
+		// 브릿지의 소켓과 방의 소켓의 위치를 일치
+		TArray<USceneComponent*> HallwaySceneCompList = FindSceneCompList(Hallway);
+
+		// 방의 소켓에 붙일 브릿지의 소켓 찾기
+		USceneComponent* EntranceSocketComp = nullptr;
+		TArray<USceneComponent*> ExitSocketCompList;
+		for (USceneComponent* HallwaySceneComp : HallwaySceneCompList) {
+			if (HallwaySceneComp && HallwaySceneComp->GetName().Contains(TEXT("EntranceSocket")))
+				EntranceSocketComp = HallwaySceneComp;
+			else
+				ExitSocketCompList.Add(HallwaySceneComp);
+		}
+
+		// 브릿지 위치 조정
+		if (EntranceSocketComp) {
+			FTransform HallwayEntryTransform = EntranceSocketComp->GetComponentTransform();
+			FTransform HallwayActorTransform = Hallway->GetActorTransform();
+			FTransform ExitSocketRelativeTransform = HallwayEntryTransform.GetRelativeTransform(HallwayActorTransform);
+
+			FTransform NewHallwayTransform = ExitSocketRelativeTransform.Inverse() * RoomSocketTransform;
+			Hallway->SetActorTransform(NewHallwayTransform);
+		}
+		else
+			PRINT_LOG(TEXT("My Log : %s "), TEXT("null ExitSocket"));
+	}
+	else
+		PRINT_LOG(TEXT("My Log : %s "), TEXT("null HallwayActor"));
 }
 
