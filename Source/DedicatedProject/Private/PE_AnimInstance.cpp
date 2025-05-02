@@ -9,6 +9,20 @@ UPE_AnimInstance::UPE_AnimInstance()
 {
 	CurrentPawnSpeed = 0.0f;
 	IsInAir = false;
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Pattern1
+	(TEXT("/Script/Engine.AnimMontage'/Game/Fab/SciFi_ToiletMech/Animation/SKEL_SciFi_ToiletMech_Skeleton_Montage.SKEL_SciFi_ToiletMech_Skeleton_Montage'"));
+	if (Pattern1.Succeeded())
+	{
+		AttackPattern1 = Pattern1.Object;
+	}
+
+	//static ConstructorHelpers::FObjectFinder<UAnimMontage> Pattern2
+	//(TEXT("/Script/Engine.AnimMontage'/Game/Fab/SciFi_ToiletMech/Animation/SKEL_SciFi_ToiletMech_Skeleton_Montage.SKEL_SciFi_ToiletMech_Skeleton_Montage'"));
+	//if (Pattern2.Succeeded())
+	//{
+	//	AttackPattern2 = Pattern2.Object;
+	//}
 }
 
 //Tick마다 호출되는 AnimInstance함수
@@ -28,4 +42,9 @@ void UPE_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 			IsInAir = Character->GetMovementComponent()->IsFalling();
 		}
 	}
+}
+
+void UPE_AnimInstance::PlayAttackMontage()
+{
+	Montage_Play(AttackPattern1, 1.0f);
 }

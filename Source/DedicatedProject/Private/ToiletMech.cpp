@@ -3,6 +3,7 @@
 
 #include "ToiletMech.h"
 #include "PE_AIController.h"
+#include "PE_AnimInstance.h"
 
 
 // Sets default values
@@ -35,6 +36,8 @@ AToiletMech::AToiletMech()
 		//ai controller 세팅(만약 플레이어가 조종하지 않는 캐릭터라면 ai_controller의 지배를 받게 된다.)
 		AIControllerClass = APE_AIController::StaticClass();
 		AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+		IsAttacking = false;
 	}
 }
 
@@ -52,10 +55,25 @@ void AToiletMech::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void AToiletMech::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AToiletMech::PostInitializeComponents()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	Super::PostInitializeComponents();
+	PEAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
 
+	PEAnim->OnMontageEnded.AddDynamic(this, &AToiletMech::OnAttackMontageEnded);
+}
+
+void AToiletMech::Attack()
+{
+	if (IsAttacking) return;
+
+	PEAnim->PlayAttackMontage();
+	IsAttacking = true;
+}
+
+void AToiletMech::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	IsAttacking = false;
+	OnAttackEnd.Broadcast();
 }
 

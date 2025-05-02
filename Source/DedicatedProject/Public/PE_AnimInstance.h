@@ -17,6 +17,8 @@ class DEDICATEDPROJECT_API UPE_AnimInstance : public UAnimInstance
 public:
 	UPE_AnimInstance();
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	void PlayAttackMontage();
 	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pawn", meta = (AllowPrivateAccess=true))
@@ -24,4 +26,10 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pawn", meta = (AllowPrivateAccess = true))
 	bool IsInAir;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
+	UAnimMontage* AttackPattern1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
+	UAnimMontage* AttackPattern2;
 };
