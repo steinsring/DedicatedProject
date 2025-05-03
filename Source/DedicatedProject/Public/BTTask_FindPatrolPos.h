@@ -18,4 +18,10 @@ public:
 	UBTTask_FindPatrolPos();
 	
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+private:
+	UPROPERTY()
+	TArray<AActor*> PatrolPoints;
+
+	int32 CurrentPatrolIndex = 0;
 };

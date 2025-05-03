@@ -2,9 +2,15 @@
 
 
 #include "PE_AIController.h"
+#include "ToiletMech.h"
+
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
+
+#include "Engine/TargetPoint.h"
+#include "Kismet/GameplayStatics.h"
+#include "NavMesh/NavMeshBoundsVolume.h"
 
 const FName APE_AIController::HomePosKey(TEXT("HomePos"));
 const FName APE_AIController::PatrolPosKey(TEXT("PatrolPos"));
@@ -30,6 +36,8 @@ APE_AIController::APE_AIController()
 void APE_AIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+	CollectWayPointsInCurrentNavVolume();
+	UE_LOG(LogTemp, Warning, TEXT("[OnPossess] %s possessed %s"), *GetName(), *InPawn->GetName());
 	
 	if (UseBlackboard(BBAsset, BBComp))
 	{
@@ -38,6 +46,63 @@ void APE_AIController::OnPossess(APawn* InPawn)
 		if (!RunBehaviorTree(BTAsset))
 		{
 			//
+		}
+	}
+}
+
+void APE_AIController::CollectWayPointsInCurrentNavVolume()
+{
+	UE_LOG(LogTemp, Log, TEXT("StartCollectWayPoints"));
+	WayPoints.Empty();
+
+	auto ControllingPawn = GetCharacter();
+	if (nullptr == ControllingPawn) return;
+
+	const FVector PawnLocation = ControllingPawn->GetActorLocation();
+
+	// 1. NavMeshBoundsVolume 중 현재 캐릭터가 들어 있는 볼륨 찾기
+	TArray<AActor*> NavVolumes;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANavMeshBoundsVolume::StaticClass(), NavVolumes);
+
+	ANavMeshBoundsVolume* CurrentVolume = nullptr;
+	for (auto VolumeActor : NavVolumes)
+	{
+		ANavMeshBoundsVolume* Volume = Cast<ANavMeshBoundsVolume>(VolumeActor);
+		if (nullptr == Volume) continue;
+
+		FVector Origin, Extent;
+		Volume->GetActorBounds(false, Origin, Extent);
+
+		const FVector Delta = (PawnLocation - Origin).GetAbs();
+		if (Delta.X <= Extent.X && Delta.Y <= Extent.Y && Delta.Z <= Extent.Z)
+		{
+			CurrentVolume = Volume;
+			UE_LOG(LogTemp, Log, TEXT("VolumeSelected"));
+			break;
+		}
+	}
+
+	if (nullptr == CurrentVolume) return;
+
+	// 2. 현재 NavMeshBoundsVolume 안에 있는 Waypoint 찾기
+	FVector VolumeOrigin, VolumeExtent;
+	CurrentVolume->GetActorBounds(false, VolumeOrigin, VolumeExtent);
+
+	TArray<AActor*> AllWaypoints;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATargetPoint::StaticClass(), AllWaypoints);
+	UE_LOG(LogTemp, Log, TEXT("Num Of Waypoints : %d"), AllWaypoints.Num());
+
+	for (AActor* Actor : AllWaypoints)
+	{
+		ATargetPoint* Waypoint = Cast<ATargetPoint>(Actor);
+		if (nullptr == Waypoint) continue;
+
+		FVector Loc = Waypoint->GetActorLocation();
+		FVector Delta = (Loc - VolumeOrigin).GetAbs();
+
+		if (Delta.X <= VolumeExtent.X && Delta.Y <= VolumeExtent.Y && Delta.Z <= VolumeExtent.Z)
+		{
+			WayPoints.Add(Waypoint);
 		}
 	}
 }

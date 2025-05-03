@@ -20,10 +20,16 @@ public:
 	APE_AIController();
 	virtual void OnPossess(APawn* InPawn) override;
 
-	//Blackboard에 선언된 vector 키들의 string값
+	//Blackboard에 선언된 키들의 string값
 	static const FName HomePosKey;
 	static const FName PatrolPosKey;
 	static const FName TargetKey;
+
+	UFUNCTION(BlueprintCallable)
+	void CollectWayPointsInCurrentNavVolume();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<AActor*> WayPoints;
 	
 private:
 	UPROPERTY()

@@ -30,11 +30,29 @@ EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& O
 
 	//origin으로부터 반경 500에 랜덤한 포인트가 NextPatrol이 된다.
 	//500.0f는 ai가 움직일 반경의 크기(에디터에서 NavMeshBoundsVolume의 크기를 생각해서 세팅해줘야해)
-	if (NavSystem->GetRandomPointInNavigableRadius(Origin, 500.0f, NextPatrol))
-	{
-		OwnerComp.GetBlackboardComponent()->SetValueAsVector(APE_AIController::PatrolPosKey, NextPatrol.Location);
-		return EBTNodeResult::Succeeded;
-	}
+	//if (NavSystem->GetRandomPointInNavigableRadius(Origin, 500.0f, NextPatrol))
+	//{
+	//	OwnerComp.GetBlackboardComponent()->SetValueAsVector(APE_AIController::PatrolPosKey, NextPatrol.Location);
+	//	return EBTNodeResult::Succeeded;
+	//}
 
-	return EBTNodeResult::Failed;
+	APE_AIController* Controller = Cast<APE_AIController>(OwnerComp.GetAIOwner());
+	if (nullptr == Controller)
+		return EBTNodeResult::Failed;
+	
+	PatrolPoints = Controller->WayPoints;
+	if (PatrolPoints.Num() == 0) 
+		return EBTNodeResult::Failed;
+
+	float Distance = FVector::Dist(ControllingPawn->GetActorLocation(), PatrolPoints[CurrentPatrolIndex]->GetActorLocation());
+	UE_LOG(LogTemp, Log, TEXT("Dist : %f, CurrentPatrolIndex : %d"), Distance, CurrentPatrolIndex);
+
+	if (Distance < 100.0f)
+	{
+		CurrentPatrolIndex = (CurrentPatrolIndex + 1) % PatrolPoints.Num();
+	}
+	OwnerComp.GetBlackboardComponent()->SetValueAsVector(APE_AIController::PatrolPosKey, PatrolPoints[CurrentPatrolIndex]->GetActorLocation());
+	return EBTNodeResult::Succeeded;
+
+	//return EBTNodeResult::Failed;
 }
