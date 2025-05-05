@@ -28,10 +28,10 @@ protected:
 	UFUNCTION()
 	void GenerateMap();
 
-	UFUNCTION()
-	TArray<USceneComponent*> FindSceneCompList(AActor* Actor);
+	//UFUNCTION()
+	//TArray<USceneComponent*> FindSceneCompList(AActor* Actor);
 
-	void SpawnHallway(USceneComponent* Comp, TSharedPtr<FBSPNode> Leaf);
+	//void SpawnHallway(USceneComponent* Comp, TSharedPtr<FBSPNode> Leaf);
 
 	TSharedPtr<FBSPNode> MakeBSPNode();
 
@@ -39,7 +39,17 @@ protected:
 
 	TArray<TSharedPtr<FBSPNode>> LeavesList;
 
-	void CollectLeaves(const TSharedPtr<FBSPNode>& Node, TArray<TSharedPtr<FBSPNode>>& OutLeaves);
+	void CollectLeaves(const TSharedPtr<FBSPNode>& Node);
+
+	void SetNeighbors(TArray<TSharedPtr<FBSPNode>>& LeavesList);
+
+	bool IsSearchRight(const TSharedPtr<FBSPNode>& Node, const FVector2D& B);
+
+	TSharedPtr<FBSPNode> BinarySearchTree(const TSharedPtr<FBSPNode>& Node, const FVector2D TargetCoordinate);
+
+	void SpawnMap(TSharedPtr<FBSPNode>& Node);
+
+	void SpawnNeighbors(TSharedPtr<FBSPNode>& Node);
 
 public:	
 	// Called every frame
@@ -47,8 +57,20 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
 	TArray<TSubclassOf<class AActor>> GeneratableMaps; // 만들어질 방들 배열
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
-	TArray<TSubclassOf<class AActor>> GeneratableBridges; // 만들어질 방들 배열
+	TArray<TSubclassOf<class AActor>> GeneratableMapsExit4; // 출입구4개
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
+	TArray<TSubclassOf<class AActor>> GeneratableMapsExit3; // 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
+	TArray<TSubclassOf<class AActor>> GeneratableMapsExit2_1; // 일자 출입구 2개
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
+	TArray<TSubclassOf<class AActor>> GeneratableMapsExit2_2; // ㄱ자 출입구 2개
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
+	TArray<TSubclassOf<class AActor>> GeneratableMapsExit1; // 만들어질 방들 배열
+
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
+	//TArray<TSubclassOf<class AActor>> GeneratableBridges; // 만들어질 방들 배열
 
 	/*
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
