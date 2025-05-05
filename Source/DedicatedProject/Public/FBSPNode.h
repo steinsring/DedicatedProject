@@ -14,13 +14,27 @@ public:
 	FVector2D MinCoordinate; // double값으로 이루어진 2D좌표 구조체
 	UPROPERTY()
 	FVector2D MaxCoordinate;
+	UPROPERTY()
+	FVector2D CenterCoordinate;
 
-	TSharedPtr<FBSPNode> Left; //스마트 포인터
-	TSharedPtr<FBSPNode> Right;
+	TSharedPtr<FBSPNode> LeftChild = NULL; //스마트 포인터
+	TSharedPtr<FBSPNode> RightChild = NULL;
 
-	bool IsLeaf() const { return !Left && !Right; }
+	TSharedPtr<FBSPNode> LeftNode = NULL;
+	TSharedPtr<FBSPNode> RightNode = NULL;
+	TSharedPtr<FBSPNode> TopNode = NULL;
+	TSharedPtr<FBSPNode> BottomNode = NULL;
+	TSharedPtr<FBSPNode> TopFloorNode = NULL;
+	TSharedPtr<FBSPNode> BottomFloorNode = NULL;
+
+	bool isSpawned = false;
+	bool isConnectLeft = false; // 현재 노드가 이웃노드와 반드시 이어야 하면 true, 잇지 않아도 되면 false
+	bool isConnectRight = false;
+	bool isConnectTop = false;
+	bool isConnectBottom = false;
+
+	bool IsLeaf() const { return !LeftChild && !RightChild; }
 	bool Split(const TSharedPtr<FBSPNode> Node, const FVector2D MaxRoomSize);
-	//void CreateRoom(TSharedPtr<FBSPNode> Node);
 
 };
 
