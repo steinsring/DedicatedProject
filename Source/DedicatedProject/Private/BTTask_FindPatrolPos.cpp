@@ -12,7 +12,7 @@ UBTTask_FindPatrolPos::UBTTask_FindPatrolPos()
 	NodeName = TEXT("FindPatrolPos");
 }
 
-//태스크는 Update처럼 ExecuteTask함수가 계속 실행되며 그때마다 Failed, Inprogress, Succeeded를 반환한다.
+//태스크는 해당 TaskNode가 실행될 때 한번만 호출되는 함수이며, Failed, Inprogress, Succeeded를 반환한다.
 EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
