@@ -48,3 +48,8 @@ void UPE_AnimInstance::PlayAttackMontage()
 {
 	Montage_Play(AttackPattern1, 1.0f);
 }
+
+void UPE_AnimInstance::AnimNotify_AttackRangeCheck()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ohyeah"));
+}

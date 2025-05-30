@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "BTTask_TurnToTarget.h"
@@ -9,24 +9,44 @@
 UBTTask_TurnToTarget::UBTTask_TurnToTarget()
 {
 	NodeName = (TEXT("Turn"));
+
+    bNotifyTick = true;
+    bCreateNodeInstance = true;
+
+    AcceptableAngle = 5.0f;     // 회전 완료로 간주할 각도
+    RotationSpeed = 5.0f;       // 회전 속도 (보간에 사용)
 }
 
 EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
+    // TickTask에서 처리하니까 여기선 InProgress
+    return EBTNodeResult::InProgress;
+}
 
-	auto ProjectPlayer = Cast<AProjectPlayer>(OwnerComp.GetAIOwner()->GetPawn());
-	if (nullptr == ProjectPlayer)
-		return EBTNodeResult::Failed;
+void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+{
+    AAIController* AIController = OwnerComp.GetAIOwner();
+    APawn* Pawn = AIController ? AIController->GetPawn() : nullptr;
+    AProjectPlayer* Target = Cast<AProjectPlayer>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(APE_AIController::TargetKey));
 
-	auto Target = Cast<AProjectPlayer>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(APE_AIController::TargetKey));
-	if (nullptr == Target)
-		return EBTNodeResult::Failed;
+    if (!Pawn || !Target)
+    {
+        FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+        return;
+    }
 
-	FVector LookVector = Target->GetActorLocation() - ProjectPlayer->GetActorLocation();
-	LookVector.Z = 0.0f;
-	FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
-	ProjectPlayer->SetActorRotation(FMath::RInterpTo(ProjectPlayer->GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), 2.0f));
+    FVector Direction = Target->GetActorLocation() - Pawn->GetActorLocation();
+    Direction.Z = 0.0f;
 
-	return EBTNodeResult::Succeeded;
+    FRotator TargetRot = Direction.Rotation();
+    FRotator CurrentRot = Pawn->GetActorRotation();
+
+    FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaSeconds, RotationSpeed);
+    Pawn->SetActorRotation(NewRot);
+
+    float AngleDiff = FMath::Abs(FRotator::NormalizeAxis((TargetRot - NewRot).Yaw));
+    if (AngleDiff < AcceptableAngle)
+    {
+        FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+    }
 }
