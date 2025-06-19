@@ -13,7 +13,7 @@ APE_MapGenerator::APE_MapGenerator()
 	// 맵을 생성할 위치 설정
 	GenerateArea = CreateDefaultSubobject<UBoxComponent>(TEXT("Generate Area"));
 	RootComponent = GenerateArea;
-	GenerateArea->SetupAttachment(RootComponent);
+	//GenerateArea->SetupAttachment(RootComponent);
 	GenerateArea->SetBoxExtent(FVector(MapSizeX, MapSizeY, MapSizeZ));
 
 	TArray<FString> BPRoomPaths = {
@@ -90,7 +90,7 @@ void APE_MapGenerator::BeginPlay()
 	RootNode = MakeBSPNode();
 	RootNode->Split(RootNode, MaxRoomSize);
 
-	//GenerateMap();
+	GenerateMap();
 }
 
 // Called every frame
