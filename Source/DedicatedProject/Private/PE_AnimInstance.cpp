@@ -2,6 +2,8 @@
 
 
 #include "PE_AnimInstance.h"
+#include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PawnMovementComponent.h"
 
@@ -51,5 +53,22 @@ void UPE_AnimInstance::PlayAttackMontage()
 
 void UPE_AnimInstance::AnimNotify_AttackRangeCheck()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ohyeah"));
+	auto OwnerCharacter = Cast<ACharacter>(TryGetPawnOwner());
+	if (!OwnerCharacter) return;
+
+	auto AIController = Cast<AAIController>(OwnerCharacter->GetController());
+	if (!AIController) return;
+
+	auto BlackBoard = AIController->GetBlackboardComponent();
+	if (!BlackBoard) return;
+
+	const bool bIsInAttackRange = BlackBoard->GetValueAsBool("IsInAttackRange");
+
+	if (!bIsInAttackRange)
+	{
+		if (Montage_IsPlaying(AttackPattern1))
+		{
+			Montage_Stop(0.2f, AttackPattern1);
+		}
+	}
 }
