@@ -33,10 +33,23 @@ public:
 	UFUNCTION()
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	UFUNCTION()
+	void AttackCheck();
+
+	UFUNCTION()
+	void OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	bool IsAttacking;
 
 	UPROPERTY()
 	class UPE_AnimInstance* PEAnim;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hitbox")
+	UCapsuleComponent* LeftHandHitBox;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Hitbox")
+	UCapsuleComponent* RightHandHitBox;
 };

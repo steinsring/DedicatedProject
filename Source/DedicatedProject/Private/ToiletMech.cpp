@@ -4,6 +4,8 @@
 #include "ToiletMech.h"
 #include "PE_AIController.h"
 #include "PE_AnimInstance.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/PrimitiveComponent.h"
 
 
 // Sets default values
@@ -37,6 +39,28 @@ AToiletMech::AToiletMech()
 		AIControllerClass = APE_AIController::StaticClass();
 		AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
+		//히트박스 세팅
+		LeftHandHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("LeftHandHitbox"));
+		RightHandHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RightHandHitbox"));
+
+		LeftHandHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_l"));
+		RightHandHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_r"));
+
+		//왼손
+		LeftHandHitBox->SetCapsuleHalfHeight(30.0f);
+		LeftHandHitBox->SetCapsuleRadius(20.0f);
+		LeftHandHitBox->SetRelativeRotation(FRotator(0.0f, 90.0f, 16.0f));
+		
+		//오른손
+		RightHandHitBox->SetCapsuleHalfHeight(56.0f);
+		RightHandHitBox->SetCapsuleRadius(20.0f);
+		RightHandHitBox->SetRelativeLocation(FVector(-15.0f, -6.0f, 0.0f));
+		RightHandHitBox->SetRelativeRotation(FRotator(0.0f, 83.0f, 16.0f));
+
+		//공격을 안할 처음에는 콜리전을 꺼준다.(공격 실행시 켜주고 공격 끝나면 꺼주어야 함)
+		LeftHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		RightHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 		IsAttacking = false;
 	}
 }
@@ -61,6 +85,10 @@ void AToiletMech::PostInitializeComponents()
 	PEAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
 
 	PEAnim->OnMontageEnded.AddDynamic(this, &AToiletMech::OnAttackMontageEnded);
+
+	//OnComponentBeginOverlap 델리게이트에 바인딩해주기
+	LeftHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMech::OnHitboxOverlap);
+	RightHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMech::OnHitboxOverlap);
 }
 
 void AToiletMech::Attack()
@@ -75,5 +103,16 @@ void AToiletMech::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	IsAttacking = false;
 	OnAttackEnd.Broadcast();
+}
+
+void AToiletMech::AttackCheck()
+{
+
+}
+
+void AToiletMech::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Log, TEXT("%s"), *(OverlappedComponent->GetName()));
 }
 
