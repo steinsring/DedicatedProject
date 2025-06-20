@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "HealthComponent.h"
 #include "GameFramework/Character.h"
 #include "ProjectPlayer.generated.h"
 
@@ -18,6 +19,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(VisibleAnywhere)
+	UHealthComponent* HealthComp;
 
 public:	
 	// Called every frame
@@ -66,6 +70,10 @@ public:
 	struct FPE_CharacterStats* CharacterStats; // 데이터 테이블에서 단일 행을 참조해 캐릭터 스탯으로 사용
 	void UpdateCharacterStats(int32 CharacterLevel);
 	FORCEINLINE FPE_CharacterStats* GetCharacterStats() const { return CharacterStats; } //스탯 구조체를 위한 Getter함수
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
+		AController* EventInstigator, AActor* DamageCauser) override;
+
 
 	//달리기 관련
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")

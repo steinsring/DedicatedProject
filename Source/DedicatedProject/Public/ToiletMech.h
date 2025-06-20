@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "HealthComponent.h"
 #include "GameFramework/Character.h"
 #include "ToiletMech.generated.h"
 
@@ -20,6 +21,11 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	UDataTable* ToiletMechDataTable;
+
+	float AttackPower = 0.0f;
 
 public:	
 	// Called every frame
@@ -52,4 +58,7 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Hitbox")
 	UCapsuleComponent* RightHandHitBox;
+
+	UPROPERTY(VisibleAnywhere)
+	UHealthComponent* HealthComp;
 };

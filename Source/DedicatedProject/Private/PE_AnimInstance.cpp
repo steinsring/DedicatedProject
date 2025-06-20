@@ -73,6 +73,11 @@ void UPE_AnimInstance::AnimNotify_AttackRangeCheck()
 	}
 }
 
-void UPE_AnimInstance::AnimNotify_AttackHitCheck()
+void UPE_AnimInstance::AnimNotify_SetLeftHandCollision()
+{
+
+}
+
+void UPE_AnimInstance::AnimNotify_SetRightHandCollision()
 {
 }

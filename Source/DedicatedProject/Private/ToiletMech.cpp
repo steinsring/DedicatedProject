@@ -4,8 +4,12 @@
 #include "ToiletMech.h"
 #include "PE_AIController.h"
 #include "PE_AnimInstance.h"
+
 #include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
+
+#include "PE_ToiletMechStats.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -61,22 +65,10 @@ AToiletMech::AToiletMech()
 		LeftHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		RightHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+		HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthStat"));
+
 		IsAttacking = false;
 	}
-}
-
-// Called when the game starts or when spawned
-void AToiletMech::BeginPlay()
-{
-	Super::BeginPlay();
-
-}
-
-// Called every frame
-void AToiletMech::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void AToiletMech::PostInitializeComponents()
@@ -89,6 +81,42 @@ void AToiletMech::PostInitializeComponents()
 	//OnComponentBeginOverlap 델리게이트에 바인딩해주기
 	LeftHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMech::OnHitboxOverlap);
 	RightHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMech::OnHitboxOverlap);
+}
+
+// Called when the game starts or when spawned
+void AToiletMech::BeginPlay()
+{
+	Super::BeginPlay();
+
+	//데이터 테이블에서 AttackPower 가져오기
+	if (ToiletMechDataTable)
+	{
+		//디버깅용
+		static const FString ContextString(TEXT("ToiletMech Stats Lookup"));
+
+		FPE_ToiletMechStats* StatsRow = ToiletMechDataTable->FindRow<FPE_ToiletMechStats>(FName("Default"), ContextString);
+
+		if (StatsRow)
+		{
+			AttackPower = StatsRow->AttackPower;
+			UE_LOG(LogTemp, Warning, TEXT("Row 'Default' found in ToiletMechStatsDataTable"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Row 'Default' not found in ToiletMechStatsDataTable"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ToiletMechStatsDataTable is null"));
+	}
+}
+
+// Called every frame
+void AToiletMech::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
 }
 
 void AToiletMech::Attack()
@@ -113,6 +141,16 @@ void AToiletMech::AttackCheck()
 void AToiletMech::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Log, TEXT("%s"), *(OverlappedComponent->GetName()));
+	if (!IsValid(OtherActor) || OtherActor == this) return;
+
+	UE_LOG(LogTemp, Log, TEXT("HitResult : %s"), *(OverlappedComponent->GetName()));
+
+	UGameplayStatics::ApplyDamage(
+		OtherActor,
+		AttackPower,
+		GetController(),
+		this,
+		nullptr
+	);
 }
 

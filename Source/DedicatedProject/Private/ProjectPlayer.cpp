@@ -58,6 +58,8 @@ AProjectPlayer::AProjectPlayer()
 		//ai controller 세팅(만약 플레이어가 조종하지 않는 캐릭터라면 ai_controller의 지배를 받게 된다.)
 		//AIControllerClass = APE_AIController::StaticClass();
 		//AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+		HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthStat"));
 	}
 }
 
@@ -167,6 +169,13 @@ void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {
 		}
 	}
 }
+
+//TakeDamage 오버라이드
+float AProjectPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	return HealthComp->ApplyDamage(DamageAmount);
+}
+
 void AProjectPlayer::SprintStart(const struct FInputActionValue& inputValue)
 {
 	SprintStart_Server();
