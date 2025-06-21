@@ -154,3 +154,15 @@ void AToiletMech::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	);
 }
 
+void AToiletMech::SetLeftHandHitbox(ECollisionEnabled::Type CollisionEnabled)
+{
+	if (LeftHandHitBox)
+		LeftHandHitBox->SetCollisionEnabled(CollisionEnabled);
+}
+
+void AToiletMech::SetRightHandHitbox(ECollisionEnabled::Type CollisionEnabled)
+{
+	if (RightHandHitBox)
+		RightHandHitBox->SetCollisionEnabled(CollisionEnabled);
+}
+

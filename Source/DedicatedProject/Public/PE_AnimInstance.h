@@ -23,8 +23,6 @@ public:
 public:
 	UFUNCTION()
 	void AnimNotify_AttackRangeCheck();
-	void AnimNotify_SetLeftHandCollision();
-	void AnimNotify_SetRightHandCollision();
 	
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pawn", meta = (AllowPrivateAccess=true))

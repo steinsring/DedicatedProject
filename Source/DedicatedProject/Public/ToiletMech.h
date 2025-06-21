@@ -46,6 +46,12 @@ public:
 	void OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION(BlueprintCallable)
+	void SetLeftHandHitbox(ECollisionEnabled::Type CollisionEnabled);
+
+	UFUNCTION(BlueprintCallable)
+	void SetRightHandHitbox(ECollisionEnabled::Type CollisionEnabled);
+
 private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	bool IsAttacking;
