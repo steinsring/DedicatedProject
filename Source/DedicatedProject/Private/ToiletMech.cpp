@@ -143,7 +143,7 @@ void AToiletMech::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 {
 	if (!IsValid(OtherActor) || OtherActor == this) return;
 
-	UE_LOG(LogTemp, Log, TEXT("HitResult : %s"), *(OverlappedComponent->GetName()));
+	UE_LOG(LogTemp, Log, TEXT("HitResult : %s"), *(OtherActor->GetName()));
 
 	UGameplayStatics::ApplyDamage(
 		OtherActor,
