@@ -6,11 +6,10 @@
 #include "PE_PlayerController.h"
 #include "PE_PlayerState.h"
 #include "ProjectPlayer.h"
-#include "PE_MapGenerator.h"
+#include "Map/PE_MapGenerator.h"
 #include "UObject/ConstructorHelpers.h"
 
 APE_GameMode::APE_GameMode() { //생성자
-	UE_LOG(LogTemp, Warning, TEXT("게임모드만들어줘 미친놈아"));
 	GameStateClass = APE_GameState::StaticClass(); // 게임 스테이트
 	PlayerStateClass = APE_PlayerState::StaticClass(); // 플레이어 스테이트
 	PlayerControllerClass = APE_PlayerController::StaticClass(); // 플레이어 컨트롤러
