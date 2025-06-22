@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "FBSPNode.h"
+#include "Map/FBSPNode.h"
 #include "DedicatedProject.h"
 
 bool FBSPNode::Split(const TSharedPtr<FBSPNode> Node, const FVector2D MaxRoomSize) // 현재 노드 , 최대 방 크기

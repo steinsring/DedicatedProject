@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PE_BasePickup.h"
+#include "Item/PE_BasePickup.h"
 #include "ProjectPlayer.h"
 #include "Components/SphereComponent.h"
 

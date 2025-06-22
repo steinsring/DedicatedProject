@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "PE_MapGenerator.h"
+#include "Map/PE_MapGenerator.h"
 #include "DedicatedProject.h"
 #include "Components/BoxComponent.h"
 

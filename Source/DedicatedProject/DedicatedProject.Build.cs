@@ -9,7 +9,7 @@ public class DedicatedProject : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", 
-            "NavigationSystem", "AIModule", "GameplayTasks" });
+            "NavigationSystem", "AIModule", "GameplayTasks", "OnlineSubsystem", "OnlineSubsystemSteam" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
