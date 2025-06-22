@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "HealthComponent.h"
@@ -36,12 +36,18 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 float UHealthComponent::ApplyDamage(float DamageAmount)
 {
+	AActor* Owner = GetOwner(); // 이 HealthComponent가 달려 있는 액터
+	FString OwnerName = Owner ? Owner->GetName() : TEXT("Unknown");
+
 	CurrentHealth -= DamageAmount;
-	UE_LOG(LogTemp, Log, TEXT("Health Remain : %f"), CurrentHealth);
+	UE_LOG(LogTemp, Log, TEXT("%s's Health Remain : %f"), *OwnerName, CurrentHealth);
+
 	if (CurrentHealth <= 0.0f)
 	{
-		UE_LOG(LogTemp, Log, TEXT("You Died"));
+		UE_LOG(LogTemp, Log, TEXT("%s Died"), *OwnerName);
 	}
+
 	return DamageAmount;
+
 }
 

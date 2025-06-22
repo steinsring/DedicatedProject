@@ -26,6 +26,7 @@ protected:
 	UDataTable* ToiletMechDataTable;
 
 	float AttackPower = 0.0f;
+	TSet<AActor*> HitActors;
 
 public:	
 	// Called every frame

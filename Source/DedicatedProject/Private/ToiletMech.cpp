@@ -141,9 +141,11 @@ void AToiletMech::AttackCheck()
 void AToiletMech::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, 
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!IsValid(OtherActor) || OtherActor == this) return;
+	if (!IsValid(OtherActor) || OtherActor == this || HitActors.Contains(OtherActor)) return;
 
-	UE_LOG(LogTemp, Log, TEXT("HitResult : %s"), *(OtherActor->GetName()));
+	HitActors.Add(OtherActor);
+
+	UE_LOG(LogTemp, Log, TEXT("Overlapped with: %s | Component: %s"), *OtherActor->GetName(), *OtherComp->GetName());
 
 	UGameplayStatics::ApplyDamage(
 		OtherActor,
@@ -156,6 +158,9 @@ void AToiletMech::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 
 void AToiletMech::SetLeftHandHitbox(ECollisionEnabled::Type CollisionEnabled)
 {
+	if (CollisionEnabled == ECollisionEnabled::NoCollision)
+		HitActors.Empty();
+
 	if (LeftHandHitBox)
 		LeftHandHitBox->SetCollisionEnabled(CollisionEnabled);
 }
