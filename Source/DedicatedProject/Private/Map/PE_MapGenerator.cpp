@@ -13,6 +13,7 @@ APE_MapGenerator::APE_MapGenerator()
 	// 맵을 생성할 위치 설정
 	GenerateArea = CreateDefaultSubobject<UBoxComponent>(TEXT("Generate Area"));
 	RootComponent = GenerateArea;
+	GenerateArea->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//GenerateArea->SetupAttachment(RootComponent);
 	GenerateArea->SetBoxExtent(FVector(MapSizeX, MapSizeY, MapSizeZ));
 
