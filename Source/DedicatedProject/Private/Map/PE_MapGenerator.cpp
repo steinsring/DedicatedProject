@@ -33,7 +33,8 @@ APE_MapGenerator::APE_MapGenerator()
 		TEXT("/Game/Asset/HomeMade/BP_Test3.BP_Test3_C")
 	};
 	TArray<FString> BPRoom4Paths = {
-		TEXT("/Game/Asset/HomeMade/BP_Test4.BP_Test4_C")
+		TEXT("/Game/Asset/HomeMade/BP_Test4.BP_Test4_C"),
+		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_CommonNodeEntry4.BP_CommonNodeEntry4_C")
 	};
 
 	for (const FString& Path : BPRoomPaths)
