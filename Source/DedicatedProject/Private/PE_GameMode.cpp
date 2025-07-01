@@ -35,6 +35,9 @@ void APE_GameMode::BeginPlay()
 			SpawnParams
 		);
 	}
+
+    
+
 }
 
 // 이유는 모르겠는데 서버가 PostLogin을 스킵해서 강제로 실행하도록함. 이것을 하지 않으면 서버가 아닌 다른 클라이언트들은 character가 아닌 spectator로 생성이 되었음.
@@ -42,7 +45,7 @@ void APE_GameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
     UE_LOG(LogTemp, Warning, TEXT("[GameMode] PostLogin called for %s"), *NewPlayer->GetName());
-
+	
     if (NewPlayer->GetPawn())
     {
         UE_LOG(LogTemp, Warning, TEXT("[GameMode] Player already has Pawn: %s"), *NewPlayer->GetPawn()->GetName());
@@ -61,6 +64,24 @@ void APE_GameMode::PostLogin(APlayerController* NewPlayer)
             NewPlayer->Possess(Pawn);
         }
     }
+	
+}
+
+void APE_GameMode::SetPlayerLocation(FVector PlayerStartLocation)
+{
+    // 1틱 뒤에 실행하여 Pawn이 완전히 Possess된 뒤 위치 이동
+    GetWorld()->GetTimerManager().SetTimerForNextTick([this, PlayerStartLocation]()
+        {
+            for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+            {
+                APlayerController* PC = It->Get();
+                if (PC && PC->GetPawn())
+                {
+                    FVector NewLocation = PlayerStartLocation; // 커스텀 위치
+                    PC->GetPawn()->SetActorLocation(PlayerStartLocation);
+                }
+            }
+        });
 }
 
 

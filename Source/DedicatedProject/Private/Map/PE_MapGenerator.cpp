@@ -3,6 +3,8 @@
 #include "Map/PE_MapGenerator.h"
 #include "DedicatedProject.h"
 #include "Components/BoxComponent.h"
+#include "PE_GameMode.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 APE_MapGenerator::APE_MapGenerator()
@@ -34,8 +36,20 @@ APE_MapGenerator::APE_MapGenerator()
 		TEXT("/Game/Asset/HomeMade/BP_Test3.BP_Test3_C")
 	};
 	TArray<FString> BPRoom4Paths = {
-		TEXT("/Game/Asset/HomeMade/BP_Test4.BP_Test4_C")
+		TEXT("/Game/Asset/HomeMade/BP_Test4.BP_Test4_C"),
+		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_CommonNodeEntry4.BP_CommonNodeEntry4_C")
 	};
+
+	TArray<FString> BPStartRoomPaths = {
+		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_StartNode1.BP_StartNode1_C")
+	};
+
+	for (const FString& Path : BPStartRoomPaths)
+	{
+		UClass* LoadedClass = LoadClass<AActor>(nullptr, *Path);
+		if (LoadedClass)
+			GeneratableMapsStart.Add(LoadedClass);
+	}
 
 	for (const FString& Path : BPRoomPaths)
 	{
@@ -457,10 +471,10 @@ void APE_MapGenerator::GenerateMap() {
 
 	// 시작방은 항상 4방향으로
 	int32 start = FMath::RandRange(0, LeavesList.Num() - 1);
-	TSubclassOf<AActor> Map = GeneratableMapsExit4[FMath::RandRange(0, GeneratableMapsExit4.Num() - 1)];
+	TSubclassOf<AActor> Map = GeneratableMapsStart[FMath::RandRange(0, GeneratableMapsStart.Num() - 1)];
 	const FRotator Rotation = FRotator::ZeroRotator;
 	const FVector Location = FVector(LeavesList[start]->CenterCoordinate, 0.0f);
-	GetWorld()->SpawnActor<AActor>(Map, Location, Rotation, SpawnParams);
+	AActor* StartNode = GetWorld()->SpawnActor<AActor>(Map, Location, Rotation, SpawnParams);
 	LeavesList[start]->isSpawned = true;
 	LeavesList[start]->isConnectLeft = true;
 	LeavesList[start]->isConnectRight = true;
@@ -468,6 +482,12 @@ void APE_MapGenerator::GenerateMap() {
 	LeavesList[start]->isConnectBottom = true;
 
 	SpawnNeighbors(LeavesList[start]);
+
+	APE_GameMode* GameMode = Cast<APE_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+	if (GameMode)
+	{
+		GameMode->SetPlayerLocation(Location);
+	}
 }
 
 // 여기부터는 쓰지 않음

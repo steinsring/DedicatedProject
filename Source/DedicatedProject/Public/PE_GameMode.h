@@ -13,9 +13,13 @@ UCLASS()
 class DEDICATEDPROJECT_API APE_GameMode : public AGameMode
 {
 	GENERATED_BODY()
+
+private:
+
 	
 public:
 	APE_GameMode(); //게임모드 생성자
+	void SetPlayerLocation(FVector NewLocation);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
