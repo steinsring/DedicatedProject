@@ -19,24 +19,19 @@ APE_MapGenerator::APE_MapGenerator()
 	//GenerateArea->SetupAttachment(RootComponent);
 	GenerateArea->SetBoxExtent(FVector(MapSizeX, MapSizeY, MapSizeZ));
 
-	TArray<FString> BPRoomPaths = {
-		TEXT("/Game/Asset/HomeMade/BP_RoomNode1.BP_RoomNode1_C")
-	};
-
 	TArray<FString> BPRoom1Paths = {
-		TEXT("/Game/Asset/HomeMade/BP_Test1.BP_Test1_C")
+		TEXT("/Game/Asset/HomeMade/NodeEntry1/BP_CommonNode1.BP_CommonNode1_C")
 	};
 	TArray<FString> BPRoom2_1Paths = {
-		TEXT("/Game/Asset/HomeMade/BP_Test2_1.BP_Test2_1_C")
+		TEXT("/Game/Asset/HomeMade/NodeEntry2-1/BP_CommonNode2-1-1.BP_CommonNode2-1-1_C")
 	};
 	TArray<FString> BPRoom2_2Paths = {
-		TEXT("/Game/Asset/HomeMade/BP_RoomNode1.BP_RoomNode1_C")
+		TEXT("/Game/Asset/HomeMade/NodeEntry2-2/BP_CommonNode2-2-1.BP_CommonNode2-2-1_C")
 	};
 	TArray<FString> BPRoom3Paths = {
-		TEXT("/Game/Asset/HomeMade/BP_Test3.BP_Test3_C")
+		TEXT("/Game/Asset/HomeMade/NodeEntry3/BP_CommonNode3.BP_CommonNode3_C")
 	};
 	TArray<FString> BPRoom4Paths = {
-		TEXT("/Game/Asset/HomeMade/BP_Test4.BP_Test4_C"),
 		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_CommonNodeEntry4.BP_CommonNodeEntry4_C")
 	};
 
@@ -49,13 +44,6 @@ APE_MapGenerator::APE_MapGenerator()
 		UClass* LoadedClass = LoadClass<AActor>(nullptr, *Path);
 		if (LoadedClass)
 			GeneratableMapsStart.Add(LoadedClass);
-	}
-
-	for (const FString& Path : BPRoomPaths)
-	{
-		UClass* LoadedClass = LoadClass<AActor>(nullptr, *Path);
-		if (LoadedClass)
-			GeneratableMaps.Add(LoadedClass);
 	}
 
 	for (const FString& Path : BPRoom1Paths)
@@ -94,9 +82,6 @@ APE_MapGenerator::APE_MapGenerator()
 void APE_MapGenerator::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (GeneratableMaps.IsEmpty())
-		return;
 	
 	if (GetLocalRole() != ROLE_Authority)
 		return;

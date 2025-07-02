@@ -56,9 +56,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
-	TArray<TSubclassOf<class AActor>> GeneratableMaps; // 만들어질 방들 배열
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
 	TArray<TSubclassOf<class AActor>> GeneratableMapsStart; // 시작하는 노드
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generater System")
 	TArray<TSubclassOf<class AActor>> GeneratableMapsExit4; // 출입구4개
