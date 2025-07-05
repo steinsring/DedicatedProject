@@ -5,16 +5,17 @@
 #include "CoreMinimal.h"
 #include "HealthComponent.h"
 #include "GameFramework/Character.h"
+#include <Components/BoxComponent.h>
+#include <Item/PE_BasePickup.h>
 #include "ProjectPlayer.generated.h"
+
+class UPE_Inventory;
+class UPE_InventoryComponent;
 
 UCLASS()
 class DEDICATEDPROJECT_API AProjectPlayer : public ACharacter
 {
 	GENERATED_BODY()
-
-public:
-	// Sets default values for this character's properties
-	AProjectPlayer();
 
 protected:
 	// Called when the game starts or when spawned
@@ -23,14 +24,13 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UHealthComponent* HealthComp;
 
-public:	
+private:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-public:
 	//카메라 관련
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArmComp; //카메라 암 위치
@@ -64,6 +64,7 @@ public:
 	class UInputAction* ia_Jump;
 	void InputJump(const struct FInputActionValue& inputValue);
 
+protected:
 	//캐릭터 스탯 관련
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Data", meta = (AllowPrivateAccess = "true"))
 	class UDataTable* CharacterDataTable; //블루프린트에서 데이터 테이블을 직접 참조
@@ -71,13 +72,10 @@ public:
 	void UpdateCharacterStats(int32 CharacterLevel);
 	FORCEINLINE FPE_CharacterStats* GetCharacterStats() const { return CharacterStats; } //스탯 구조체를 위한 Getter함수
 
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
-		AController* EventInstigator, AActor* DamageCauser) override;
-
-
 	//달리기 관련
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* ia_Sprint;
+private:
 	UFUNCTION(Server, Reliable)
 	void SprintStart_Server();
 	UFUNCTION(Server, Reliable)
@@ -89,4 +87,37 @@ public:
 	void SprintStart_Client();
 	UFUNCTION(NetMulticast, Reliable)
 	void SprintEnd_Client();
+
+	// 아이템 감지 관련
+	UPROPERTY(VisibleAnywhere)
+	UBoxComponent* InteractionZone;																				// 아이템 감지 범위 오브젝트
+	UPROPERTY()
+	APE_BasePickup* FocusedItem;																				// 감지한 아이템
+
+	UFUNCTION()
+	void OnItemOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,							// 아이템이 감지 범위 오브젝트와 충돌했을 때
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnItemOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,								// 아이템이 감지 범위 오브젝트에서 벗어났을 때
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Interact;
+	void Interact();																							// 플레이어가 E키를 클릭했을 때
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UPE_InventoryComponent> InventoryComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class UPE_Inventory> InventoryWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UPE_Inventory> InventoryWidget;
+
+public:
+	// Sets default values for this character's properties
+	AProjectPlayer();
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
+		AController* EventInstigator, AActor* DamageCauser) override;
 };

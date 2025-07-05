@@ -1,15 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "ProjectPlayer.h"
-#include <GameFramework/SpringArmComponent.h> //3인칭 카메라암
-#include <Camera/CameraComponent.h> // 카메라
-#include "EnhancedInputSubsystems.h" //EnhancedInput 사용을 위함
-#include "EnhancedInputComponent.h"
-#include "PE_CharacterStats.h"
+#include "DedicatedProject.h"
 #include "Engine/DataTable.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h" //EnhancedInput 사용을 위함
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Inventory/PE_InventoryComponent.h"
 #include "PE_AIController.h"
+#include "PE_CharacterStats.h"
+#include "UI/PE_Inventory.h"
+#include <Camera/CameraComponent.h> // 카메라
+#include <GameFramework/SpringArmComponent.h> //3인칭 카메라암
+#include "Blueprint/UserWidget.h"
 
 
 // Sets default values
@@ -19,13 +22,15 @@ AProjectPlayer::AProjectPlayer()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//스켈레탈 메쉬를 구조체로 불러와서
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
-	if (TempMesh.Succeeded()) { //에셋 로드가 성공했다면
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
+	//ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT(""));
+	if (TempMesh.Succeeded())
+	{ //에셋 로드가 성공했다면
 		/*
 		GetMesh로 Charactor 클래스의 Mesh를 불러오고 Mesh에 있는 SetSkeletalMesh를 호출
 		원하는 Mesh의 Object를 인수로 보내 SkeletalMesh를 설정해준다.
 		*/
-		GetMesh()->SetSkeletalMesh(TempMesh.Object); 
+		GetMesh()->SetSkeletalMesh(TempMesh.Object);
 
 		//마찬가지로 Mesh의 위치와 회전을 설정해 준다.
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, -90, 0));
@@ -36,6 +41,10 @@ AProjectPlayer::AProjectPlayer()
 		if (PlayerAnim.Succeeded())
 		{
 			GetMesh()->SetAnimInstanceClass(PlayerAnim.Class);
+		}
+		else
+		{
+			PRINT_ERROR_LOG(TEXT("Player Animation is NULL"));
 		}
 
 		//이렇게 하면 블루프린트에 오류가 생겨 삭제하고 재생성했을때 자동으로 설정해준다.
@@ -55,11 +64,36 @@ AProjectPlayer::AProjectPlayer()
 
 		bUseControllerRotationYaw = true;//입력의 회전 설정
 
+		InteractionZone = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionZone"));	// 감지할 오브젝트 생성
+		InteractionZone->SetupAttachment(tpsCamComp);										// 카메라에 감지할 오브젝트를 자식으로 추가
+		InteractionZone->SetBoxExtent(FVector(15.f, 15.f, 250.f));							// 감지할 범위 설정
+		InteractionZone->SetRelativeLocation(FVector(250, 0, 0));							// 위치 설정
+		InteractionZone->SetRelativeRotation(FRotator(0, -90, 90));							// 회전 설정
+		InteractionZone->SetCollisionEnabled(ECollisionEnabled::QueryOnly);					// 물리 충돌은 안 하고, 오버랩 감지만 허용
+		InteractionZone->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
+		InteractionZone->SetGenerateOverlapEvents(true);
+
 		//ai controller 세팅(만약 플레이어가 조종하지 않는 캐릭터라면 ai_controller의 지배를 받게 된다.)
 		//AIControllerClass = APE_AIController::StaticClass();
 		//AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 		HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthStat"));
+		InventoryComponent = CreateDefaultSubobject<UPE_InventoryComponent>(TEXT("InventoryComponent"));
+		
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("Player Skeletal Mesh is NULL"));
+	}
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> HUDInventory(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_Inventory.WB_Inventory_C'"));
+	if (HUDInventory.Succeeded())
+	{
+		InventoryWidgetClass = HUDInventory.Class;
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("HUDInventory is NULL"));
 	}
 }
 
@@ -70,7 +104,7 @@ void AProjectPlayer::BeginPlay()
 
 	//EnhancedInputSystem에 imc_TPS등록
 	//오류가 난다면 TPSProjec.Build.cs에 모듈에서 EnhancedInput을 추가해 주자.
-	auto pc = Cast<APlayerController>(Controller); //현재 플레이어의 APlayerController를 가져온다.
+	APlayerController* pc = Cast<APlayerController>(Controller); //현재 플레이어의 APlayerController를 가져온다.
 	if (pc)
 	{
 		auto subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer()); //입력 서브시스템을 가져와서
@@ -78,10 +112,35 @@ void AProjectPlayer::BeginPlay()
 		{
 			subsystem->AddMappingContext(imc_ProjectPlayer, 0); //입력 컨텍스트에 등록한다.
 		}
+
+		if (InventoryWidgetClass)
+		{
+			InventoryWidget = CreateWidget<UPE_Inventory>(pc, InventoryWidgetClass);
+			if (InventoryWidget)
+			{
+				InventoryWidget->AddToViewport();
+				//InventoryWidget->InitInventory(InventoryComponent);
+			}
+			else
+			{
+				PRINT_ERROR_LOG(TEXT("InventoryWidget is Not Created"));
+			}
+		}
+		else
+		{
+			PRINT_ERROR_LOG(TEXT("InventoryWidgetClass is NULL"));
+		}
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
 	}
 
 	UpdateCharacterStats(1); //캐릭터 스탯 설정
-	
+
+	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapBegin);				// 이벤트 바인딩 : 아이템 감지 범위에 아이템 콜리전이 충돌했을때 
+	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapEnd);					// 이벤트 바인딩 : 충돌범위에서 아이템이 빠져나갔을때
+
 }
 
 // Called every frame
@@ -116,6 +175,7 @@ void AProjectPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		PlayerInput->BindAction(ia_Jump, ETriggerEvent::Started, this, &AProjectPlayer::InputJump);
 		PlayerInput->BindAction(ia_Sprint, ETriggerEvent::Started, this, &AProjectPlayer::SprintStart);
 		PlayerInput->BindAction(ia_Sprint, ETriggerEvent::Completed, this, &AProjectPlayer::SprintEnd);
+		PlayerInput->BindAction(IA_Interact, ETriggerEvent::Triggered, this, &AProjectPlayer::Interact);
 	}
 }
 
@@ -210,4 +270,42 @@ void AProjectPlayer::SprintEnd_Client_Implementation()
 {
 	if (GetCharacterStats())
 		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->WalkSpeed;
+}
+
+// 이벤트 바인딩 : 아이템이 감지되었을때
+void AProjectPlayer::OnItemOverlapBegin(
+	UPrimitiveComponent* OverlappedComp,								// 오버랩 이벤트를 발생시킨 자기자신의 Collision Component
+	AActor* OtherActor,													// 충돌한 상대 Actor
+	UPrimitiveComponent* OtherComp,										// 상대 Actor의 Collision Component
+	int32 OtherBodyIndex,												// Skeletal Mesh에서 사용
+	bool bFromSweep,													// 이동중 Sweep으로 감지된 경우 true
+	const FHitResult& SweepResult)										// Sweep일 때 유효한 Hit 정보 (충돌 지점 좌표)
+{
+	APE_BasePickup* OverlappedItem = Cast<APE_BasePickup>(OtherActor);	// 감지된 액터를 아이템으로 변환. PE_BasePickup클래스가 아닐경우 nullptr반환
+	if (OverlappedItem)
+	{// PE_BasePickup 클래스(또는 상속)인 경우
+		FocusedItem = OverlappedItem;									// 플레이어가 바라보고있는 아이템을 저장
+		//Item->GetMesh()->SetRenderCustomDepth(true);			
+	}
+}
+
+// 이벤트 바인딩 : 아이템이 감지범위 밖으로 나갔을때
+void AProjectPlayer::OnItemOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	APE_BasePickup* OverlappedItem = Cast<APE_BasePickup>(OtherActor);
+	if (OverlappedItem && OverlappedItem == FocusedItem)
+	{
+		//OverlappedItem->GetMesh()->SetRenderCustomDepth(false);	// 추후 외곽선 표시를 위함
+		FocusedItem = nullptr;										// 바라보고있는 아이템 해제
+	}
+}
+
+void AProjectPlayer::Interact()
+{
+	if (FocusedItem)
+	{
+		FocusedItem->Interact(this);
+	}
+	// 밑에 여러 작용 추가
 }

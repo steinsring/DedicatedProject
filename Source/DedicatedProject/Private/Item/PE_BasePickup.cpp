@@ -3,23 +3,25 @@
 
 #include "Item/PE_BasePickup.h"
 #include "ProjectPlayer.h"
+#include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
+#include "DedicatedProject.h"
 
 
 // Sets default values
 APE_BasePickup::APE_BasePickup()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	SphereCollision = CreateDefaultSubobject<USphereComponent>("Collision");
 	RootComponent = SphereCollision;
+	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SphereCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	SphereCollision->SetGenerateOverlapEvents(true);
 	SphereCollision->SetSphereRadius(200.0f);
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	Mesh->SetupAttachment(SphereCollision);
-	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Mesh->SetGenerateOverlapEvents(true);
 
 	bReplicates = true; // 액터 복제
 }
@@ -29,25 +31,27 @@ void APE_BasePickup::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &APE_BasePickup::OnBeginOverlap); //동적 멀티캐스트 델리게이트
+	//SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &APE_BasePickup::Interact); //동적 멀티캐스트 델리게이트
 }
 
-void APE_BasePickup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
-	if (const auto Character = Cast<AProjectPlayer>(OtherActor))
-	{// 겹치는 액터가 플레이어 캐릭터라면
-		Pickup(Character); // 호출
+void APE_BasePickup::Interact(AActor* Interactor)
+{
+	PRINT_LOG(TEXT("Item : Test"));
+	if (HasAuthority()) // 서버가 아니면 서버에게 처리 위임
+	{
+		PRINT_LOG(TEXT("Item : Server"));
+		ServerInteract(Interactor);
+		return;
 	}
 }
 
-// Called every frame
-void APE_BasePickup::Tick(float DeltaTime)
+void APE_BasePickup::ServerInteract_Implementation(AActor* Interactor)
 {
-	Super::Tick(DeltaTime);
-
-}
-
-void APE_BasePickup::Pickup_Implementation(AProjectPlayer* OwningCharacter)
-{
-	SetOwner(OwningCharacter); // 
+	// 플레이어가 E 키를 눌렀을 때 픽업
+	if (AProjectPlayer* Player = Cast<AProjectPlayer>(Interactor))
+	{
+		PRINT_LOG(TEXT("Item : Destroy"));
+		Destroy();
+	}
 }
 
