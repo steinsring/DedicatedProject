@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Animation/AnimNotifies/AnimNotify.h"
-#include "CollisionOnOff.generated.h"
+#include "Monster/Enemy.h"
+#include "ToiletMechTest.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DEDICATEDPROJECT_API UCollisionOnOff : public UAnimNotify
+class DEDICATEDPROJECT_API AToiletMechTest : public AEnemy
 {
 	GENERATED_BODY()
 	

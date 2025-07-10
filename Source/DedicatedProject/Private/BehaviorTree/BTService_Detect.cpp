@@ -1,9 +1,9 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BTService_Detect.h"
-#include "PE_AIController.h"
-#include "ProjectPlayer.h"
+#include "BehaviorTree/BTService_Detect.h"
+#include "Monster/PE_AIController.h"
+#include "Player/ProjectPlayer.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/OverlapResult.h"

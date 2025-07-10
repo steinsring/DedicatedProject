@@ -1,14 +1,14 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ToiletMech.h"
-#include "PE_AIController.h"
-#include "PE_AnimInstance.h"
+#include "Monster/ToiletMech.h"
+#include "Monster/PE_AIController.h"
+#include "Monster/PE_AnimInstance.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
 
-#include "PE_ToiletMechStats.h"
+#include "Monster/PE_ToiletMechStats.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -65,18 +65,18 @@ AToiletMech::AToiletMech()
 		LeftHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		RightHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-		HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthStat"));
+		//HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthStat"));
 
-		IsAttacking = false;
+		//IsAttacking = false;
 	}
 }
 
 void AToiletMech::PostInitializeComponents()
 {
-	Super::PostInitializeComponents();
+	/*Super::PostInitializeComponents();
 	PEAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
 
-	PEAnim->OnMontageEnded.AddDynamic(this, &AToiletMech::OnAttackMontageEnded);
+	PEAnim->OnMontageEnded.AddDynamic(this, &AToiletMech::OnAttackMontageEnded);*/
 
 	//OnComponentBeginOverlap 델리게이트에 바인딩해주기
 	LeftHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMech::OnHitboxOverlap);

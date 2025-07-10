@@ -1,8 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PE_AIController.h"
-#include "ToiletMech.h"
+#include "Monster/PE_AIController.h"
+#include "Monster/ToiletMech.h"
 
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"

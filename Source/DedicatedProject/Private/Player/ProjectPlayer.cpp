@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "ProjectPlayer.h"
+#include "Player/ProjectPlayer.h"
 #include "DedicatedProject.h"
 #include "Engine/DataTable.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h" //EnhancedInput 사용을 위함
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Inventory/PE_InventoryComponent.h"
-#include "PE_AIController.h"
-#include "PE_CharacterStats.h"
+#include "Monster/PE_AIController.h"
+#include "Player/PE_CharacterStats.h"
 #include "UI/PE_Inventory.h"
 #include <Camera/CameraComponent.h> // 카메라
 #include <GameFramework/SpringArmComponent.h> //3인칭 카메라암

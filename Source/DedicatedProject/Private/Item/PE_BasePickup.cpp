@@ -2,7 +2,7 @@
 
 
 #include "Item/PE_BasePickup.h"
-#include "ProjectPlayer.h"
+#include "Player/ProjectPlayer.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "DedicatedProject.h"

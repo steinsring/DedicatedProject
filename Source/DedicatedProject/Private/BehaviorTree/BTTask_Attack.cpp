@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BTTask_Attack.h"
-#include "PE_AIController.h"
-#include "ToiletMech.h"
+#include "BehaviorTree/BTTask_Attack.h"
+#include "Monster/PE_AIController.h"
+#include "Monster/ToiletMech.h"
 
 UBTTask_Attack::UBTTask_Attack()
 {

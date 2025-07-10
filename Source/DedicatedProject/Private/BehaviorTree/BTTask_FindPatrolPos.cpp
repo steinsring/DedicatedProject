@@ -1,8 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BTTask_FindPatrolPos.h"
-#include "PE_AIController.h"
+#include "BehaviorTree/BTTask_FindPatrolPos.h"
+#include "Monster/PE_AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "NavigationSystem.h"
 

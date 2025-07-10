@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BTService_CheckAttackRange.h"
+#include "BehaviorTree/BTService_CheckAttackRange.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "PE_AIController.h"
-#include "ProjectPlayer.h"
+#include "Monster/PE_AIController.h"
+#include "Player/ProjectPlayer.h"
 
 UBTService_CheckAttackRange::UBTService_CheckAttackRange()
 {

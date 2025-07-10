@@ -3,9 +3,9 @@
 
 #include "PE_GameMode.h"
 #include "PE_GameState.h"
-#include "PE_PlayerController.h"
-#include "PE_PlayerState.h"
-#include "ProjectPlayer.h"
+#include "Player/PE_PlayerController.h"
+#include "Player/PE_PlayerState.h"
+#include "Player/ProjectPlayer.h"
 #include "Map/PE_MapGenerator.h"
 #include "UObject/ConstructorHelpers.h"
 
