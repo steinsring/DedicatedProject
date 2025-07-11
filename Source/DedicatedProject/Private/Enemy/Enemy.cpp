@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Monster/Enemy.h"
-#include "Monster/PE_AIController.h"
-#include "Monster/PE_AnimInstance.h"
+#include "Enemy/Enemy.h"
+#include "Enemy/PE_AIController.h"
+#include "Enemy/PE_AnimInstance.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
 
-#include "Monster/PE_ToiletMechStats.h"
+#include "Enemy/PE_ToiletMechStats.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -42,13 +42,6 @@ void AEnemy::PostInitializeComponents()
 	PEAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
 
 	PEAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnAttackMontageEnded);
-}
-
-// Called to bind functionality to input
-void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void AEnemy::Attack()

@@ -7,7 +7,7 @@
 #include "EnhancedInputSubsystems.h" //EnhancedInput 사용을 위함
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Inventory/PE_InventoryComponent.h"
-#include "Monster/PE_AIController.h"
+#include "Enemy/PE_AIController.h"
 #include "Player/PE_CharacterStats.h"
 #include "UI/PE_Inventory.h"
 #include <Camera/CameraComponent.h> // 카메라
@@ -112,6 +112,11 @@ void AProjectPlayer::BeginPlay()
 		{
 			subsystem->AddMappingContext(imc_ProjectPlayer, 0); //입력 컨텍스트에 등록한다.
 		}
+		else
+		{
+			PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
+		}
+		
 
 		if (InventoryWidgetClass)
 		{
@@ -141,6 +146,21 @@ void AProjectPlayer::BeginPlay()
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapBegin);				// 이벤트 바인딩 : 아이템 감지 범위에 아이템 콜리전이 충돌했을때 
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapEnd);					// 이벤트 바인딩 : 충돌범위에서 아이템이 빠져나갔을때
 
+	if (pc)
+	{
+		FInputModeGameOnly InputMode;
+		pc->SetInputMode(InputMode); //게임에만 입력을 받도록 설정
+		pc->bShowMouseCursor = false; //마우스 커서 숨김
+
+		if (pc->IsLocalController())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("PlayerController is valid and local."));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("PlayerController is NOT valid or not local."));
+		}
+	}
 }
 
 // Called every frame

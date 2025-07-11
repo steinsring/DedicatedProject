@@ -1,14 +1,14 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Monster/ToiletMech.h"
-#include "Monster/PE_AIController.h"
-#include "Monster/PE_AnimInstance.h"
+#include "Enemy/ToiletMech.h"
+#include "Enemy/PE_AIController.h"
+#include "Enemy/PE_AnimInstance.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
 
-#include "Monster/PE_ToiletMechStats.h"
+#include "Enemy/PE_ToiletMechStats.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -53,13 +53,13 @@ AToiletMech::AToiletMech()
 		//왼손
 		LeftHandHitBox->SetCapsuleHalfHeight(30.0f);
 		LeftHandHitBox->SetCapsuleRadius(20.0f);
-		LeftHandHitBox->SetRelativeRotation(FRotator(0.0f, 90.0f, 16.0f));
+		LeftHandHitBox->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
 		
 		//오른손
 		RightHandHitBox->SetCapsuleHalfHeight(56.0f);
 		RightHandHitBox->SetCapsuleRadius(20.0f);
 		RightHandHitBox->SetRelativeLocation(FVector(-15.0f, -6.0f, 0.0f));
-		RightHandHitBox->SetRelativeRotation(FRotator(0.0f, 83.0f, 16.0f));
+		RightHandHitBox->SetRelativeRotation(FRotator(16.0f, 0.0f, 83.0f));
 
 		//공격을 안할 처음에는 콜리전을 꺼준다.(공격 실행시 켜주고 공격 끝나면 꺼주어야 함)
 		LeftHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -73,10 +73,10 @@ AToiletMech::AToiletMech()
 
 void AToiletMech::PostInitializeComponents()
 {
-	/*Super::PostInitializeComponents();
+	Super::PostInitializeComponents();
 	PEAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
 
-	PEAnim->OnMontageEnded.AddDynamic(this, &AToiletMech::OnAttackMontageEnded);*/
+	PEAnim->OnMontageEnded.AddDynamic(this, &AToiletMech::OnAttackMontageEnded);
 
 	//OnComponentBeginOverlap 델리게이트에 바인딩해주기
 	LeftHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMech::OnHitboxOverlap);

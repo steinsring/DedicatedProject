@@ -3,7 +3,7 @@
 
 #include "BehaviorTree/BTService_CheckAttackRange.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Monster/PE_AIController.h"
+#include "Enemy/PE_AIController.h"
 #include "Player/ProjectPlayer.h"
 
 UBTService_CheckAttackRange::UBTService_CheckAttackRange()

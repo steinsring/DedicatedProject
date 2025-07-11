@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Monster/PE_AnimInstance.h"
+#include "Enemy/PE_AnimInstance.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
@@ -48,9 +48,15 @@ void UPE_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UPE_AnimInstance::PlayAttackMontage()
 {
+	if (!AttackPattern1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AttackPattern1 is NULL"));
+		return;
+	}
 	Montage_Play(AttackPattern1, 1.0f);
 }
 
+// 몽타주 재생 시 애니메이션 노티파이로 호출되는 함수
 void UPE_AnimInstance::AnimNotify_AttackRangeCheck()
 {
 	auto OwnerCharacter = Cast<ACharacter>(TryGetPawnOwner());

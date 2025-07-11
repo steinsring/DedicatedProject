@@ -2,8 +2,8 @@
 
 
 #include "BehaviorTree/BTTask_Attack.h"
-#include "Monster/PE_AIController.h"
-#include "Monster/ToiletMech.h"
+#include "Enemy/PE_AIController.h"
+#include "Enemy/ToiletMech.h"
 
 UBTTask_Attack::UBTTask_Attack()
 {
