@@ -105,8 +105,13 @@ void AProjectPlayer::BeginPlay()
 	//EnhancedInputSystem에 imc_TPS등록
 	//오류가 난다면 TPSProjec.Build.cs에 모듈에서 EnhancedInput을 추가해 주자.
 	APlayerController* pc = Cast<APlayerController>(Controller); //현재 플레이어의 APlayerController를 가져온다.
+
 	if (pc)
 	{
+		FInputModeGameOnly InputMode;
+		pc->SetInputMode(InputMode); //게임에만 입력을 받도록 설정
+		pc->bShowMouseCursor = false; //마우스 커서 숨김
+
 		auto subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer()); //입력 서브시스템을 가져와서
 		if (subsystem)
 		{
@@ -146,21 +151,7 @@ void AProjectPlayer::BeginPlay()
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapBegin);				// 이벤트 바인딩 : 아이템 감지 범위에 아이템 콜리전이 충돌했을때 
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapEnd);					// 이벤트 바인딩 : 충돌범위에서 아이템이 빠져나갔을때
 
-	if (pc)
-	{
-		FInputModeGameOnly InputMode;
-		pc->SetInputMode(InputMode); //게임에만 입력을 받도록 설정
-		pc->bShowMouseCursor = false; //마우스 커서 숨김
-
-		if (pc->IsLocalController())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("PlayerController is valid and local."));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("PlayerController is NOT valid or not local."));
-		}
-	}
+	
 }
 
 // Called every frame

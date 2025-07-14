@@ -1,15 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Enemy/Enemy.h"
 #include "Enemy/PE_AIController.h"
-#include "Enemy/PE_AnimInstance.h"
+#include "Enemy/Enemy_AnimInstance.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
 
 #include "Enemy/PE_ToiletMechStats.h"
 #include "Kismet/GameplayStatics.h"
+
+#include "DedicatedProject.h"
+
 
 // Sets default values
 AEnemy::AEnemy()
@@ -39,16 +41,21 @@ void AEnemy::Tick(float DeltaTime)
 void AEnemy::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	PEAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
+	EnemyAnim = Cast<UEnemy_AnimInstance>(GetMesh()->GetAnimInstance());
 
-	PEAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnAttackMontageEnded);
+	if (!EnemyAnim)
+	{
+		PRINT_LOG(TEXT("EnemyAnim is NULL"));
+		return;
+	}
+	EnemyAnim->OnMontageEnded.AddDynamic(this, &AEnemy::OnAttackMontageEnded);
 }
 
-void AEnemy::Attack()
+void AEnemy::Attack(UAnimMontage* AnimMontage)
 {
 	if (IsAttacking) return;
 
-	PEAnim->PlayAttackMontage();
+	EnemyAnim->PlayAttackMontage(AnimMontage);
 	IsAttacking = true;
 }
 
@@ -77,5 +84,20 @@ void AEnemy::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 		this,
 		nullptr
 	);
+}
+
+void AEnemy::SetHitbox(ECollisionEnabled::Type CollisionEnabled, UCapsuleComponent* HitBox)
+{
+	if (CollisionEnabled == ECollisionEnabled::NoCollision)
+		HitActors.Empty();
+
+	if (HitBox)
+	{
+		HitBox->SetCollisionEnabled(CollisionEnabled);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HitBox is NULL"));
+	}
 }
 

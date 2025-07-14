@@ -25,16 +25,9 @@ public:
 	virtual void PostInitializeComponents() override;
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void SetLeftHandHitbox(ECollisionEnabled::Type CollisionEnabled);
-
-	UFUNCTION(BlueprintCallable)
-	void SetRightHandHitbox(ECollisionEnabled::Type CollisionEnabled);
-
-private:
-	UPROPERTY(EditDefaultsOnly, Category = "Hitbox")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Hitbox")
 	UCapsuleComponent* LeftHandHitBox;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Hitbox")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Hitbox")
 	UCapsuleComponent* RightHandHitBox;
 };

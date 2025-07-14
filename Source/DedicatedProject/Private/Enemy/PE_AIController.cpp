@@ -2,7 +2,7 @@
 
 
 #include "Enemy/PE_AIController.h"
-#include "Enemy/ToiletMech.h"
+#include "GameFramework/Character.h" 
 
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
@@ -59,7 +59,6 @@ void APE_AIController::CollectWayPointsInCurrentNavVolume()
 	if (nullptr == ControllingPawn) return;
 
 	const FVector PawnLocation = ControllingPawn->GetActorLocation();
-
 	// 1. NavMeshBoundsVolume 중 현재 캐릭터가 들어 있는 볼륨 찾기
 	TArray<AActor*> NavVolumes;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANavMeshBoundsVolume::StaticClass(), NavVolumes);

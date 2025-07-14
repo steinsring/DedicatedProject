@@ -73,7 +73,8 @@ AToiletMechTest::AToiletMechTest()
 	//데이터 테이블을 불러오기
 	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableAsset(TEXT
 					("/Script/Engine.DataTable'/Game/BluePrints/DT_ToiletMechStats.DT_ToiletMechStats'"));
-	EnemyDataTable = DataTableAsset.Object;
+	if (DataTableAsset.Succeeded())
+		EnemyDataTable = DataTableAsset.Object;
 }
 
 void AToiletMechTest::BeginPlay()
@@ -111,20 +112,4 @@ void AToiletMechTest::PostInitializeComponents()
 
    LeftHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMechTest::OnHitboxOverlap);  
    RightHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMechTest::OnHitboxOverlap);  
-}
-
-//각각의 히트박스 별로 함수 만들어주기
-void AToiletMechTest::SetLeftHandHitbox(ECollisionEnabled::Type CollisionEnabled)
-{
-	if (CollisionEnabled == ECollisionEnabled::NoCollision)
-		HitActors.Empty();
-
-	if (LeftHandHitBox)
-		LeftHandHitBox->SetCollisionEnabled(CollisionEnabled);
-}
-
-void AToiletMechTest::SetRightHandHitbox(ECollisionEnabled::Type CollisionEnabled)
-{
-	if (RightHandHitBox)
-		RightHandHitBox->SetCollisionEnabled(CollisionEnabled);
 }

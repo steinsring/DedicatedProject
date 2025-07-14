@@ -1,9 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "BehaviorTree/BTTask_Attack.h"
+#include "DedicatedProject.h"
 #include "Enemy/PE_AIController.h"
-#include "Enemy/ToiletMech.h"
+#include "Enemy/Enemy_AnimInstance.h"
+#include "Enemy/Enemy.h"
 
 UBTTask_Attack::UBTTask_Attack()
 {
@@ -15,13 +16,22 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	auto ToiletMech = Cast<AToiletMech>(OwnerComp.GetAIOwner()->GetPawn());
-	if (nullptr == ToiletMech)
+	auto Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
+	if (nullptr == Enemy)
 		return EBTNodeResult::Failed;
+	auto EnemyAnimInstance = Cast<UEnemy_AnimInstance>(Enemy->GetMesh()->GetAnimInstance());
+	if (nullptr == EnemyAnimInstance)
+		return EBTNodeResult::Failed;
+	auto RandomMontage = EnemyAnimInstance->GetRandomAttackMontage();
+	if (nullptr == RandomMontage)
+	{
+		//PRINT_LOG(TEXT("RandomMontage is NULL"));
+		return EBTNodeResult::Failed;
+	}
 
-	ToiletMech->Attack();
+	Enemy->Attack(RandomMontage);
 	IsAttacking = true;
-	ToiletMech->OnAttackEnd.AddLambda([this]()  -> void {
+	Enemy->OnAttackEnd.AddLambda([this]()  -> void {
 		IsAttacking = false;
 	});
 
