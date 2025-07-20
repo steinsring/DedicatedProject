@@ -74,7 +74,7 @@ AToiletMechTest::AToiletMechTest()
 	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableAsset(TEXT
 					("/Script/Engine.DataTable'/Game/BluePrints/DT_ToiletMechStats.DT_ToiletMechStats'"));
 	if (DataTableAsset.Succeeded())
-		EnemyDataTable = DataTableAsset.Object;
+		DataTable = DataTableAsset.Object;
 }
 
 void AToiletMechTest::BeginPlay()
@@ -82,12 +82,12 @@ void AToiletMechTest::BeginPlay()
 	Super::BeginPlay();
 	
 	//데이터 테이블에서 AttackPower 가져오기
-	if (EnemyDataTable)
+	if (DataTable)
 	{
 		//디버깅용
 		static const FString ContextString(TEXT("ToiletMech Stats Lookup"));
 
-		FPE_ToiletMechStats* StatsRow = EnemyDataTable->FindRow<FPE_ToiletMechStats>(FName("Default"), ContextString);
+		FPE_ToiletMechStats* StatsRow = DataTable->FindRow<FPE_ToiletMechStats>(FName("Default"), ContextString);
 
 		if (StatsRow)
 		{

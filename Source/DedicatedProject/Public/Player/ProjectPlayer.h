@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "HealthComponent.h"
-#include "GameFramework/Character.h"
+#include "CharacterCommon.h"
 #include <Components/BoxComponent.h>
 #include <Item/PE_BasePickup.h>
 #include "ProjectPlayer.generated.h"
@@ -13,7 +13,7 @@ class UPE_Inventory;
 class UPE_InventoryComponent;
 
 UCLASS()
-class DEDICATEDPROJECT_API AProjectPlayer : public ACharacter
+class DEDICATEDPROJECT_API AProjectPlayer : public ACharacterCommon
 {
 	GENERATED_BODY()
 
@@ -21,14 +21,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
-	bool IsAttacking;
-
 	UPROPERTY()
 	class UPE_AnimInstance* PlayerAnim;
-
-	UPROPERTY(VisibleAnywhere)
-	UHealthComponent* HealthComp;
 
 private:	
 	// Called every frame
@@ -36,6 +30,7 @@ private:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void PostInitializeComponents() override;
 
 	//카메라 관련
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -73,7 +68,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_Attack; // 공격 입력 액션
 	void InputAttack(const struct FInputActionValue& inputValue);
-	void Attack();
+	//void Attack();
 
 protected:
 	//캐릭터 스탯 관련
@@ -131,4 +126,7 @@ public:
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 		AController* EventInstigator, AActor* DamageCauser) override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Hitbox")
+	UCapsuleComponent* RightFootHitBox; 
 };

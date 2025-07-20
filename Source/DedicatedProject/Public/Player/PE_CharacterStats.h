@@ -25,4 +25,7 @@ struct DEDICATEDPROJECT_API FPE_CharacterStats : public FTableRowBase
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float StealthMultiplier = 1.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float AttackPower = 1.0f;
 };

@@ -2,15 +2,19 @@
 
 #include "Player/ProjectPlayer.h"
 #include "DedicatedProject.h"
+
 #include "Engine/DataTable.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h" //EnhancedInput 사용을 위함
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
+
 #include "Inventory/PE_InventoryComponent.h"
 #include "Enemy/PE_AIController.h"
 #include "Player/PE_CharacterStats.h"
 #include "Enemy/PE_AnimInstance.h"
 #include "UI/PE_Inventory.h"
+
 #include <Camera/CameraComponent.h> // 카메라
 #include <GameFramework/SpringArmComponent.h> //3인칭 카메라암
 #include "Blueprint/UserWidget.h"
@@ -78,7 +82,12 @@ AProjectPlayer::AProjectPlayer()
 		//AIControllerClass = APE_AIController::StaticClass();
 		//AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-		HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthStat"));
+		//히트박스 세팅
+		RightFootHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RightFootHitBox"));
+		RightFootHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("foot_r")); //메쉬의 발에 히트박스 추가
+		RightFootHitBox->SetCapsuleHalfHeight(30.0f); //높이 설정
+		RightFootHitBox->SetCapsuleRadius(20.0f); //반지름 설정
+
 		InventoryComponent = CreateDefaultSubobject<UPE_InventoryComponent>(TEXT("InventoryComponent"));
 		
 	}
@@ -96,8 +105,6 @@ AProjectPlayer::AProjectPlayer()
 	{
 		PRINT_ERROR_LOG(TEXT("HUDInventory is NULL"));
 	}
-
-	IsAttacking = false; //공격중인지 여부
 }
 
 // Called when the game starts or when spawned
@@ -149,19 +156,23 @@ void AProjectPlayer::BeginPlay()
 		PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
 	}
 
-	PlayerAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance()); //애니메이션 인스턴스 캐스팅
-	if (!PlayerAnim)
+	PlayerAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
+	if (PlayerAnim && PlayerAnim->BasicAttack)
 	{
-		PRINT_ERROR_LOG(TEXT("PlayerAnim is NULL"));
+		PRINT_LOG(TEXT("✅ PlayerAnim 초기화 완료: BasicAttack is valid"));
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("❌ InitPlayerAnim: BasicAttack is NULL"));
 	}
 
 	UpdateCharacterStats(1); //캐릭터 스탯 설정
 
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapBegin);				// 이벤트 바인딩 : 아이템 감지 범위에 아이템 콜리전이 충돌했을때 
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapEnd);					// 이벤트 바인딩 : 충돌범위에서 아이템이 빠져나갔을때
-
-	
 }
+
+
 
 // Called every frame
 void AProjectPlayer::Tick(float DeltaTime)
@@ -200,6 +211,12 @@ void AProjectPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	}
 }
 
+void AProjectPlayer::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	
+	RightFootHitBox->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnHitboxOverlap); //히트박스 오버랩 이벤트 바인딩
+}
 
 void AProjectPlayer::Turn(const FInputActionValue& inputValue)
 {
@@ -227,23 +244,31 @@ void AProjectPlayer::InputJump(const struct FInputActionValue& inputValue)
 	Jump();
 }
 
-void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
-{
-	PRINT_LOG(TEXT("InputAttack Called"));
-	if (!PlayerAnim)
-	{
-		PRINT_ERROR_LOG(TEXT("PlayerAnim is NULL"));
-		return;
-	}
-	Attack();
-}
+void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)  
+{  
+   PRINT_LOG(TEXT("InputAttack Called"));  
+   if (!PlayerAnim)  
+   {  
+       PRINT_ERROR_LOG(TEXT("PlayerAnim is NULL"));  
+       return;  
+   }  
 
-void AProjectPlayer::Attack()
-{
-	if (IsAttacking) return;
-
-	PlayerAnim->PlayAttackMontage();
-	IsAttacking = true;
+   if (PlayerAnim->BasicAttack)  
+   {  
+       UAnimMontage* AttackMontage = Cast<UAnimMontage>(PlayerAnim->BasicAttack);  
+       if (AttackMontage)  
+       {  
+           ACharacterCommon::Attack(AttackMontage);  
+       }  
+       else  
+       {  
+           PRINT_ERROR_LOG(TEXT("BasicAttack is not a UAnimMontage"));  
+       }  
+   }  
+   else  
+   {  
+       PRINT_ERROR_LOG(TEXT("BasicAttack is NULL"));  
+   }  
 }
  
 void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {
@@ -268,6 +293,7 @@ void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {
 				SprintStart_Server(); //달리는중 올바르게 업데이트하기 위함
 		}
 	}
+	AttackPower = GetCharacterStats()->AttackPower; //공격력 업데이트
 }
 
 //TakeDamage 오버라이드

@@ -1,24 +1,16 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Animation/AnimInstance.h"
+#include "Common_AnimInstance.h" // Include the correct base class header
 #include "Enemy_AnimInstance.generated.h"
 
 /**
- *
- */
+*
+*/
 UCLASS()
-class DEDICATEDPROJECT_API UEnemy_AnimInstance : public UAnimInstance
+class DEDICATEDPROJECT_API UEnemy_AnimInstance : public UCommon_AnimInstance // Use UCommon_AnimInstance as base
 {
 	GENERATED_BODY()
-
-public:
-	UEnemy_AnimInstance();
-	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-
-	void PlayAttackMontage(UAnimMontage* AnimMontage);
 
 public:
 	UFUNCTION()
@@ -29,11 +21,4 @@ public:
 
 protected:
 	TArray<UAnimMontage*> AttackMontages;
-       
-private:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pawn", meta = (AllowPrivateAccess = true))
-	float CurrentPawnSpeed;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pawn", meta = (AllowPrivateAccess = true))
-	bool IsInAir;
 };
