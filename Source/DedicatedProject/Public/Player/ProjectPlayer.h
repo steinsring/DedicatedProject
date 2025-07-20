@@ -21,6 +21,12 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
+	bool IsAttacking;
+
+	UPROPERTY()
+	class UPE_AnimInstance* PlayerAnim;
+
 	UPROPERTY(VisibleAnywhere)
 	UHealthComponent* HealthComp;
 
@@ -63,6 +69,11 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_Jump;
 	void InputJump(const struct FInputActionValue& inputValue);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ia_Attack; // 공격 입력 액션
+	void InputAttack(const struct FInputActionValue& inputValue);
+	void Attack();
 
 protected:
 	//캐릭터 스탯 관련

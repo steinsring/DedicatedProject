@@ -12,11 +12,11 @@ UPE_AnimInstance::UPE_AnimInstance()
 	CurrentPawnSpeed = 0.0f;
 	IsInAir = false;
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> Pattern1
-	(TEXT("/Script/Engine.AnimMontage'/Game/Fab/SciFi_ToiletMech/Animation/SKEL_SciFi_ToiletMech_Skeleton_Montage.SKEL_SciFi_ToiletMech_Skeleton_Montage'"));
-	if (Pattern1.Succeeded())
+	static ConstructorHelpers::FObjectFinder<UAnimSequence> BasicAttackPattern
+	(TEXT("/Script/Engine.AnimSequence'/Game/Retargetting/Anim_SciFi_ToiletMech_Attack3.Anim_SciFi_ToiletMech_Attack3'"));
+	if (BasicAttackPattern.Succeeded())
 	{
-		AttackPattern1 = Pattern1.Object;
+		BasicAttack = BasicAttackPattern.Object;
 	}
 
 	//static ConstructorHelpers::FObjectFinder<UAnimMontage> Pattern2
@@ -48,12 +48,13 @@ void UPE_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 void UPE_AnimInstance::PlayAttackMontage()
 {
-	if (!AttackPattern1)
+	if (!BasicAttack)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("AttackPattern1 is NULL"));
+		UE_LOG(LogTemp, Warning, TEXT("BasicAttack is NULL"));
 		return;
 	}
-	Montage_Play(AttackPattern1, 1.0f);
+	PlaySlotAnimationAsDynamicMontage(BasicAttack, TEXT("DefaultSlot"), 1.0f);
+	//Montage_Play(AttackPattern1, 1.0f); // 몽타주 재생
 }
 
 // 몽타주 재생 시 애니메이션 노티파이로 호출되는 함수

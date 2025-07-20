@@ -9,6 +9,7 @@
 #include "Inventory/PE_InventoryComponent.h"
 #include "Enemy/PE_AIController.h"
 #include "Player/PE_CharacterStats.h"
+#include "Enemy/PE_AnimInstance.h"
 #include "UI/PE_Inventory.h"
 #include <Camera/CameraComponent.h> // 카메라
 #include <GameFramework/SpringArmComponent.h> //3인칭 카메라암
@@ -37,10 +38,10 @@ AProjectPlayer::AProjectPlayer()
 
 		//ProjectPlayer 불루프린트 클래스에 애니메이션 블루프린트를 세팅해준다.
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		static ConstructorHelpers::FClassFinder<UAnimInstance> PlayerAnim(TEXT("/Game/BluePrints/AB_AnimBlueprint.AB_AnimBlueprint_C"));
-		if (PlayerAnim.Succeeded())
+		static ConstructorHelpers::FClassFinder<UAnimInstance> PlayerAnimAsset(TEXT("/Game/BluePrints/AB_AnimBlueprint.AB_AnimBlueprint_C"));
+		if (PlayerAnimAsset.Succeeded())
 		{
-			GetMesh()->SetAnimInstanceClass(PlayerAnim.Class);
+			GetMesh()->SetAnimInstanceClass(PlayerAnimAsset.Class);
 		}
 		else
 		{
@@ -95,6 +96,8 @@ AProjectPlayer::AProjectPlayer()
 	{
 		PRINT_ERROR_LOG(TEXT("HUDInventory is NULL"));
 	}
+
+	IsAttacking = false; //공격중인지 여부
 }
 
 // Called when the game starts or when spawned
@@ -146,6 +149,12 @@ void AProjectPlayer::BeginPlay()
 		PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
 	}
 
+	PlayerAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance()); //애니메이션 인스턴스 캐스팅
+	if (!PlayerAnim)
+	{
+		PRINT_ERROR_LOG(TEXT("PlayerAnim is NULL"));
+	}
+
 	UpdateCharacterStats(1); //캐릭터 스탯 설정
 
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapBegin);				// 이벤트 바인딩 : 아이템 감지 범위에 아이템 콜리전이 충돌했을때 
@@ -187,6 +196,7 @@ void AProjectPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		PlayerInput->BindAction(ia_Sprint, ETriggerEvent::Started, this, &AProjectPlayer::SprintStart);
 		PlayerInput->BindAction(ia_Sprint, ETriggerEvent::Completed, this, &AProjectPlayer::SprintEnd);
 		PlayerInput->BindAction(IA_Interact, ETriggerEvent::Triggered, this, &AProjectPlayer::Interact);
+		PlayerInput->BindAction(ia_Attack, ETriggerEvent::Started, this, &AProjectPlayer::InputAttack);
 	}
 }
 
@@ -215,6 +225,25 @@ void AProjectPlayer::Move(const FInputActionValue& inputValue)
 void AProjectPlayer::InputJump(const struct FInputActionValue& inputValue)
 {
 	Jump();
+}
+
+void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
+{
+	PRINT_LOG(TEXT("InputAttack Called"));
+	if (!PlayerAnim)
+	{
+		PRINT_ERROR_LOG(TEXT("PlayerAnim is NULL"));
+		return;
+	}
+	Attack();
+}
+
+void AProjectPlayer::Attack()
+{
+	if (IsAttacking) return;
+
+	PlayerAnim->PlayAttackMontage();
+	IsAttacking = true;
 }
  
 void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {
