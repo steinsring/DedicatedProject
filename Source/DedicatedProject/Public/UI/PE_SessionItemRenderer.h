@@ -23,13 +23,13 @@ protected:
 	virtual void NativeConstruct() override;
 
 	// 블루프린트에 있는 바인딩용 텍스트 위젯
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
 	UButton* JoinBtn;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
 	UTextBlock* ServerNameLabel;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
 	UTextBlock* NumPlayersLabel;
 
 public:

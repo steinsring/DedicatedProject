@@ -13,27 +13,14 @@ class DEDICATEDPROJECT_API APE_BasePickup : public AActor, public IPE_Interactab
 	GENERATED_BODY()
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USphereComponent> SphereCollision; // 액터의 콜리젼
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UStaticMeshComponent> Mesh; // 액터의 메시
-
 	UFUNCTION(Server, Reliable)
-	void ServerInteract(AActor* Interactor);
-	
-public:	
-	// Sets default values for this actor's properties
-	APE_BasePickup();
+	void ServerInteract(class AActor* Interactor);
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(VisibleAnywhere)
+	FName PickupID = "Test";
 
-public:	
-	FORCEINLINE USphereComponent* GetSphereCollision() const { return SphereCollision; }
+public:
+	virtual void Interact(class AActor* Interactor) override;
 
-	FORCEINLINE UStaticMeshComponent* GetMesh() const { return Mesh; }
-
-	virtual void Interact(AActor* Interactor) override;
 };
