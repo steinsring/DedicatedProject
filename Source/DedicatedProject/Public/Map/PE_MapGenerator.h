@@ -15,7 +15,7 @@ class DEDICATEDPROJECT_API APE_MapGenerator : public AActor
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Generater System", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UBoxComponent> GenerateArea; //스폰될 맵의 전체 크기
-
+	TArray<AActor*> MapList;
 
 public:	
 	// Sets default values for this actor's properties
@@ -47,9 +47,11 @@ protected:
 
 	TSharedPtr<FBSPNode> BinarySearchTree(const TSharedPtr<FBSPNode>& Node, const FVector2D TargetCoordinate);
 
-	void SpawnMap(TSharedPtr<FBSPNode>& Node);
+	AActor* SpawnMap(TSharedPtr<FBSPNode>& Node);
 
 	void SpawnNeighbors(TSharedPtr<FBSPNode>& Node);
+
+	void SpawnEnemies();
 
 public:	
 	// Called every frame

@@ -5,6 +5,9 @@
 #include "Components/BoxComponent.h"
 #include "PE_GameMode.h"
 #include <Kismet/GameplayStatics.h>
+#include <Enemy/SpawnPoint.h>
+#include <Enemy/ToiletMechTest.h>
+#include "Enemy/PE_AIController.h"
 
 // Sets default values
 APE_MapGenerator::APE_MapGenerator()
@@ -90,7 +93,7 @@ void APE_MapGenerator::BeginPlay()
 	RootNode = MakeBSPNode();
 	RootNode->Split(RootNode, MaxRoomSize);
 
-	//GenerateMap();
+	GenerateMap();
 }
 
 // Called every frame
@@ -299,8 +302,8 @@ enum ERoomExitMask
 	EXIT_Bottom = 1 << 3  // 1000
 };
 
-void APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
-	if (!Node.IsValid()) return;
+AActor* APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
+	if (!Node.IsValid()) return nullptr;
 
 	int32 Mask = 0;
 	FVector Location(Node->CenterCoordinate, 0.f);
@@ -337,91 +340,95 @@ void APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
 	if (Mask <= 0 || Mask > 15) {
 		PRINT_LOG(TEXT("My Log : %s "), TEXT("Mask is 0 ERROR"));
 		Node->isSpawned = true;
-		return;
+		return nullptr;
 	}
+
+	AActor* SpawnedMap = nullptr;
 
 	switch (Mask)
 	{
 	case EXIT_Left:
 		Map = GeneratableMapsExit1[FMath::RandRange(0, GeneratableMapsExit1.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 180, 0));
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 180, 0));
 		Node->isSpawned = true;
 		break;
 	case EXIT_Right:
 		Map = GeneratableMapsExit1[FMath::RandRange(0, GeneratableMapsExit1.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator::ZeroRotator);
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator::ZeroRotator);
 		Node->isSpawned = true;
 		break;
 	case EXIT_Top:
 		Map = GeneratableMapsExit1[FMath::RandRange(0, GeneratableMapsExit1.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, -90, 0));
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, -90, 0));
 		Node->isSpawned = true;
 		break;
 	case EXIT_Bottom:
 		Map = GeneratableMapsExit1[FMath::RandRange(0, GeneratableMapsExit1.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 90, 0));
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 90, 0));
 		Node->isSpawned = true;
 		break;
 	case EXIT_Left | EXIT_Right:
 		Map = GeneratableMapsExit2_1[FMath::RandRange(0, GeneratableMapsExit2_1.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator::ZeroRotator);
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator::ZeroRotator);
 		Node->isSpawned = true;
 		break;
 	case EXIT_Left | EXIT_Top:
 		Map = GeneratableMapsExit2_2[FMath::RandRange(0, GeneratableMapsExit2_2.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 180, 0));
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 180, 0));
 		Node->isSpawned = true;
 		break;
 	case EXIT_Left | EXIT_Bottom:
 		Map = GeneratableMapsExit2_2[FMath::RandRange(0, GeneratableMapsExit2_2.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 90, 0));
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 90, 0));
 		Node->isSpawned = true;
 		break;
 	case EXIT_Right | EXIT_Top:
 		Map = GeneratableMapsExit2_2[FMath::RandRange(0, GeneratableMapsExit2_2.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, -90, 0));
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, -90, 0));
 		Node->isSpawned = true;
 		break;
 	case EXIT_Right | EXIT_Bottom:
 		Map = GeneratableMapsExit2_2[FMath::RandRange(0, GeneratableMapsExit2_2.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator::ZeroRotator);
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator::ZeroRotator);
 		Node->isSpawned = true;
 		break;
 	case EXIT_Top | EXIT_Bottom:
 		Map = GeneratableMapsExit2_1[FMath::RandRange(0, GeneratableMapsExit2_1.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 90, 0));
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 90, 0));
 		Node->isSpawned = true;
 		break;
 	case EXIT_Left | EXIT_Right | EXIT_Top:
 		Map = GeneratableMapsExit3[FMath::RandRange(0, GeneratableMapsExit3.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 180, 0));
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 180, 0));
 		Node->isSpawned = true;
 		break;
 	case EXIT_Left | EXIT_Right | EXIT_Bottom:
 		Map = GeneratableMapsExit3[FMath::RandRange(0, GeneratableMapsExit3.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator::ZeroRotator);
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator::ZeroRotator);
 		Node->isSpawned = true;
 		break;
 	case EXIT_Left | EXIT_Top | EXIT_Bottom:
 		Map = GeneratableMapsExit3[FMath::RandRange(0, GeneratableMapsExit3.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 90, 0));
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 90, 0));
 		Node->isSpawned = true;
 		break;
 	case EXIT_Right | EXIT_Top | EXIT_Bottom:
 		Map = GeneratableMapsExit3[FMath::RandRange(0, GeneratableMapsExit3.Num() - 1)];
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, -90, 0));
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, -90, 0));
 		Node->isSpawned = true;
 		break;
 	case EXIT_Left | EXIT_Right | EXIT_Top | EXIT_Bottom:
 		Map = GeneratableMapsExit4[FMath::RandRange(0, GeneratableMapsExit4.Num() - 1)];
 		Rotation = 90 * FMath::RandRange(0, 3);
-		GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, Rotation, 0));
+		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, Rotation, 0));
 		Node->isSpawned = true;
 		break;
 	default:
 		Node->isSpawned = true;
 		break;
 	}
+
+	return SpawnedMap;
 }
 
 // sibal fucking if 문
@@ -437,12 +444,67 @@ void APE_MapGenerator::SpawnNeighbors(TSharedPtr<FBSPNode>& Node) {
 			{ // 모든 방향의 이웃과 연결 탐색
 				CheckAndSetConnection(Neighbor, SubDir);
 			}
-			SpawnMap(Neighbor);
+			MapList.Add(SpawnMap(Neighbor));
 			SpawnNeighbors(Neighbor); // 재귀적 확장
 		}
 		else // 이미스폰된경우 할필요없음
 		{
 			UE_LOG(LogTemp, Log, TEXT("My Log : Already Spawned, %s"), *Neighbor->CenterCoordinate.ToString());
+		}
+	}
+}
+
+void APE_MapGenerator::SpawnEnemies()
+{
+	for (auto* Map : MapList)
+	{
+		if (!Map) continue;
+
+		TArray<UChildActorComponent*> ChildActorComps;
+		Map->GetComponents<UChildActorComponent>(ChildActorComps); // ✅ Map 액터에서 가져오기
+
+		PRINT_LOG(TEXT("My Log : %s %d"), TEXT("ChildActorComps Count : "), ChildActorComps.Num());
+		PRINT_LOG(TEXT("My Log : %s %s"), TEXT("Map Name : "), *Map->GetName());
+
+		for (auto* Comp : ChildActorComps)
+		{
+			if (ASpawnPoint* SP = Cast<ASpawnPoint>(Comp->GetChildActor()))
+			{
+				PRINT_LOG(TEXT("My Log : %s %s"), TEXT("Child Actor is SpawnPoint"), *SP->GetName());
+
+				FVector Location = SP->GetActorLocation();
+				FRotator Rotation = SP->GetActorRotation();
+
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+				AActor* Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
+				if (Enemy)
+				{
+					PRINT_LOG(TEXT("My Log : %s "), TEXT("Enemy Spawned"));
+					TArray<UChildActorComponent*> SpChildComps;
+					SP->GetComponents<UChildActorComponent>(SpChildComps); // ✅ SpawnPoint 액터에서 가져오기
+					APE_AIController* EnemyController = Cast<APE_AIController>(Enemy->GetInstigatorController());
+					if (!EnemyController)
+					{
+						PRINT_ERROR_LOG(TEXT("My Log : %s "), TEXT("EnemyController is NULL"));
+						continue;
+					}
+					PRINT_LOG(TEXT("My Log : %s %d"), TEXT("SpChildComps Count : "), SpChildComps.Num());
+
+					for (auto* ChildComp : SpChildComps)
+					{
+						if (ChildComp->IsA<ATargetPoint>())
+						{
+							EnemyController->WayPoints.Add(Cast<ATargetPoint>(ChildComp));
+						}
+					}
+				}
+			}
+			else
+			{
+				PRINT_LOG(TEXT("My Log : %s "), TEXT("Child Actor is not SpawnPoint"));
+			}
 		}
 	}
 }
@@ -460,6 +522,7 @@ void APE_MapGenerator::GenerateMap() {
 	const FRotator Rotation = FRotator::ZeroRotator;
 	const FVector Location = FVector(LeavesList[start]->CenterCoordinate, 0.0f);
 	AActor* StartNode = GetWorld()->SpawnActor<AActor>(Map, Location, Rotation, SpawnParams);
+	MapList.Add(StartNode);
 	LeavesList[start]->isSpawned = true;
 	LeavesList[start]->isConnectLeft = true;
 	LeavesList[start]->isConnectRight = true;
@@ -473,6 +536,8 @@ void APE_MapGenerator::GenerateMap() {
 	{
 		GameMode->SetPlayerLocation(Location);
 	}
+
+	SpawnEnemies();
 }
 
 // 여기부터는 쓰지 않음
