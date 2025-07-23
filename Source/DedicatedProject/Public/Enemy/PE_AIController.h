@@ -28,6 +28,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CollectWayPointsInCurrentNavVolume();
 
+	UFUNCTION(BlueprintCallable)
+	void CollectChildrenWayPoints();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<AActor*> WayPoints;
 	

@@ -12,6 +12,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
+#include "DedicatedProject.h"
+
 const FName APE_AIController::HomePosKey(TEXT("HomePos"));
 const FName APE_AIController::PatrolPosKey(TEXT("PatrolPos"));
 const FName APE_AIController::TargetKey(TEXT("Target"));
@@ -36,7 +38,9 @@ APE_AIController::APE_AIController()
 void APE_AIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	CollectWayPointsInCurrentNavVolume();
+	//+/*--+
+	// CollectWayPointsInCurrentNavVolume();
+	CollectChildrenWayPoints();
 	UE_LOG(LogTemp, Warning, TEXT("[OnPossess] %s possessed %s"), *GetName(), *InPawn->GetName());
 	
 	if (UseBlackboard(BBAsset, BBComp))
@@ -104,4 +108,72 @@ void APE_AIController::CollectWayPointsInCurrentNavVolume()
 			WayPoints.Add(Waypoint);
 		}
 	}
+}
+
+void APE_AIController::CollectChildrenWayPoints()
+{
+	//APawn* ControlledPawn = GetPawn();
+	//if (!ControlledPawn)
+	//{
+	//	UE_LOG(LogTemp, Error, TEXT("CollectChildrenWayPoints : ControlledPawn is NULL"));
+	//	return;
+	//}
+
+	//UE_LOG(LogTemp, Error, TEXT("CollectChildrenWayPoints : Start collecting WayPoints from %s"), *ControlledPawn->GetName());
+	//TArray<UActorComponent*> ChildActorComponents = ControlledPawn->GetComponents();
+
+	//for (AActor* Child : AllAttachedActors)
+	//{
+	//	if (ATargetPoint* TP = Cast<ATargetPoint>(Child))
+	//	{
+	//		// WayPoint로 캐스팅이 성공하면 WayPoints 배열에 추가
+	//		if (!WayPoints.Contains(TP)) // 중복 방지
+	//		{
+	//			WayPoints.Add(TP);
+	//			UE_LOG(LogTemp, Error, TEXT("CollectChildrenWayPoints : %s"), *TP->GetName());
+	//		}
+	//	}
+	//	//UE_LOG(LogTemp, Log, TEXT("CollectChildrenWayPoints : %s"), *Child->GetName());
+	//	//else
+	//	//{
+	//	//	// 재귀적으로 자식 WayPoint를 수집
+	//	//	APE_AIController* ChildController = Cast<APE_AIController>(Child);
+	//	//	if (ChildController)
+	//	//	{
+	//	//		ChildController->CollectChildrenWayPoints();
+	//	//	}
+	//	//}
+	APawn* ControlledPawn = GetPawn();
+	if (!ControlledPawn)
+	{
+		UE_LOG(LogTemp, Error, TEXT("CollectChildrenWayPoints : ControlledPawn is NULL"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("CollectChildrenWayPoints : Start collecting WayPoints from %s"), *ControlledPawn->GetName());
+
+	// Use GetComponents to iterate through all components and filter UChildActorComponent
+	TArray<UActorComponent*> Components = ControlledPawn->GetComponents().Array();
+	UE_LOG(LogTemp, Error, TEXT("GetComponents : Collected %d Components"), Components.Num());
+	for (UActorComponent* Component : Components)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Collected Component Name : %s"), *Component->GetName());
+		if (UChildActorComponent* ChildActorComponent = Cast<UChildActorComponent>(Component))
+		{
+			if (AActor* ChildActor = ChildActorComponent->GetChildActor())
+			{
+				if (ATargetPoint* TP = Cast<ATargetPoint>(ChildActor))
+				{
+					// Add to WayPoints if it's a valid TargetPoint and not already added
+					if (!WayPoints.Contains(TP))
+					{
+						WayPoints.Add(TP);
+						UE_LOG(LogTemp, Error, TEXT("CollectChildrenWayPoints : %s"), *TP->GetName());
+					}
+				}
+			}
+		}
+	}
+
+	UE_LOG(LogTemp, Error, TEXT("CollectChildrenWayPoints : Collected %d WayPoints"), WayPoints.Num());
 }
