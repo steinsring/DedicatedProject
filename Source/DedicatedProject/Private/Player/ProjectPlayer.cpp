@@ -105,6 +105,8 @@ AProjectPlayer::AProjectPlayer()
 	{
 		PRINT_ERROR_LOG(TEXT("HUDInventory is NULL"));
 	}
+
+	CharacterDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_CharacterStats.DT_CharacterStats"));
 }
 
 // Called when the game starts or when spawned
@@ -132,13 +134,14 @@ void AProjectPlayer::BeginPlay()
 			PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
 		}
 		
-
+		/*
 		if (InventoryWidgetClass)
 		{
 			InventoryWidget = CreateWidget<UPE_Inventory>(pc, InventoryWidgetClass);
 			if (InventoryWidget)
 			{
-				InventoryWidget->AddToViewport();
+				PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
+				//InventoryWidget->AddToViewport();
 				//InventoryWidget->InitInventory(InventoryComponent);
 			}
 			else
@@ -149,7 +152,7 @@ void AProjectPlayer::BeginPlay()
 		else
 		{
 			PRINT_ERROR_LOG(TEXT("InventoryWidgetClass is NULL"));
-		}
+		}*/
 	}
 	else
 	{
@@ -369,9 +372,16 @@ void AProjectPlayer::OnItemOverlapEnd(UPrimitiveComponent* OverlappedComp, AActo
 
 void AProjectPlayer::Interact()
 {
+	bool bHasAuthority = false;
 	if (FocusedItem)
 	{
 		FocusedItem->Interact(this);
 	}
 	// 밑에 여러 작용 추가
+}
+
+void AProjectPlayer::AddItemToInventory(FName PickupID)
+{
+	InventoryComponent->AddItem(PickupID, 1);
+	PRINT_LOG(TEXT("ItemPickupID : %s"), *PickupID.ToString());
 }

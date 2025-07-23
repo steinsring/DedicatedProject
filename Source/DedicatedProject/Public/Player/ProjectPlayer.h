@@ -72,7 +72,7 @@ private:
 
 protected:
 	//캐릭터 스탯 관련
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Data", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Data", meta = (AllowPrivateAccess = "true"))
 	class UDataTable* CharacterDataTable; //블루프린트에서 데이터 테이블을 직접 참조
 	struct FPE_CharacterStats* CharacterStats; // 데이터 테이블에서 단일 행을 참조해 캐릭터 스탯으로 사용
 	void UpdateCharacterStats(int32 CharacterLevel);
@@ -110,6 +110,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Interact;
 	void Interact();																							// 플레이어가 E키를 클릭했을 때
+	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UPE_InventoryComponent> InventoryComponent;
@@ -129,4 +130,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Hitbox")
 	UCapsuleComponent* RightFootHitBox; 
+
+	void AddItemToInventory(FName PickupID);
 };

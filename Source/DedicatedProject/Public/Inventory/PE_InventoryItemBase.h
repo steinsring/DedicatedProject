@@ -27,4 +27,11 @@ public:
     //UFUNCTION()
     //virtual void Use(class AProjectPlayer* Character);
 	
+    UFUNCTION(BlueprintCallable)
+    void Init(FText NewItemName, UTexture2D* NewIcon, int32 NewMaxStackSize = 1)
+    {
+        ItemName = NewItemName;
+        Icon = NewIcon;
+        MaxStackSize = NewMaxStackSize;
+    }
 };
