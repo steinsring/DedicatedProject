@@ -41,7 +41,7 @@ void APE_AIController::OnPossess(APawn* InPawn)
 	//+/*--+
 	// CollectWayPointsInCurrentNavVolume();
 	//CollectChildrenWayPoints();
-	UE_LOG(LogTemp, Warning, TEXT("[OnPossess] %s possessed %s"), *GetName(), *InPawn->GetName());
+	//UE_LOG(LogTemp, Warning, TEXT("[OnPossess] %s possessed %s"), *GetName(), *InPawn->GetName());
 	
 	if (UseBlackboard(BBAsset, BBComp))
 	{

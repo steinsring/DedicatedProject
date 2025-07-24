@@ -460,6 +460,7 @@ void APE_MapGenerator::SpawnEnemies()
 	{
 		if (!Map) continue;
 
+		// Map 액터에서 ChildActorComponent를 가져옴
 		TArray<UChildActorComponent*> ChildActorComps;
 		Map->GetComponents<UChildActorComponent>(ChildActorComps); // ✅ Map 액터에서 가져오기
 
@@ -468,6 +469,7 @@ void APE_MapGenerator::SpawnEnemies()
 
 		for (auto* Comp : ChildActorComps)
 		{
+			// ChildActorComponent가 SpawnPoint인지 확인
 			if (ASpawnPoint* SP = Cast<ASpawnPoint>(Comp->GetChildActor()))
 			{
 				PRINT_LOG(TEXT("My Log : %s %s"), TEXT("Child Actor is SpawnPoint"), *SP->GetName());
@@ -482,21 +484,26 @@ void APE_MapGenerator::SpawnEnemies()
 				if (Enemy)
 				{
 					PRINT_LOG(TEXT("My Log : %s "), TEXT("Enemy Spawned"));
-					TArray<UChildActorComponent*> SpChildComps;
-					SP->GetComponents<UChildActorComponent>(SpChildComps); // ✅ SpawnPoint 액터에서 가져오기
+					auto* CompActor = Cast<UChildActorComponent>(Comp);
+
+					// 스폰한 ToiletMechTest의 AIController를 가져옴
 					APE_AIController* EnemyController = Cast<APE_AIController>(Enemy->GetInstigatorController());
 					if (!EnemyController)
 					{
 						PRINT_ERROR_LOG(TEXT("My Log : %s "), TEXT("EnemyController is NULL"));
 						continue;
 					}
-					PRINT_LOG(TEXT("My Log : %s %d"), TEXT("SpChildComps Count : "), SpChildComps.Num());
 
-					for (auto* ChildComp : SpChildComps)
+					TArray<UChildActorComponent*> TargetPointComps;
+					SP->GetComponents<UChildActorComponent>(TargetPointComps); // ✅ SpawnPoint 액터에서 가져오기
+					PRINT_LOG(TEXT("My Log : %s %d"), TEXT("TargetPointComps Count : "), TargetPointComps.Num());
+
+					for (auto* TargetComp : TargetPointComps)
 					{
-						if (ChildComp->IsA<ATargetPoint>())
+						if (ATargetPoint* TP = Cast<ATargetPoint>(TargetComp->GetChildActor()))
 						{
-							EnemyController->WayPoints.Add(Cast<ATargetPoint>(ChildComp));
+							PRINT_LOG(TEXT("My Log : %s %s"), TEXT("Child Actor is TargetPoint"), *TP->GetName());
+							EnemyController->WayPoints.Add(TP);
 						}
 					}
 				}
