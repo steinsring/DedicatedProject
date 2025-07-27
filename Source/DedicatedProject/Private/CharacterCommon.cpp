@@ -51,6 +51,7 @@ void ACharacterCommon::Attack(UAnimMontage* AnimMontage)
 {
 	if (IsAttacking) return;
 
+	HitActors.Empty();
 	BaseAnimInstance->PlayAttackMontage(AnimMontage);
 	IsAttacking = true;
 }

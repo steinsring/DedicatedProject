@@ -16,6 +16,7 @@ class DEDICATEDPROJECT_API UPE_AnimInstance : public UCommon_AnimInstance
 	
 public:
 	UPE_AnimInstance();
+	virtual void NativeInitializeAnimation() override;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	UAnimMontage* BasicAttack;

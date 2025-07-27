@@ -169,6 +169,9 @@ void AProjectPlayer::BeginPlay()
 		PRINT_ERROR_LOG(TEXT("❌ InitPlayerAnim: BasicAttack is NULL"));
 	}
 
+	FString OwnerName = GetName();
+	PRINT_LOG(TEXT("My Character name : %s"), *OwnerName);
+	
 	UpdateCharacterStats(1); //캐릭터 스탯 설정
 
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapBegin);				// 이벤트 바인딩 : 아이템 감지 범위에 아이템 콜리전이 충돌했을때 

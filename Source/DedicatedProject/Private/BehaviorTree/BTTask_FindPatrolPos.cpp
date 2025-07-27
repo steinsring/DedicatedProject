@@ -43,17 +43,17 @@ EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& O
 	PatrolPoints = Controller->WayPoints;
 	if (PatrolPoints.Num() == 0) 
 		return EBTNodeResult::Failed;
-	UE_LOG(LogTemp, Log, TEXT("PatrolPoints Count : %d"), PatrolPoints.Num());
+	//UE_LOG(LogTemp, Log, TEXT("PatrolPoints Count : %d"), PatrolPoints.Num());
 
 	float Distance = FVector::Dist(ControllingPawn->GetActorLocation(), PatrolPoints[CurrentPatrolIndex]->GetActorLocation());
-	UE_LOG(LogTemp, Log, TEXT("Dist : %f, CurrentPatrolIndex : %d"), Distance, CurrentPatrolIndex);
+	//UE_LOG(LogTemp, Log, TEXT("Dist : %f, CurrentPatrolIndex : %d"), Distance, CurrentPatrolIndex);
 
 	if (Distance < 100.0f)
 	{
 		CurrentPatrolIndex = (CurrentPatrolIndex + 1) % PatrolPoints.Num();
 	}
 	OwnerComp.GetBlackboardComponent()->SetValueAsVector(APE_AIController::PatrolPosKey, PatrolPoints[CurrentPatrolIndex]->GetActorLocation());
-	UE_LOG(LogTemp, Log, TEXT("PatrolPos : %s"), *OwnerComp.GetBlackboardComponent()->GetValueAsVector(APE_AIController::PatrolPosKey).ToString());
+	//UE_LOG(LogTemp, Log, TEXT("PatrolPos : %s"), *OwnerComp.GetBlackboardComponent()->GetValueAsVector(APE_AIController::PatrolPosKey).ToString());
 	return EBTNodeResult::Succeeded;
 
 	//return EBTNodeResult::Failed;

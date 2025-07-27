@@ -23,3 +23,12 @@ UPE_AnimInstance::UPE_AnimInstance()
 		PRINT_ERROR_LOG(TEXT("BasicAttackPattern is NULL"));
 	}
 }
+
+void UPE_AnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+
+	AActor* Owner = TryGetPawnOwner();
+	FString OwnerName = Owner ? Owner->GetName() : TEXT("Unknown");
+	PRINT_LOG(TEXT("My Character name : %s"), *OwnerName);
+}
