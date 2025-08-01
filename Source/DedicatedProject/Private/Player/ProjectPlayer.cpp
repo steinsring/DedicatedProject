@@ -14,10 +14,12 @@
 #include "Player/PE_CharacterStats.h"
 #include "Enemy/PE_AnimInstance.h"
 #include "UI/PE_Inventory.h"
+#include "UI/PE_HPBarWidget.h"
 
 #include <Camera/CameraComponent.h> // 카메라
 #include <GameFramework/SpringArmComponent.h> //3인칭 카메라암
 #include "Blueprint/UserWidget.h"
+#include "Components/WidgetComponent.h"
 
 
 // Sets default values
@@ -96,6 +98,24 @@ AProjectPlayer::AProjectPlayer()
 		PRINT_ERROR_LOG(TEXT("Player Skeletal Mesh is NULL"));
 	}
 
+	HPBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBarWidget"));
+	HPBarWidget->SetupAttachment(GetMesh()); //루트 컴포넌트에 위젯 컴포넌트를 붙인다.
+
+	//HPBarWidget->SetRelativeLocation(FVector(100.0f, 100.0f, 0.0f)); //위젯 컴포넌트의 위치 설정
+	static ConstructorHelpers::FClassFinder<UUserWidget> HPBarWidgetAsset(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_HPbar.WB_HPbar_C'"));
+	if (HPBarWidgetAsset.Succeeded())
+	{
+		HPBarWidget->SetWidgetClass(HPBarWidgetAsset.Class); //위젯 컴포넌트에 위젯 클래스 설정
+		HPBarWidget->SetDrawSize(FVector2D(200.0f, 50.0f)); //위젯 크기 설정
+		HPBarWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f)); //위젯 위치 설정
+		HPBarWidget->SetCollisionEnabled(ECollisionEnabled::NoCollision); //충돌 비활성화
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("HPBarWidget is NULL"));
+	}
+	
+
 	static ConstructorHelpers::FClassFinder<UUserWidget> HUDInventory(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_Inventory.WB_Inventory_C'"));
 	if (HUDInventory.Succeeded())
 	{
@@ -171,6 +191,27 @@ void AProjectPlayer::BeginPlay()
 
 	FString OwnerName = GetName();
 	PRINT_LOG(TEXT("My Character name : %s"), *OwnerName);
+
+	if (HPBarWidget)
+	{
+		UUserWidget* UserWidget = HPBarWidget->GetUserWidgetObject();
+		if (UserWidget)
+		{
+			UPE_HPBarWidget* CastedWidget = Cast<UPE_HPBarWidget>(UserWidget);
+			if (CastedWidget)
+			{
+				CastedWidget->BindToHealthComponent(HealthComp); // ✅ HP 위젯과 체력 연결
+			}
+			else
+			{
+				PRINT_ERROR_LOG(TEXT("HP Widget is not of type UPE_HPBarWidget"));
+			}
+		}
+		else
+		{
+			PRINT_ERROR_LOG(TEXT("HPBarWidget has no UserWidgetObject"));
+		}
+	}
 	
 	UpdateCharacterStats(1); //캐릭터 스탯 설정
 

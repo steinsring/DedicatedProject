@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnHPIsZeroDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnHPChangedDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DEDICATEDPROJECT_API UHealthComponent : public UActorComponent
@@ -23,7 +25,14 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void SetHP(float NewHP);
 	float ApplyDamage(float DamageAmount);
+	float GetHPRatio();
+	float GetCurrentHealth() const { return CurrentHealth; }
+	float GetMaxHealth() const { return MaxHealth; }
+
+	FOnHPIsZeroDelegate OnHPIsZero; // HP가 0이 되었을 때 호출되는 델리게이트
+	FOnHPChangedDelegate OnHPChanged;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Actor Stat")

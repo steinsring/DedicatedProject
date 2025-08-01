@@ -121,6 +121,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<UPE_Inventory> InventoryWidget;
 
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	class UWidgetComponent* HPBarWidget; // 플레이어 UI 위젯 컴포넌트
+
 public:
 	// Sets default values for this character's properties
 	AProjectPlayer();
