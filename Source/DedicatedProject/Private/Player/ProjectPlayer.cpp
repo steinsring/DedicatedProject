@@ -98,23 +98,15 @@ AProjectPlayer::AProjectPlayer()
 		PRINT_ERROR_LOG(TEXT("Player Skeletal Mesh is NULL"));
 	}
 
-	HPBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBarWidget"));
-	HPBarWidget->SetupAttachment(GetMesh()); //루트 컴포넌트에 위젯 컴포넌트를 붙인다.
-
-	//HPBarWidget->SetRelativeLocation(FVector(100.0f, 100.0f, 0.0f)); //위젯 컴포넌트의 위치 설정
-	static ConstructorHelpers::FClassFinder<UUserWidget> HPBarWidgetAsset(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_HPbar.WB_HPbar_C'"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> HPBarWidgetAsset(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_HPBar.WB_HPBar_C'"));
 	if (HPBarWidgetAsset.Succeeded())
 	{
-		HPBarWidget->SetWidgetClass(HPBarWidgetAsset.Class); //위젯 컴포넌트에 위젯 클래스 설정
-		HPBarWidget->SetDrawSize(FVector2D(200.0f, 50.0f)); //위젯 크기 설정
-		HPBarWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f)); //위젯 위치 설정
-		HPBarWidget->SetCollisionEnabled(ECollisionEnabled::NoCollision); //충돌 비활성화
+		HPBarWidgetClass = HPBarWidgetAsset.Class; //블루프린트에서 위젯 클래스를 불러온다.
 	}
 	else
 	{
-		PRINT_ERROR_LOG(TEXT("HPBarWidget is NULL"));
+		PRINT_ERROR_LOG(TEXT("HPBarWidgetAsset is NULL"));
 	}
-	
 
 	static ConstructorHelpers::FClassFinder<UUserWidget> HUDInventory(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_Inventory.WB_Inventory_C'"));
 	if (HUDInventory.Succeeded())
@@ -173,6 +165,24 @@ void AProjectPlayer::BeginPlay()
 		{
 			PRINT_ERROR_LOG(TEXT("InventoryWidgetClass is NULL"));
 		}*/
+
+		if (HPBarWidgetClass)
+		{
+			HPBarWidget = CreateWidget<UPE_HPBarWidget>(pc, HPBarWidgetClass);
+			if (HPBarWidget)
+			{
+				HPBarWidget->AddToViewport();
+				HPBarWidget->BindToHealthComponent(HealthComp); //HealthComponent를 위젯에 설정
+			}
+			else
+			{
+				PRINT_ERROR_LOG(TEXT("HPBarWidget is Not Created"));
+			}
+		}
+		else
+		{
+			PRINT_ERROR_LOG(TEXT("HPBarWidgetClass is NULL"));
+		}
 	}
 	else
 	{
@@ -191,27 +201,6 @@ void AProjectPlayer::BeginPlay()
 
 	FString OwnerName = GetName();
 	PRINT_LOG(TEXT("My Character name : %s"), *OwnerName);
-
-	if (HPBarWidget)
-	{
-		UUserWidget* UserWidget = HPBarWidget->GetUserWidgetObject();
-		if (UserWidget)
-		{
-			UPE_HPBarWidget* CastedWidget = Cast<UPE_HPBarWidget>(UserWidget);
-			if (CastedWidget)
-			{
-				CastedWidget->BindToHealthComponent(HealthComp); // ✅ HP 위젯과 체력 연결
-			}
-			else
-			{
-				PRINT_ERROR_LOG(TEXT("HP Widget is not of type UPE_HPBarWidget"));
-			}
-		}
-		else
-		{
-			PRINT_ERROR_LOG(TEXT("HPBarWidget has no UserWidgetObject"));
-		}
-	}
 	
 	UpdateCharacterStats(1); //캐릭터 스탯 설정
 

@@ -9,6 +9,8 @@
 #include <Item/PE_BasePickup.h>
 #include "ProjectPlayer.generated.h"
 
+
+class UPE_HPBarWidget;
 class UPE_Inventory;
 class UPE_InventoryComponent;
 
@@ -122,7 +124,10 @@ private:
 	TObjectPtr<UPE_Inventory> InventoryWidget;
 
 	UPROPERTY(VisibleAnywhere, Category = "UI")
-	class UWidgetComponent* HPBarWidget; // 플레이어 UI 위젯 컴포넌트
+	TSubclassOf<UPE_HPBarWidget> HPBarWidgetClass; // 플레이어 UI 위젯 컴포넌트
+
+	UPROPERTY()
+	TObjectPtr<UPE_HPBarWidget> HPBarWidget; // 플레이어 UI 위젯 인스턴스
 
 public:
 	// Sets default values for this character's properties
