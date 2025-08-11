@@ -123,6 +123,8 @@ private:
 	UPROPERTY()
 	TObjectPtr<UPE_Inventory> InventoryWidget;
 
+	class UInputAction* ia_SkillTree;
+
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	TSubclassOf<UPE_HPBarWidget> HPBarWidgetClass; // 플레이어 UI 위젯 컴포넌트
 
