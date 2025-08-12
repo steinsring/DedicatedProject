@@ -20,6 +20,7 @@
 #include <GameFramework/SpringArmComponent.h> //3인칭 카메라암
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetComponent.h"
+#include "Player/PE_ItemThrowableComponent.h"
 
 
 // Sets default values
@@ -91,7 +92,11 @@ AProjectPlayer::AProjectPlayer()
 		RightFootHitBox->SetCapsuleRadius(20.0f); //반지름 설정
 
 		InventoryComponent = CreateDefaultSubobject<UPE_InventoryComponent>(TEXT("InventoryComponent"));
-		
+
+		// 던지는 아이템
+		ItemThrowable = CreateDefaultSubobject<UPE_ItemThrowableComponent>(TEXT("ItemThrowable"));
+		ItemThrowable->SetupAttachment(RootComponent);
+		ItemThrowable->SetRelativeLocation(FVector(4.f, -11.f, 80.f));
 	}
 	else
 	{

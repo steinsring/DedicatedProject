@@ -129,6 +129,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<UPE_HPBarWidget> HPBarWidget; // 플레이어 UI 위젯 인스턴스
 
+	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
+	TObjectPtr<class UPE_ItemThrowableComponent> ItemThrowable;	// 던지는 아이템
+
 public:
 	// Sets default values for this character's properties
 	AProjectPlayer();
@@ -140,4 +143,6 @@ public:
 	UCapsuleComponent* RightFootHitBox; 
 
 	void AddItemToInventory(FName PickupID);
+
+	FORCEINLINE UPE_ItemThrowableComponent* GetItemThrowable() const { return ItemThrowable; }
 };
