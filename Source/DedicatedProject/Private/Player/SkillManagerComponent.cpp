@@ -28,11 +28,12 @@ void USkillManagerComponent::UnlockSkill(FName SkillName)
 {
 	for (auto& Skill : Skills)
 	{
-		//if (Skill.SkillName == SkillName)
-		//{
-		//	Skill.bIsUnlocked = true;
-		//	return; // Exit after unlocking the skill
-		//}
+		FName SkillNameToName = FName(Skill.SkillName.ToString());
+		if (SkillNameToName == SkillName)
+		{
+			Skill.bIsUnlocked = true;
+			return; // Exit after unlocking the skill
+		}
 	}
 }
 
@@ -40,11 +41,12 @@ void USkillManagerComponent::LockSkill(FName SkillName)
 {
 	for (auto& Skill : Skills)
 	{
-		//if (Skill.SkillName == SkillName)
-		//{
-		//	Skill.bIsUnlocked = false;
-		//	return; // Exit after locking the skill
-		//}
+		FName SkillNameToName = FName(Skill.SkillName.ToString());
+		if (SkillNameToName == SkillName)
+		{
+			Skill.bIsUnlocked = false;
+			return; // Exit after locking the skill
+		}
 	}
 }
 
@@ -70,11 +72,12 @@ void USkillManagerComponent::SetSkillData(FPE_SkillDataTable SkillData)
 {
 	for (auto& Skill : Skills)
 	{
-		//if (Skill.SkillName == SkillData.SkillName)
-		//{
-		//	Skill = SkillData;
-		//	return; // Exit after setting the skill data
-		//}
+		//FName SkillNameToName = FName(SkillData.SkillID);
+		if (Skill.SkillID == SkillData.SkillID)
+		{
+			Skill = SkillData;
+			return; // Exit after setting the skill data
+		}
 	}
 }
 
