@@ -14,6 +14,8 @@ class DEDICATEDPROJECT_API UPE_InventorySlot : public UUserWidget
 {
 	GENERATED_BODY()
 
+private:
+	int32 Stack = 0;
 protected:
 	virtual void NativeConstruct() override;
 	
@@ -24,5 +26,5 @@ public:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
 	UTextBlock* Number;
 
-	void SetIcon(UTexture2D* Icon);
+	void SetItem(UTexture2D* Icon, int32 Quantity);
 };

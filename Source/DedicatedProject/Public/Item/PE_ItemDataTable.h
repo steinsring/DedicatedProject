@@ -21,5 +21,5 @@ struct DEDICATEDPROJECT_API FPE_ItemDataTable : public FTableRowBase
 	TObjectPtr<UTexture2D> Icon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-	int32 MaxStackSize = 1;
+	int32 Quantity = 1;
 };

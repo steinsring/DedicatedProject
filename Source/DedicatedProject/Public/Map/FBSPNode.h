@@ -11,15 +11,17 @@ struct FBSPNode
 	GENERATED_BODY()
 public:
 	UPROPERTY()
-	FVector2D MinCoordinate; // double값으로 이루어진 2D좌표 구조체
+	FVector2D MinCoordinate; 	// 노드의 좌하단 좌표
 	UPROPERTY()
-	FVector2D MaxCoordinate;
+	FVector2D MaxCoordinate;	// 노드의 우상단 좌표
 	UPROPERTY()
-	FVector2D CenterCoordinate;
+	FVector2D CenterCoordinate;	// 노드의 중앙 좌표
 
-	TSharedPtr<FBSPNode> LeftChild = NULL; //스마트 포인터
+	// 자식이 있는 경우 (leaf가 아닌 노드)
+	TSharedPtr<FBSPNode> LeftChild = NULL; // 노드의 좌하단 좌표
 	TSharedPtr<FBSPNode> RightChild = NULL;
 
+	// 자식이 없는 경우 이웃 노드를 모두 저장 (leaf 노드)
 	TSharedPtr<FBSPNode> LeftNode = NULL;
 	TSharedPtr<FBSPNode> RightNode = NULL;
 	TSharedPtr<FBSPNode> TopNode = NULL;
@@ -27,8 +29,10 @@ public:
 	TSharedPtr<FBSPNode> TopFloorNode = NULL;
 	TSharedPtr<FBSPNode> BottomFloorNode = NULL;
 
-	bool isSpawned = false;
-	bool isConnectLeft = false; // 현재 노드가 이웃노드와 반드시 이어야 하면 true, 잇지 않아도 되면 false
+	bool isSpawned = false;			// 현재 노드가 스폰되어 있는가
+
+	// 현재 노드가 이웃노드와 반드시 이어야 하면 true, 잇지 않아도 되면 false
+	bool isConnectLeft = false;
 	bool isConnectRight = false;
 	bool isConnectTop = false;
 	bool isConnectBottom = false;

@@ -12,19 +12,13 @@ void UPE_InventorySlot::NativeConstruct()
 	Super::NativeConstruct();
 }
 
-void UPE_InventorySlot::SetIcon(UTexture2D* Icon)
+void UPE_InventorySlot::SetItem(UTexture2D* Icon, int32 Quantity)
 {
 	if (IsValid(IconImage))
 	{
-		//FSlateBrush Brush;
-		//Brush.SetResourceObject(Icon);
-		//Brush.ImageSize = FVector2D(1024.f, 1024.f);
-		//Brush.DrawAs = ESlateBrushDrawType::Image;
-
-		//IconImage->SetBrush(Brush);
 		IconImage->SetBrushFromTexture(Icon, true);
-		Number->SetText(FText::FromString(TEXT("1")));
-		//IconImage->Brush.SetResourceObject(Icon);
+		Stack += Quantity;
+		Number->SetText(FText::AsNumber(Stack));
 		PRINT_LOG(TEXT("Set Item Icon Success"));
 	}
 	else

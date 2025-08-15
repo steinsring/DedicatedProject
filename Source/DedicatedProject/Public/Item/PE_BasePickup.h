@@ -17,7 +17,7 @@ private:
 	void ServerInteract(class AActor* Interactor);
 
 protected:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere)
 	FName PickupID = "Test";
 
 public:
