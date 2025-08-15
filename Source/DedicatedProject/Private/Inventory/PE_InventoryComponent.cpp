@@ -1,13 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "Inventory/PE_InventoryComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "DedicatedProject.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
-#include "Inventory/PE_InventoryComponent.h"
 #include "Inventory/PE_InventoryItemBase.h"
 #include "UI/PE_Inventory.h"
 
