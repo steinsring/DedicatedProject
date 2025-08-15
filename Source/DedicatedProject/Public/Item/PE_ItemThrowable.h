@@ -18,8 +18,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
 	TObjectPtr<UStaticMeshComponent> ItemMesh;							// 아이템 메시
 
-	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
-	TObjectPtr<class UProjectileMovementComponent> ProjectileMovement;	// 투사체 로직
+	//UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
+	//TObjectPtr<class UProjectileMovementComponent> ProjectileMovement;	// 투사체 로직
 	
 public:	
 	// Sets default values for this actor's properties
@@ -27,7 +27,7 @@ public:
 
 	FORCEINLINE USphereComponent* GetItemThrowableCollision() const { return ItemCollision; }
 	FORCEINLINE UStaticMeshComponent* GetItemThrowableMesh() const { return ItemMesh; }
-	FORCEINLINE UProjectileMovementComponent* GetItemProjectile() const { return ProjectileMovement; }
+	//FORCEINLINE UProjectileMovementComponent* GetItemProjectile() const { return ProjectileMovement; }
 
 protected:
 	// Called when the game starts or when spawned

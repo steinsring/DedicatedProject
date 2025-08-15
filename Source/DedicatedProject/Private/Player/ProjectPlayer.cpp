@@ -74,7 +74,7 @@ AProjectPlayer::AProjectPlayer()
 
 		InteractionZone = CreateDefaultSubobject<UBoxComponent>(TEXT("InteractionZone"));	// 감지할 오브젝트 생성
 		InteractionZone->SetupAttachment(tpsCamComp);										// 카메라에 감지할 오브젝트를 자식으로 추가
-		InteractionZone->SetBoxExtent(FVector(15.f, 15.f, 250.f));							// 감지할 범위 설정
+		InteractionZone->SetBoxExtent(FVector(15.f, 15.f, 350.f));							// 감지할 범위 설정
 		InteractionZone->SetRelativeLocation(FVector(250, 0, 0));							// 위치 설정
 		InteractionZone->SetRelativeRotation(FRotator(0, -90, 90));							// 회전 설정
 		InteractionZone->SetCollisionEnabled(ECollisionEnabled::QueryOnly);					// 물리 충돌은 안 하고, 오버랩 감지만 허용
@@ -287,6 +287,14 @@ void AProjectPlayer::InputJump(const struct FInputActionValue& inputValue)
 
 void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)  
 {  
+	if (true)
+	{
+		ItemThrowable->Throw();
+	}
+	else
+	{
+
+	}
    PRINT_LOG(TEXT("InputAttack Called"));  
    if (!PlayerAnim)  
    {  
@@ -420,6 +428,6 @@ void AProjectPlayer::Interact()
 
 void AProjectPlayer::AddItemToInventory(FName PickupID)
 {
-	InventoryComponent->AddItem(PickupID, 1);
+	InventoryComponent->AddItem(PickupID);
 	PRINT_LOG(TEXT("ItemPickupID : %s"), *PickupID.ToString());
 }

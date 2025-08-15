@@ -9,6 +9,7 @@
 class UUniformGridPanel;
 class UOverlay;
 class UPE_InventorySlot;
+class UWidget;
 
 UCLASS()
 class DEDICATEDPROJECT_API UPE_Inventory : public UUserWidget
@@ -30,6 +31,12 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UUniformGridPanel> ItemGridPanel = nullptr;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UWidget> Highlight = nullptr;
+
 	// 아이템 추가 함수
-	void AddItemToInventory(UTexture2D* ItemIcon);
+	void AddItemToInventory(UTexture2D* ItemIcon, int32 Quantity);
+
+	// 슬롯 선택시 해당 아이템 반환
+	void ItemSlotSelect(int KeyboardNumber);
 };

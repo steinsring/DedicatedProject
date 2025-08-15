@@ -9,6 +9,7 @@
 class UInputMappingContext;
 class UInputAction;
 
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DEDICATEDPROJECT_API UPE_ItemThrowableComponent : public USceneComponent
 {
@@ -16,13 +17,7 @@ class DEDICATEDPROJECT_API UPE_ItemThrowableComponent : public USceneComponent
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Projectile")
-	TSubclassOf<class APE_ItemThrowable> ItemThrowable;						// 던질 아이템 클래스
-
-	UPROPERTY(VisibleAnywhere, Category = "Input")
-	TObjectPtr<UInputMappingContext> ThrowMappingContext;						// 입력받는 매핑 컨텍스트
-
-	UPROPERTY(VisibleAnywhere, Category = "Input")
-	TObjectPtr<UInputAction> ThrowAction;										// 입력
+	TSubclassOf<class APE_ItemThrowable> ItemThrowable;							// 던질 아이템 클래스
 
 public:	
 	// Sets default values for this component's properties
@@ -31,11 +26,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Projectile")
 	void SetProjectileClass(TSubclassOf<class APE_ItemThrowable> NewItemThrowable);	// 스폰되는 클래스
 
+	void Throw();																	// 던질때 클라에서 실행
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-	void Throw();																	// 던질때 클라에서 실행
 
 	UFUNCTION(Server, Reliable)
 	void Throw_Server();															// 던질때 서버에서 실행
@@ -43,7 +38,4 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
-	
 };

@@ -19,6 +19,7 @@ APE_ItemPickup::APE_ItemPickup()
 	Mesh->SetupAttachment(SphereCollision);
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	Mesh->SetGenerateOverlapEvents(true);
+	Mesh->SetSimulatePhysics(true);
 
 	bReplicates = true; // 액터 복제
 }

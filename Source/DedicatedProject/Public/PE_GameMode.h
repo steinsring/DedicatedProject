@@ -20,8 +20,16 @@ private:
 public:
 	APE_GameMode(); //게임모드 생성자
 	void SetPlayerLocation(FVector NewLocation);
+
+	UFUNCTION()
+	void PlacePawnIfReady(APlayerController* PC);
+
+	UPROPERTY()
+	FVector TargetLocation;
+	bool bHasTarget = false;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+	//virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 };

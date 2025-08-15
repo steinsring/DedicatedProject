@@ -64,6 +64,8 @@ void APE_GameMode::PostLogin(APlayerController* NewPlayer)
             NewPlayer->Possess(Pawn);
         }
     }
+
+    PlacePawnIfReady(NewPlayer);
 	
 }
 
@@ -85,4 +87,19 @@ void APE_GameMode::SetPlayerLocation(FVector PlayerStartLocation)
 }
 
 
+void APE_GameMode::PlacePawnIfReady(APlayerController* PC)
+{
+    if (!bHasTarget || !PC) return;
+
+    // Pawn이 아직 없으면, 다음 Possess 때 다시 시도
+    if (APawn* P = PC->GetPawn())
+    {
+        // 이동 복제: Pawn은 기본적으로 ReplicateMovement 켜두세요
+        // Character라면 TeleportTo 권장(스윕 OFF, 텔레포트 ON)
+        P->TeleportTo(TargetLocation, P->GetActorRotation(), /*bIsATest=*/false, /*bNoCheck=*/true);
+
+        // (선택) 클라 보정이 필요하면:
+        PC->ClientSetLocation(TargetLocation, PC->GetControlRotation());
+    }
+}
 

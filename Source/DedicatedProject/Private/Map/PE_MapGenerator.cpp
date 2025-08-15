@@ -127,6 +127,13 @@ void APE_MapGenerator::CollectLeaves(const TSharedPtr<FBSPNode>& Node)
 
 void APE_MapGenerator::SetNeighbors(TArray<TSharedPtr<FBSPNode>>& List)
 {
+	/*
+	각 Leaf에는 노드의 좌하단, 우상단, 정중앙 좌표값이 기록되어 있다.
+	모든 Leaf 노드는 크기가 동일하므로 이웃노드와 좌표의 절대값 차이가 동일하다.
+	따라서 절대값 차이로 모든 이웃노드의 대략적인 좌하단, 우상단 좌표값을 알 수 있다.
+	그리고 좌하단, 우상단 사이에 반드시 정중앙 좌표값이 있을 것이므로 범위 안에 있는 정중앙 좌표값을 가진 노드를
+	BinarySearchTree로 검색해 찾아 등록한다.
+	*/
 	FVector WorldLocation = GenerateArea->GetComponentLocation(); // boxcomponent transform
 	FVector2D MapMinCoordinate = FVector2D(WorldLocation.X - MapSizeX, WorldLocation.Y - MapSizeY);
 	FVector2D MapMaxCoordinate = FVector2D(WorldLocation.X + MapSizeX, WorldLocation.Y + MapSizeY);
@@ -141,16 +148,6 @@ void APE_MapGenerator::SetNeighbors(TArray<TSharedPtr<FBSPNode>>& List)
 			LeftNodeCenterCoordinate.ComponentwiseAllLessThan(MapMaxCoordinate))
 			Leaf->LeftNode = BinarySearchTree(RootNode, LeftNodeCenterCoordinate);
 
-		//PRINT_LOG(TEXT("My Log : %s, %s "), TEXT("This : "), *Leaf->CenterCoordinate.ToString());
-		/*
-		if (Leaf->LeftNode) {
-			PRINT_LOG(TEXT("My Log : %s, %s "), TEXT("LeftNode : "), *LeftNodeCenterCoordinate.ToString());
-		}
-		else
-		{
-			PRINT_LOG(TEXT("My Log : %s "), TEXT("LeftNode : NULL"));
-		}
-		*/
 		FVector2D RightNodeCenterCoordinate = FVector2D(
 			Leaf->CenterCoordinate.X + (Leaf->MaxCoordinate.X - Leaf->MinCoordinate.X),
 			Leaf->CenterCoordinate.Y
@@ -159,15 +156,6 @@ void APE_MapGenerator::SetNeighbors(TArray<TSharedPtr<FBSPNode>>& List)
 		if (MapMinCoordinate.ComponentwiseAllLessThan(RightNodeCenterCoordinate) && 
 			RightNodeCenterCoordinate.ComponentwiseAllLessThan(MapMaxCoordinate))
 			Leaf->RightNode = BinarySearchTree(RootNode, RightNodeCenterCoordinate);
-		/*
-		if (Leaf->RightNode) {
-			PRINT_LOG(TEXT("My Log : %s, %s "), TEXT("RightNode : "), *RightNodeCenterCoordinate.ToString());
-		}
-		else
-		{
-			PRINT_LOG(TEXT("My Log : %s "), TEXT("RightNode : NULL"));
-		}
-		*/
 
 		FVector2D TopNodeCenterCoordinate = FVector2D(
 			Leaf->CenterCoordinate.X,
@@ -176,15 +164,6 @@ void APE_MapGenerator::SetNeighbors(TArray<TSharedPtr<FBSPNode>>& List)
 		if (MapMinCoordinate.ComponentwiseAllLessThan(TopNodeCenterCoordinate) &&
 			TopNodeCenterCoordinate.ComponentwiseAllLessThan(MapMaxCoordinate))
 			Leaf->TopNode = BinarySearchTree(RootNode, TopNodeCenterCoordinate);
-		/*
-		if (Leaf->TopNode) {
-			PRINT_LOG(TEXT("My Log : %s, %s "), TEXT("TopNode : "), *TopNodeCenterCoordinate.ToString());
-		}
-		else
-		{
-			PRINT_LOG(TEXT("My Log : %s "), TEXT("TopNode : NULL"));
-		}
-		*/
 
 		FVector2D BottomNodeCenterCoordinate = FVector2D(
 			Leaf->CenterCoordinate.X,
@@ -193,15 +172,6 @@ void APE_MapGenerator::SetNeighbors(TArray<TSharedPtr<FBSPNode>>& List)
 		if (MapMinCoordinate.ComponentwiseAllLessThan(BottomNodeCenterCoordinate) &&
 			BottomNodeCenterCoordinate.ComponentwiseAllLessThan(MapMaxCoordinate))
 			Leaf->BottomNode = BinarySearchTree(RootNode, BottomNodeCenterCoordinate);
-		/*
-		if (Leaf->BottomNode) {
-			PRINT_LOG(TEXT("My Log : %s, %s "), TEXT("BottomNode : "), *BottomNodeCenterCoordinate.ToString());
-		}
-		else
-		{
-			PRINT_LOG(TEXT("My Log : %s "), TEXT("BottomNode : NULL"));
-		}
-		*/
 	}
 }
 
@@ -303,6 +273,11 @@ enum ERoomExitMask
 };
 
 AActor* APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
+	/*
+	현재 노드를 기준으로 이웃한 노드가 스폰되어 있지 않고 다리로 잇지 않아도 되면
+	(`isConnectXXX = false`) 80%확률로 true로 변경해 이을 수 있게 한다.
+	그렇게 확정된 `isConnectXXX` 변수에 따라 적절한 방향의 방 에셋을 비트마스킹으로 검사하고 불러와 노드에 스폰한다.
+	*/
 	if (!Node.IsValid()) return nullptr;
 
 	int32 Mask = 0;
@@ -520,10 +495,10 @@ void APE_MapGenerator::GenerateMap() {
 	FActorSpawnParameters SpawnParams; // Actor를 생성할 때 사용할 파라미터를 담는 구조체
 	//SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding; // 스폰하려는 레벨의 다른 오브젝트가 있다면 위치를 조정. 그래도 충돌하면 스폰하지 않음.
 
-	CollectLeaves(RootNode);
-	SetNeighbors(LeavesList);
+	CollectLeaves(RootNode);				// child가 없는 leaf를 모두 수집
+	SetNeighbors(LeavesList);				// 모든 leaf를 순회하며 이웃노드를 등록한다
 
-	// 시작방은 항상 4방향으로
+	// StartNode는 항상 4방향으로
 	int32 start = FMath::RandRange(0, LeavesList.Num() - 1);
 	TSubclassOf<AActor> Map = GeneratableMapsStart[FMath::RandRange(0, GeneratableMapsStart.Num() - 1)];
 	const FRotator Rotation = FRotator::ZeroRotator;
@@ -536,12 +511,19 @@ void APE_MapGenerator::GenerateMap() {
 	LeavesList[start]->isConnectTop = true;
 	LeavesList[start]->isConnectBottom = true;
 
-	SpawnNeighbors(LeavesList[start]);
+	SpawnNeighbors(LeavesList[start]);		// StartNode를 기점으로 모든 노드를 재귀적으로 순환해 노드를 스폰
 
 	APE_GameMode* GameMode = Cast<APE_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
 	{
-		GameMode->SetPlayerLocation(Location);
+		GameMode->TargetLocation = Location;
+		GameMode->bHasTarget = true;
+
+		// 이미 접속 중인 컨트롤러들 처리 시도
+		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			GameMode->PlacePawnIfReady(It->Get());
+		}
 	}
 
 	SpawnEnemies();

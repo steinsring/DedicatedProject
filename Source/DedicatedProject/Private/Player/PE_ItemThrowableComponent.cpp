@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "InputAction.h"
 #include "Item/PE_ItemThrowable.h"
+#include "Item/PE_ItemGranadeEMP.h"
 #include "DedicatedProject.h"
 #include "Player/ProjectPlayer.h"
 
@@ -18,29 +19,7 @@ UPE_ItemThrowableComponent::UPE_ItemThrowableComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	ItemThrowable = APE_ItemThrowable::StaticClass();
-
-	// IMC 로드
-	static const TCHAR* IMCPath = TEXT("/Game/Inputs/IMC_ItemThrowable.IMC_ItemThrowable");
-	if (UInputMappingContext* IMC = LoadObject<UInputMappingContext>(nullptr, IMCPath))
-	{
-		ThrowMappingContext = IMC;
-	}
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("ThrowMappingContext is NULL"));
-	}
-
-	// IA 로드
-	static const TCHAR* IAPath = TEXT("/Game/Inputs/IA_Throw.IA_Throw");
-	if (UInputAction* IA = LoadObject<UInputAction>(nullptr, IAPath))
-	{
-		ThrowAction = IA;
-	}
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("ThrowInputAction is NULL"));
-	}
+	ItemThrowable = APE_ItemGranadeEMP::StaticClass();
 }
 
 
@@ -48,26 +27,6 @@ UPE_ItemThrowableComponent::UPE_ItemThrowableComponent()
 void UPE_ItemThrowableComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	const AProjectPlayer* Character = Cast<AProjectPlayer>(GetOwner());
-	if (!Character)
-	{
-		return;
-	}
-
-	if (const APlayerController* PlayerController = Cast<APlayerController>(Character->GetController()))
-	{// 컴포넌트의 owner가 ProjectPlayer클래스인지 확인
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{// 해당 캐릭터의 컨트롤러를 가져와서
-			Subsystem->AddMappingContext(ThrowMappingContext, 1);	// 매핑 컨텍스트 초기화
-		}
-
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-		{// 마찬가지로 액션 초기화
-			EnhancedInputComponent->BindAction(ThrowAction, ETriggerEvent::Triggered, this, &UPE_ItemThrowableComponent::Throw);
-		}
-	}
-	
 }
 
 void UPE_ItemThrowableComponent::Throw()
