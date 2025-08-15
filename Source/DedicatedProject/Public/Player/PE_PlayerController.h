@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "SkillManagerComponent.h"
 #include "PE_PlayerController.generated.h"
 
 /**
@@ -14,7 +15,9 @@ class DEDICATEDPROJECT_API APE_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
+public:
+	APE_PlayerController();
 	
-	
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
+	USkillManagerComponent* SkillManager;
 };

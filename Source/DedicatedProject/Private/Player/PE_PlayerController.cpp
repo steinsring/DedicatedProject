@@ -3,6 +3,7 @@
 
 #include "Player/PE_PlayerController.h"
 
-
-
-
+APE_PlayerController::APE_PlayerController()
+{
+	SkillManager = CreateDefaultSubobject<USkillManagerComponent>(TEXT("SkillManager"));
+}
