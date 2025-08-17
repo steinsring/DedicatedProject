@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "HealthComponent.h"
 #include "CharacterCommon.h"
+#include "SkillManagerComponent.h"
 #include <Components/BoxComponent.h>
 #include <Item/PE_BasePickup.h>
 #include "ProjectPlayer.generated.h"
@@ -143,6 +144,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Hitbox")
 	UCapsuleComponent* RightFootHitBox; 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
+	USkillManagerComponent* SkillManager; // 스킬 매니저 컴포넌트
 
 	void AddItemToInventory(FName PickupID);
 

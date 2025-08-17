@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "DedicatedProject.h"
 #include "Player/SkillManagerComponent.h"
 
 
@@ -32,6 +33,7 @@ void USkillManagerComponent::UnlockSkill(FName SkillName)
 		if (SkillNameToName == SkillName)
 		{
 			Skill.bIsUnlocked = true;
+			PRINT_LOG(TEXT("Skill %s unlocked!"), *SkillName.ToString());
 			return; // Exit after unlocking the skill
 		}
 	}
@@ -72,10 +74,11 @@ void USkillManagerComponent::SetSkillData(FPE_SkillDataTable SkillData)
 {
 	for (auto& Skill : Skills)
 	{
-		//FName SkillNameToName = FName(SkillData.SkillID);
-		if (Skill.SkillID == SkillData.SkillID)
+		PRINT_LOG(TEXT("Checking skill: %s against %s"), *Skill.SkillName.ToString(), *SkillData.SkillName.ToString());
+		if (Skill.SkillName.ToString() == SkillData.SkillName.ToString())
 		{
 			Skill = SkillData;
+			PRINT_LOG(TEXT("Skill data for %s set successfully."), *Skill.SkillName.ToString());
 			return; // Exit after setting the skill data
 		}
 	}

@@ -5,5 +5,5 @@
 
 APE_PlayerController::APE_PlayerController()
 {
-	SkillManager = CreateDefaultSubobject<USkillManagerComponent>(TEXT("SkillManager"));
+	//SkillManager = CreateDefaultSubobject<USkillManagerComponent>(TEXT("SkillManager"));
 }
