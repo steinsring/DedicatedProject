@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "DedicatedProject.h"
 #include "Player/SkillManagerComponent.h"
+#include "DedicatedProject.h"
 
 
 // Sets default values for this component's properties
@@ -69,18 +68,3 @@ void USkillManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	// ...
 }
-
-void USkillManagerComponent::SetSkillData(FPE_SkillDataTable SkillData)
-{
-	for (auto& Skill : Skills)
-	{
-		PRINT_LOG(TEXT("Checking skill: %s against %s"), *Skill.SkillName.ToString(), *SkillData.SkillName.ToString());
-		if (Skill.SkillName.ToString() == SkillData.SkillName.ToString())
-		{
-			Skill = SkillData;
-			PRINT_LOG(TEXT("Skill data for %s set successfully."), *Skill.SkillName.ToString());
-			return; // Exit after setting the skill data
-		}
-	}
-}
-

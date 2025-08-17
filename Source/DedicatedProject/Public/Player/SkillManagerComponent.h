@@ -33,7 +33,4 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	UFUNCTION(BlueprintCallable, Category = "Skills")
-	void SetSkillData(FPE_SkillDataTable SkillData);
 };
