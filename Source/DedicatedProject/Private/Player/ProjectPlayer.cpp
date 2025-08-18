@@ -12,7 +12,7 @@
 #include "Inventory/PE_InventoryComponent.h"
 #include "Enemy/PE_AIController.h"
 #include "Player/PE_CharacterStats.h"
-#include "Enemy/PE_AnimInstance.h"
+#include "Player/PE_AnimInstance.h"
 #include "UI/PE_Inventory.h"
 #include "UI/PE_HPBarWidget.h"
 

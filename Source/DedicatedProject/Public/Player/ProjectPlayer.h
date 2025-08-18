@@ -126,6 +126,8 @@ private:
 
 	class UInputAction* ia_SkillTree;
 
+	class UInputAction* ia_SkillChoice;
+
 	UPROPERTY(VisibleAnywhere, Category = "UI")
 	TSubclassOf<UPE_HPBarWidget> HPBarWidgetClass; // 플레이어 UI 위젯 컴포넌트
 

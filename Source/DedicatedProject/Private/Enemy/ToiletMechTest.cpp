@@ -72,7 +72,7 @@ AToiletMechTest::AToiletMechTest()
 
 	//데이터 테이블을 불러오기
 	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableAsset(TEXT
-					("/Script/Engine.DataTable'/Game/BluePrints/DT_ToiletMechStats.DT_ToiletMechStats'"));
+					("'/Game/DataTable/DT_ToiletMechStats.DT_ToiletMechStats'"));
 	if (DataTableAsset.Succeeded())
 		DataTable = DataTableAsset.Object;
 }
