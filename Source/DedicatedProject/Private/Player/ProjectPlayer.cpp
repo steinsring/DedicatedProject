@@ -151,26 +151,6 @@ void AProjectPlayer::BeginPlay()
 		{
 			PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
 		}
-		
-		/*
-		if (InventoryWidgetClass)
-		{
-			InventoryWidget = CreateWidget<UPE_Inventory>(pc, InventoryWidgetClass);
-			if (InventoryWidget)
-			{
-				PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
-				//InventoryWidget->AddToViewport();
-				//InventoryWidget->InitInventory(InventoryComponent);
-			}
-			else
-			{
-				PRINT_ERROR_LOG(TEXT("InventoryWidget is Not Created"));
-			}
-		}
-		else
-		{
-			PRINT_ERROR_LOG(TEXT("InventoryWidgetClass is NULL"));
-		}*/
 
 		if (HPBarWidgetClass)
 		{
@@ -212,6 +192,15 @@ void AProjectPlayer::BeginPlay()
 
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapBegin);				// 이벤트 바인딩 : 아이템 감지 범위에 아이템 콜리전이 충돌했을때 
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapEnd);					// 이벤트 바인딩 : 충돌범위에서 아이템이 빠져나갔을때
+
+	if (ItemThrowable && InventoryComponent)
+	{
+		InventoryComponent->SetComponent(ItemThrowable);
+	}
+	else
+	{
+		PRINT_LOG(TEXT("ItemThrowableComponent is NOT setting in InventoryComponent"));
+	}
 }
 
 
@@ -290,7 +279,8 @@ void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
 {  
 	if (true)
 	{
-		ItemThrowable->Throw();
+		InventoryComponent->UseItem();
+		//ItemThrowable->Throw();
 	}
 	else
 	{

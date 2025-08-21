@@ -48,6 +48,10 @@ void UPE_ItemThrowableComponent::Throw_Server_Implementation()
 
 		GetWorld()->SpawnActor<APE_ItemThrowable>(ItemThrowable, ItemSpawnLocation, ItemSpawnRotation, ItemSpawnParams);
 	}
+	else
+	{
+		PRINT_LOG(TEXT("ItemThrowable is null"));
+	}
 }
 
 // 스폰하는 아이템 변경
