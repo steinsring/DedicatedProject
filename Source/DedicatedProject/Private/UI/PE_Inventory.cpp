@@ -34,42 +34,75 @@ void UPE_Inventory::NativeConstruct()
 	}
 }
 
-void UPE_Inventory::AddItemToInventory(UTexture2D* ItemIcon, int32 Quantity)
+UPE_InventorySlot* UPE_Inventory::FindInventorySlot(const int SlotNumber) const
 {
-	PRINT_LOG(TEXT("Try Add Item To Inventory"));
-	/*
-	APlayerController* LocalPlayerController = GetWorld()->GetFirstPlayerController();
-	UPE_InventorySlot* NewSlot = CreateWidget<UPE_InventorySlot>(LocalPlayerController, InventoryWidget);
-	NewSlot->SetItem(ItemIcon, Quantity);
-	InventorySlots[0]->AddChild(NewSlot);
-	*/
-	UPE_InventorySlot* FoundSlot = nullptr;
-	const int32 ChildCount = InventorySlots[0]->GetChildrenCount();
+	const int32 ChildCount = InventorySlots[SlotNumber]->GetChildrenCount();
 	for (int32 i = 0; i < ChildCount; ++i)
 	{
-		if (UPE_InventorySlot* Temp = Cast<UPE_InventorySlot>(InventorySlots[0]->GetChildAt(i)))
+		if (UPE_InventorySlot* CheckingSlot = Cast<UPE_InventorySlot>(InventorySlots[SlotNumber]->GetChildAt(i)))
 		{
-			FoundSlot = Temp;
-			break; // 첫 번째만 찾고 끝내려면 break
+			return CheckingSlot;
 		}
 	}
 
-	if (FoundSlot)
-	{
-		FoundSlot->SetItem(ItemIcon, Quantity);
-	}
-	//PRINT_LOG(TEXT("InventorySlots is valid. Name: %s"), *InventorySlots[0]->GetName());
-	//PRINT_LOG(TEXT("NewSlot is valid. Name: %s"), *NewSlot->GetName());
+	return nullptr;
 }
 
-// 숫자키를 누르면 해당되는 아이템 슬롯을 선택해 표시하고 해당 아이템 정보를 반환
-void UPE_Inventory::ItemSlotSelect(int KeyboardNumber)
+void UPE_Inventory::AddItemToInventory(const FName ItemID)
+{
+	PRINT_LOG(TEXT("Try Add Item To Inventory"));
+	UPE_InventorySlot* FoundSlot = nullptr;
+	for (int32 SlotNumber = 0; SlotNumber < InventorySlots.Num(); ++SlotNumber)
+	{
+		const int32 ChildCount = InventorySlots[SlotNumber]->GetChildrenCount();
+		if (UPE_InventorySlot* CheckingSlot = FindInventorySlot(SlotNumber))
+		{
+			if (CheckingSlot->GetSlotInformation().IsNone())
+			{
+				FoundSlot = CheckingSlot;
+				break; // 첫 번째만 찾고 끝내려면 break
+			}
+		}
+	}
+	
+	if (FoundSlot)
+	{
+		FoundSlot->SetItem(ItemID);
+	}
+	else
+	{
+		PRINT_LOG(TEXT("All Inventory Slot are Full"));
+	}
+}
+
+// 숫자키를 누르면 해당되는 아이템 슬롯을 선택해 표시
+void UPE_Inventory::ItemSlotSelect(const int KeyboardNumber)
 {
 	// 선택된 아이템 슬롯 하이라이트
 	if (UUniformGridSlot* GridSlot = Cast<UUniformGridSlot>(Highlight->Slot))
 	{
 		GridSlot->SetColumn(KeyboardNumber);
 	}
+}
 
+// 선택된 슬롯에 아이템이 있는지 검사
+bool UPE_Inventory::IsEmptySlot(const int SlotNumber) const
+{
+	if (UPE_InventorySlot* CheckingSlot = FindInventorySlot(SlotNumber))
+	{
+		if (CheckingSlot->GetSlotInformation().IsNone())
+		{
+			return true;
+		}
+	}
+	return false;
+}
 
+void UPE_Inventory::UseItem(const int SlotNumber)
+{
+	if (UPE_InventorySlot* CheckingSlot = FindInventorySlot(SlotNumber))
+	{
+		CheckingSlot->UseItem();
+		return;
+	}
 }

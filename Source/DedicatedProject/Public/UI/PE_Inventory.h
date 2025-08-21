@@ -23,6 +23,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = UI)
 	TSubclassOf<UPE_InventorySlot> InventoryWidget;
 
+	UPE_InventorySlot* FindInventorySlot(const int SlotNumber) const;
+
 protected:
 	virtual void NativeConstruct() override;
 	
@@ -35,8 +37,12 @@ public:
 	TObjectPtr<UWidget> Highlight = nullptr;
 
 	// 아이템 추가 함수
-	void AddItemToInventory(UTexture2D* ItemIcon, int32 Quantity);
+	void AddItemToInventory(const FName ItemID);
 
 	// 슬롯 선택시 해당 아이템 반환
-	void ItemSlotSelect(int KeyboardNumber);
+	void ItemSlotSelect(const int KeyboardNumber);
+
+	bool IsEmptySlot(const int SlotNumber) const;
+
+	void UseItem(const int SlotNumber);
 };

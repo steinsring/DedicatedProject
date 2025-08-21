@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include <Item/PE_ItemDataTable.h>
 #include "PE_InventorySlot.generated.h"
 
 class UImage;
@@ -16,8 +17,20 @@ class DEDICATEDPROJECT_API UPE_InventorySlot : public UUserWidget
 
 private:
 	int32 Stack = 0;
+	FName ID;
+
+	UFUNCTION()
+	void FindItemData(FName ItemID);
+
+	TArray<FPE_ItemDataTable*> ItemDataRows;
+	struct FPE_ItemDataTable* SearchedItemData;
+
+	FORCEINLINE FPE_ItemDataTable* GetItemData() const { return SearchedItemData; }
 protected:
 	virtual void NativeConstruct() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Data")
+	class UDataTable* ItemDataTable;
 	
 public:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
@@ -26,5 +39,9 @@ public:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
 	UTextBlock* Number;
 
-	void SetItem(UTexture2D* Icon, int32 Quantity);
+	void SetItem(FName ItemID);
+
+	FName GetSlotInformation();
+
+	void UseItem();
 };
