@@ -417,6 +417,16 @@ void AProjectPlayer::Interact()
 	// 밑에 여러 작용 추가
 }
 
+void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
+{
+
+}
+
+void AProjectPlayer::InputOverrideSkill(const FInputActionValue& inputValue)
+{
+
+}
+
 void AProjectPlayer::AddItemToInventory(FName PickupID)
 {
 	InventoryComponent->AddItem(PickupID);

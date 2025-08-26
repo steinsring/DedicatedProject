@@ -51,6 +51,16 @@ void USkillManagerComponent::LockSkill(FName SkillName)
 	}
 }
 
+void USkillManagerComponent::SetAugmentSkill(E_AugmentSkills skill)
+{
+	CurrentAugmentSkill = skill;
+}
+
+void USkillManagerComponent::SetOverrideSkill(E_OverrideSkills skill)
+{
+	CurrentOverrideSkill = skill;
+}
+
 // Called when the game starts
 void USkillManagerComponent::BeginPlay()
 {
@@ -58,13 +68,4 @@ void USkillManagerComponent::BeginPlay()
 
 	// ...
 	
-}
-
-
-// Called every frame
-void USkillManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }

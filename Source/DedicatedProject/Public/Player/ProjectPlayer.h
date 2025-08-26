@@ -114,6 +114,13 @@ private:
 	class UInputAction* IA_Interact;
 	void Interact();																							// 플레이어가 E키를 클릭했을 때
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ia_Skill_Augment;
+	void InputAugmentSkill(const struct FInputActionValue& inputValue);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ia_Skill_Override;
+	void InputOverrideSkill(const struct FInputActionValue& inputValue);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UPE_InventoryComponent> InventoryComponent;
