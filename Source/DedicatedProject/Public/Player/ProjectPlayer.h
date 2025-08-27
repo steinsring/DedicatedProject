@@ -154,8 +154,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Hitbox")
 	UCapsuleComponent* RightFootHitBox; 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
-	USkillManagerComponent* SkillManager; // 스킬 매니저 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skills")
+	TObjectPtr<class USkillManagerComponent> SkillManager; // 스킬 매니저 컴포넌트
+
+	UFUNCTION(BlueprintCallable)
+	USkillManagerComponent* GetSkillManager() const { return SkillManager; }
 
 	void AddItemToInventory(FName PickupID);
 

@@ -125,6 +125,15 @@ AProjectPlayer::AProjectPlayer()
 
 	CharacterDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_CharacterStats.DT_CharacterStats"));
 	SkillManager = CreateDefaultSubobject<USkillManagerComponent>(TEXT("SkillManager"));
+
+	if (SkillManager)
+	{
+		PRINT_LOG(TEXT("✅ SkillManagerComponent is Created"));
+	}
+	else
+	{
+		PRINT_LOG(TEXT("❌ SkillManagerComponent is NOT Created"));
+	}
 }
 
 // Called when the game starts or when spawned
