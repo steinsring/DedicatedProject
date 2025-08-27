@@ -25,6 +25,25 @@ enum class E_OverrideSkills : uint8
 	SeeThrough		UMETA(DisplayName = "SeeThrough")
 };
 
+UENUM(BlueprintType)
+enum class E_Skills : uint8
+{
+	AttackUp		UMETA(DisplayName = "AttackUp"),
+	DefenseUp		UMETA(DisplayName = "DefenseUp"),
+	SpeedUp			UMETA(DisplayName = "SpeedUp"),
+	SightHacking	UMETA(DisplayName = "SightHacking"),
+	Slow			UMETA(DisplayName = "Slow"),
+	ElectricShock	UMETA(DisplayName = "ElectricShock"),
+	SeeThrough		UMETA(DisplayName = "SeeThrough")
+};
+
+UENUM(BlueprintType)
+enum class E_SkillType : uint8
+{
+	Augment			UMETA(DisplayName = "Augment"),
+	Override		UMETA(DisplayName = "Override")
+};
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DEDICATEDPROJECT_API USkillManagerComponent : public UActorComponent
@@ -45,16 +64,29 @@ public:
 	void LockSkill(FName SkillName);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
-	E_AugmentSkills CurrentAugmentSkill;
+	E_Skills CurrentAugmentSkill;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
-	E_OverrideSkills CurrentOverrideSkill;
+	E_Skills CurrentOverrideSkill;
 
 	UFUNCTION(BlueprintCallable)
-	void SetAugmentSkill(E_AugmentSkills skill);
+	void SetAugmentSkill(E_Skills skill);
 
 	UFUNCTION(BlueprintCallable)
-	void SetOverrideSkill(E_OverrideSkills skill);
+	void SetOverrideSkill(E_Skills skill);
+
+	UFUNCTION(BlueprintCallable)
+	bool IsSkillUnlocked(FName SkillName) const;
+
+	FString GetCurrentAugmentSkillName() const
+	{
+		return *UEnum::GetValueAsString(CurrentAugmentSkill);
+	}
+
+	FString GetCurrentOverrideSkillName() const
+	{
+		return *UEnum::GetValueAsString(CurrentOverrideSkill);
+	}
 
 protected:
 	// Called when the game starts

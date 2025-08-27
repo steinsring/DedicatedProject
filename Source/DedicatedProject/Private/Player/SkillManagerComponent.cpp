@@ -51,14 +51,27 @@ void USkillManagerComponent::LockSkill(FName SkillName)
 	}
 }
 
-void USkillManagerComponent::SetAugmentSkill(E_AugmentSkills skill)
+void USkillManagerComponent::SetAugmentSkill(E_Skills skill)
 {
 	CurrentAugmentSkill = skill;
 }
 
-void USkillManagerComponent::SetOverrideSkill(E_OverrideSkills skill)
+void USkillManagerComponent::SetOverrideSkill(E_Skills skill)
 {
 	CurrentOverrideSkill = skill;
+}
+
+bool USkillManagerComponent::IsSkillUnlocked(FName SkillName) const
+{
+	for (const auto& Skill : Skills)
+	{
+		FName SkillNameToName = FName(Skill.SkillName.ToString());
+		if (SkillNameToName == SkillName)
+		{
+			return Skill.bIsUnlocked;
+		}
+	}
+	return false;
 }
 
 // Called when the game starts

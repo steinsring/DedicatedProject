@@ -239,6 +239,8 @@ void AProjectPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		PlayerInput->BindAction(ia_Sprint, ETriggerEvent::Completed, this, &AProjectPlayer::SprintEnd);
 		PlayerInput->BindAction(IA_Interact, ETriggerEvent::Triggered, this, &AProjectPlayer::Interact);
 		PlayerInput->BindAction(ia_Attack, ETriggerEvent::Started, this, &AProjectPlayer::InputAttack);
+		PlayerInput->BindAction(ia_Skill_Augment, ETriggerEvent::Started, this, &AProjectPlayer::InputAugmentSkill);
+		PlayerInput->BindAction(ia_Skill_Override, ETriggerEvent::Started, this, &AProjectPlayer::InputOverrideSkill);
 	}
 }
 
@@ -419,12 +421,12 @@ void AProjectPlayer::Interact()
 
 void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
 {
-
+	PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentAugmentSkillName());
 }
 
 void AProjectPlayer::InputOverrideSkill(const FInputActionValue& inputValue)
 {
-
+	PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentOverrideSkillName());
 }
 
 void AProjectPlayer::AddItemToInventory(FName PickupID)

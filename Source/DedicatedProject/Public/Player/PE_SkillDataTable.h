@@ -22,5 +22,8 @@ public:
 	bool bIsUnlocked = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+	bool bIsSelected = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
 	float Cost;
 };
