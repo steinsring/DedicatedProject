@@ -430,12 +430,48 @@ void AProjectPlayer::Interact()
 
 void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
 {
-	PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentAugmentSkillName());
+	//PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentAugmentSkillName());
+	E_Skills CurrentAugmentSkill = SkillManager->GetCurrentAugmentSkill();
+
+	switch (CurrentAugmentSkill)
+	{
+	case E_Skills::AttackUp:
+		SkillManager->AttackUp();
+		break;
+
+	case E_Skills::DefenseUp:
+		SkillManager->DefenseUp();
+		break;
+
+	case E_Skills::SpeedUp:
+		SkillManager->SpeedUp();
+		break;
+	}
 }
 
 void AProjectPlayer::InputOverrideSkill(const FInputActionValue& inputValue)
 {
-	PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentOverrideSkillName());
+	//PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentOverrideSkillName());
+	E_Skills CurrentOverrideSkill = SkillManager->GetCurrentOverrideSkill();
+
+	switch (CurrentOverrideSkill)
+	{
+	case E_Skills::SightHacking:
+		SkillManager->SightHacking();
+		break;
+
+	case E_Skills::Slow:
+		SkillManager->Slow();
+		break;
+
+	case E_Skills::ElectricShock:
+		SkillManager->ElectricShock();
+		break;
+
+	case E_Skills::SeeThrough:
+		SkillManager->SeeThrough();
+		break;
+	}
 }
 
 void AProjectPlayer::AddItemToInventory(FName PickupID)

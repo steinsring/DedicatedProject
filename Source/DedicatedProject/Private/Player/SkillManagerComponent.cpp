@@ -82,3 +82,38 @@ void USkillManagerComponent::BeginPlay()
 	// ...
 	
 }
+
+void USkillManagerComponent::AttackUp()
+{
+	PRINT_LOG(TEXT("Attack Up Activated"));
+}
+
+void USkillManagerComponent::DefenseUp()
+{
+	PRINT_LOG(TEXT("Defense Up Activated"));
+}
+
+void USkillManagerComponent::SpeedUp()
+{
+	PRINT_LOG(TEXT("Speed Up Activated"));
+}
+
+void USkillManagerComponent::SightHacking()
+{
+	PRINT_LOG(TEXT("Sight Hacking Activated"));
+}
+
+void USkillManagerComponent::Slow()
+{
+	PRINT_LOG(TEXT("Slow Activated"));
+}
+
+void USkillManagerComponent::ElectricShock()
+{
+	PRINT_LOG(TEXT("Electric Shock Activated"));
+}
+
+void USkillManagerComponent::SeeThrough()
+{
+	PRINT_LOG(TEXT("See Through Activated"));
+}
