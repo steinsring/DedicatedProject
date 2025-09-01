@@ -34,7 +34,8 @@ enum class E_Skills : uint8
 	SightHacking	UMETA(DisplayName = "SightHacking"),
 	Slow			UMETA(DisplayName = "Slow"),
 	ElectricShock	UMETA(DisplayName = "ElectricShock"),
-	SeeThrough		UMETA(DisplayName = "SeeThrough")
+	SeeThrough		UMETA(DisplayName = "SeeThrough"),
+	None			UMETA(DisplayName = "None")
 };
 
 UENUM(BlueprintType)
