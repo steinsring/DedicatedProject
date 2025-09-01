@@ -430,9 +430,7 @@ void AProjectPlayer::Interact()
 
 void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
 {
-<<<<<<< Updated upstream
 	PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentAugmentSkillName());
-=======
 	//PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentAugmentSkillName());
 	E_Skills CurrentAugmentSkill = SkillManager->GetCurrentAugmentSkill();
 
@@ -454,14 +452,11 @@ void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
 		PRINT_LOG(TEXT("No Augment Skill is selected"));
 		break;
 	}
->>>>>>> Stashed changes
 }
 
 void AProjectPlayer::InputOverrideSkill(const FInputActionValue& inputValue)
 {
-<<<<<<< Updated upstream
 	PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentOverrideSkillName());
-=======
 	//PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentOverrideSkillName());
 	E_Skills CurrentOverrideSkill = SkillManager->GetCurrentOverrideSkill();
 
@@ -487,7 +482,6 @@ void AProjectPlayer::InputOverrideSkill(const FInputActionValue& inputValue)
 		PRINT_LOG(TEXT("No Override Skill is selected"));
 		break;
 	}
->>>>>>> Stashed changes
 }
 
 void AProjectPlayer::AddItemToInventory(FName PickupID)

@@ -11,9 +11,6 @@ USkillManagerComponent::USkillManagerComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	CurrentAugmentSkill = E_Skills::None;
-	CurrentAugmentSkill = E_Skills::None;
-
 	UDataTable* SkillDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_SkillDataTable.DT_SkillDataTable"));
 	if (SkillDataTable)
 	{
@@ -83,5 +80,40 @@ void USkillManagerComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+
+}
+
+void USkillManagerComponent::AttackUp()
+{
+	PRINT_LOG(TEXT("Attack Up Activated"));
+}
+
+void USkillManagerComponent::DefenseUp()
+{
+	PRINT_LOG(TEXT("Defense Up Activated"));
+}
+
+void USkillManagerComponent::SpeedUp()
+{
+	PRINT_LOG(TEXT("Speed Up Activated"));
+}
+
+void USkillManagerComponent::SightHacking()
+{
+	PRINT_LOG(TEXT("Sight Hacking Activated"));
+}
+
+void USkillManagerComponent::Slow()
+{
+	PRINT_LOG(TEXT("Slow Activated"));
+}
+
+void USkillManagerComponent::ElectricShock()
+{
+	PRINT_LOG(TEXT("Electric Shock Activated"));
+}
+
+void USkillManagerComponent::SeeThrough()
+{
+	PRINT_LOG(TEXT("See Through Activated"));
 }

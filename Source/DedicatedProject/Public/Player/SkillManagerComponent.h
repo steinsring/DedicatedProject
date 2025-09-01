@@ -8,22 +8,22 @@
 #include "SkillManagerComponent.generated.h"
 
 
-UENUM(BlueprintType)
-enum class E_AugmentSkills : uint8
-{
-	AttackUp		UMETA(DisplayName = "AttackUp"),
-	DefenseUp		UMETA(DisplayName = "DefenseUp"),
-	SpeedUp			UMETA(DisplayName = "SpeedUp")
-};
-
-UENUM(BlueprintType)
-enum class E_OverrideSkills : uint8
-{
-	SightHacking	UMETA(DisplayName = "SightHacking"),
-	Slow			UMETA(DisplayName = "Slow"),
-	ElectricShock	UMETA(DisplayName = "ElectricShock"),
-	SeeThrough		UMETA(DisplayName = "SeeThrough")
-};
+//UENUM(BlueprintType)
+//enum class E_AugmentSkills : uint8
+//{
+//	AttackUp		UMETA(DisplayName = "AttackUp"),
+//	DefenseUp		UMETA(DisplayName = "DefenseUp"),
+//	SpeedUp			UMETA(DisplayName = "SpeedUp")
+//};
+//
+//UENUM(BlueprintType)
+//enum class E_OverrideSkills : uint8
+//{
+//	SightHacking	UMETA(DisplayName = "SightHacking"),
+//	Slow			UMETA(DisplayName = "Slow"),
+//	ElectricShock	UMETA(DisplayName = "ElectricShock"),
+//	SeeThrough		UMETA(DisplayName = "SeeThrough")
+//};
 
 UENUM(BlueprintType)
 enum class E_Skills : uint8
@@ -46,12 +46,12 @@ enum class E_SkillType : uint8
 };
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DEDICATEDPROJECT_API USkillManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	USkillManagerComponent();
 
@@ -63,12 +63,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void LockSkill(FName SkillName);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
-	E_Skills CurrentAugmentSkill;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
-	E_Skills CurrentOverrideSkill;
 
 	UFUNCTION(BlueprintCallable)
 	void SetAugmentSkill(E_Skills skill);
@@ -89,7 +83,25 @@ public:
 		return *UEnum::GetValueAsString(CurrentOverrideSkill);
 	}
 
+	E_Skills GetCurrentAugmentSkill() const { return CurrentAugmentSkill; }
+	E_Skills GetCurrentOverrideSkill() const { return CurrentOverrideSkill; }
+
+	void AttackUp();
+	void DefenseUp();
+	void SpeedUp();
+	void SightHacking();
+	void Slow();
+	void ElectricShock();
+	void SeeThrough();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+private:
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
+	E_Skills CurrentAugmentSkill;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
+	E_Skills CurrentOverrideSkill;
 };
