@@ -2,6 +2,7 @@
 
 
 #include "Enemy/ToiletMech_AnimInstance.h"
+#include "DedicatedProject.h"
 
 //공격 패턴만 넣어주면 됨
 UToiletMech_AnimInstance::UToiletMech_AnimInstance()
@@ -21,4 +22,34 @@ UToiletMech_AnimInstance::UToiletMech_AnimInstance()
 	//}
 
 	AttackMontages.Add(AttackPattern1);
+
+	// 스턴 몽타주 할당
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> TempMontage
+	(TEXT("/Game/Fab/SciFi_ToiletMech/Animation/Anim_SciFi_ToiletMech_Stun_Montage.Anim_SciFi_ToiletMech_Stun_Montage"));
+	if (TempMontage.Succeeded())
+	{
+		StunMontage = TempMontage.Object;
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("StunMontage is Null"));
+	}
+}
+
+void UToiletMech_AnimInstance::PlayStunMontage(float Duration)
+{
+	IsStuned = true;
+	StunDuration = Duration;
+
+	if (!StunMontage)
+	{
+		PRINT_LOG(TEXT("StunMontage is NULL"));
+		return;
+	}
+	Montage_Play(StunMontage, Duration);
+}
+
+void UToiletMech_AnimInstance::EndStunMontage()
+{
+	IsStuned = false;
 }

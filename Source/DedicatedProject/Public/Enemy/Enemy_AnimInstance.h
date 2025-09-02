@@ -18,7 +18,4 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Animation")
 	UAnimMontage* GetRandomAttackMontage();
-
-protected:
-	TArray<UAnimMontage*> AttackMontages;
 };
