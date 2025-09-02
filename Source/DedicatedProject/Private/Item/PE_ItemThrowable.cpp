@@ -26,8 +26,9 @@ APE_ItemThrowable::APE_ItemThrowable()
 	ItemCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	ItemCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);   // 트리거 전용
 	ItemCollision->SetGenerateOverlapEvents(true);
-	ItemCollision->InitSphereRadius(10.f);
-	ItemCollision->SetNotifyRigidBodyCollision(true);								// Hit 이벤트
+	ItemCollision->InitSphereRadius(700.f);
+	ItemCollision->SetGenerateOverlapEvents(true);						// 오버랩시 이벤트
+	ItemCollision->SetNotifyRigidBodyCollision(false);					// Hit 이벤트
 	//ItemCollision->OnComponentHit.AddDynamic(this, &APE_ItemThrowable::OnHit);
 	ItemCollision->SetupAttachment(RootComponent);
 	
@@ -57,7 +58,7 @@ void APE_ItemThrowable::BeginPlay()
 	const FVector Forward = GetActorForwardVector();
 	FVector Velocity = Forward * 3000.f;
 
-	// 2) 발사자 속도 상속(선택)
+	// 2) 발사자 속도 상속
 
 	if (const APawn* InstigatorPawn = Cast<APawn>(GetOwner()))
 	{
@@ -71,7 +72,6 @@ void APE_ItemThrowable::BeginPlay()
 
 	// 3) 적용
 	ItemMesh->SetPhysicsLinearVelocity(Velocity, /*bAddToCurrent=*/false);
-
 }
 
 // Called every frame

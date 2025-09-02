@@ -6,7 +6,8 @@
 
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "Enemy/PE_AIController.h"
+#include "BrainComponent.h"
 #include "DedicatedProject.h"
 
 // Sets default values
@@ -44,7 +45,25 @@ void ACharacterCommon::PostInitializeComponents()
 		PRINT_LOG(TEXT("BaseAnim is NULL"));
 		return;
 	}
-	BaseAnimInstance->OnMontageEnded.AddDynamic(this, &ACharacterCommon::OnAttackMontageEnded);
+	BaseAnimInstance->OnMontageEnded.AddDynamic(this, &ACharacterCommon::OnMontageEnded);
+}
+
+// Montage 종료시 Type을 구분해 이후 함수 호출
+void ACharacterCommon::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	EMontageType Type =	BaseAnimInstance->GetMontageType(Montage);
+	
+	switch (Type)
+	{
+	case EMontageType::Attack:
+		OnAttackMontageEnded(Montage, bInterrupted);
+		break;
+	case EMontageType::Stun:
+		EndStun();
+		break;
+	default: 
+		return;
+	}
 }
 
 void ACharacterCommon::Attack(UAnimMontage* AnimMontage)
@@ -97,5 +116,58 @@ void ACharacterCommon::SetHitbox(ECollisionEnabled::Type CollisionEnabled, UCaps
 float ACharacterCommon::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	return HealthComp->ApplyDamage(DamageAmount);
+}
+
+void ACharacterCommon::ApplyStun(float Duration)
+{
+	if (bIsStunned) return;
+	bIsStunned = true;
+
+	// 1) 현재 진행 중인 공격 끊기
+	if (BaseAnimInstance)
+	{
+		// 공격 Anim 정지 → OnMontageEnded
+		BaseAnimInstance->Montage_Stop(0.1f);
+	}
+
+	// 2) 공격 중이라면 공격판정/상태 강제 종료
+	if (IsAttacking)
+	{
+		IsAttacking = false;
+		OnAttackEnd.Broadcast();
+	}
+
+	// 3) 스턴 몽타주 재생
+	//  - FullBody 슬롯의 스턴 몽타주여야 공격/로코모션을 확실히 덮어씀
+	if (UCommon_AnimInstance* CommonAnim = Cast<UCommon_AnimInstance>(BaseAnimInstance))
+	{
+		CommonAnim->PlayStunMontage(Duration); // 스턴 Anim 재생
+	}
+
+	// 4) BT 일시정지
+	if (APE_AIController* AI = Cast<APE_AIController>(GetController()))
+	{
+		if (UBrainComponent* Brain = AI->GetBrainComponent())
+		{
+			Brain->PauseLogic(TEXT("Stun"));
+		}
+	}
+}
+
+void ACharacterCommon::EndStun()
+{
+	if (UCommon_AnimInstance* CommonAnim = Cast<UCommon_AnimInstance>(BaseAnimInstance))
+	{
+		CommonAnim->EndStunMontage();
+	}
+
+	// BT 재개
+	if (AAIController* AI = Cast<AAIController>(GetController()))
+	{
+		if (UBrainComponent* Brain = AI->GetBrainComponent())
+		{
+			Brain->ResumeLogic(TEXT("Stun ended"));
+		}
+	}
 }
 

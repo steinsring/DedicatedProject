@@ -67,7 +67,7 @@ AToiletMechTest::AToiletMechTest()
 
 		//HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthStat"));
 
-		//IsAttacking = false;
+		//IsAttacking = false; 
 	}
 
 	//데이터 테이블을 불러오기

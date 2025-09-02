@@ -53,10 +53,25 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 		AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(BlueprintCallable)
+	void ApplyStun(float Duration);	// 스턴이 적용되었을 때 현재 BT, Anim 종료 및 Stun 실행. 외부에서 호출하는 stun 시작점
+
 private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	bool IsAttacking;
 
 	UPROPERTY()
 	class UCommon_AnimInstance* BaseAnimInstance;
+
+	UFUNCTION()
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);	// 현재 실행중인 Montage가 종료됐을 때 호출
+
+	// 스턴 상태
+	UPROPERTY(VisibleAnywhere, Category = "Stun")
+	bool bIsStunned = false;
+
+	FTimerHandle StunTimer;		// 스턴 시간
+
+	UFUNCTION()
+	void EndStun();	// 스턴 종료시
 };

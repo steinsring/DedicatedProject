@@ -13,33 +13,27 @@ class DEDICATEDPROJECT_API APE_ItemThrowable : public AActor
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
-	TObjectPtr<class USphereComponent> ItemCollision;					// 충돌 영역
-
-	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
 	TObjectPtr<UStaticMeshComponent> ItemMesh;							// 아이템 메시
 
 	//UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
 	//TObjectPtr<class UProjectileMovementComponent> ProjectileMovement;	// 투사체 로직
-	
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
+	TObjectPtr<class USphereComponent> ItemCollision;					// 감지 영역
+
 public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 	// Sets default values for this actor's properties
 	APE_ItemThrowable();
 
 	FORCEINLINE USphereComponent* GetItemThrowableCollision() const { return ItemCollision; }
 	FORCEINLINE UStaticMeshComponent* GetItemThrowableMesh() const { return ItemMesh; }
 	//FORCEINLINE UProjectileMovementComponent* GetItemProjectile() const { return ProjectileMovement; }
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-	//UFUNCTION()
-	//virtual void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	
 	
 };

@@ -6,9 +6,8 @@
 #include "Animation/AnimInstance.h"
 #include "Common_AnimInstance.generated.h"
 
-/**
- * 
- */
+enum class EMontageType { Attack, Stun, None };
+
 UCLASS()
 class DEDICATEDPROJECT_API UCommon_AnimInstance : public UAnimInstance
 {
@@ -19,6 +18,28 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
 	void PlayAttackMontage(UAnimMontage* AnimMontage);
+
+	virtual void PlayStunMontage(float Duration = 0.0);
+	virtual void EndStunMontage();
+
+	EMontageType GetMontageType(UAnimMontage* Montage) const;
+
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "Stun", meta = (AllowPrivateAccess = true))
+	UAnimMontage* StunMontage = nullptr;	// 애니메이션 몽타주는 부모에서 선언하고 자식에서 각각 할당함.
+
+	UPROPERTY(VisibleAnywhere, Category = "Stun", meta = (AllowPrivateAccess = true))
+	bool IsStuned = false;
+
+	float StunDuration = 0.0;
+
+	TArray<UAnimMontage*> AttackMontages;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
+	UAnimMontage* AttackPattern1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
+	UAnimMontage* AttackPattern2;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pawn", meta = (AllowPrivateAccess = true))

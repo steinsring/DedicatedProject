@@ -40,3 +40,30 @@ void UCommon_AnimInstance::PlayAttackMontage(UAnimMontage* AnimMontage)
 	}
 	Montage_Play(AnimMontage, 1.0f);
 }
+
+// 자식에서 구현
+void UCommon_AnimInstance::PlayStunMontage(float Duration)
+{
+	
+}
+
+// 자식에서 구현
+void UCommon_AnimInstance::EndStunMontage()
+{
+
+}
+
+EMontageType UCommon_AnimInstance::GetMontageType(UAnimMontage* Montage) const
+{
+	if (AttackMontages.Contains(Montage))
+	{
+		return EMontageType::Attack;
+	}
+
+	if (StunMontage == Montage)
+	{
+		return EMontageType::Stun;
+	}
+
+	return EMontageType::None;
+}
