@@ -11,6 +11,9 @@ USkillManagerComponent::USkillManagerComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
+	CurrentAugmentSkill = E_Skills::None;
+	CurrentOverrideSkill = E_Skills::None;
+
 	UDataTable* SkillDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_SkillDataTable.DT_SkillDataTable"));
 	if (SkillDataTable)
 	{
