@@ -30,7 +30,7 @@ AProjectPlayer::AProjectPlayer()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//스켈레탈 메쉬를 구조체로 불러와서
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequin_UE4/Meshes/SK_Mannequin.SK_Mannequin'"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Game/ParagonWraith/Characters/Heroes/Wraith/Meshes/Wraith.Wraith"));
 	//ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT(""));
 	if (TempMesh.Succeeded())
 	{ //에셋 로드가 성공했다면
@@ -45,7 +45,7 @@ AProjectPlayer::AProjectPlayer()
 
 		//ProjectPlayer 불루프린트 클래스에 애니메이션 블루프린트를 세팅해준다.
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		static ConstructorHelpers::FClassFinder<UAnimInstance> PlayerAnimAsset(TEXT("/Game/BluePrints/AB_AnimBlueprint.AB_AnimBlueprint_C"));
+		static ConstructorHelpers::FClassFinder<UAnimInstance> PlayerAnimAsset(TEXT("/Game/ParagonWraith/Characters/Heroes/Wraith/Wraith_AnimBlueprint.Wraith_AnimBlueprint_C"));
 		if (PlayerAnimAsset.Succeeded())
 		{
 			GetMesh()->SetAnimInstanceClass(PlayerAnimAsset.Class);
