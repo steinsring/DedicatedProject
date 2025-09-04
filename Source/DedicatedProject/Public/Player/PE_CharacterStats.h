@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -18,7 +18,7 @@ struct DEDICATEDPROJECT_API FPE_CharacterStats : public FTableRowBase
 	float SprintSpeed = 400.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float DamageMultiplier = 1.0f;
+	float DamageMultiplier = 1.0f; //받는 데미지 배율
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 NextLevelXp = 10.0f;
@@ -28,4 +28,10 @@ struct DEDICATEDPROJECT_API FPE_CharacterStats : public FTableRowBase
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float AttackPower = 1.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float AttackPowerMultiplier = 1.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float SpeedMultiplier = 1.0f;
 };

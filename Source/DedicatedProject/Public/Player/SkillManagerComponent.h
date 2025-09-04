@@ -7,6 +7,8 @@
 #include "Player/PE_SkillDataTable.h"
 #include "SkillManagerComponent.generated.h"
 
+class AProjectPlayer; // forward declaration
+
 
 //UENUM(BlueprintType)
 //enum class E_AugmentSkills : uint8
@@ -104,4 +106,8 @@ private:
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
 	E_Skills CurrentOverrideSkill;
+
+	void ActivateAugmentSkill(E_Skills skill, float Multiplier, float Duration);
+
+	AProjectPlayer* Player;
 };

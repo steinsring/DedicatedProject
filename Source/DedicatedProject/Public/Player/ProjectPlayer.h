@@ -122,6 +122,10 @@ private:
 	class UInputAction* ia_Skill_Override;
 	void InputOverrideSkill(const struct FInputActionValue& inputValue);
 
+	float AttackPowerMultiplier = 1.0f;
+	float DamageMultiplier = 1.0f;
+	float SpeedMultiplier = 1.0f;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UPE_InventoryComponent> InventoryComponent;
 
@@ -163,4 +167,17 @@ public:
 	void AddItemToInventory(FName PickupID);
 
 	FORCEINLINE UPE_ItemThrowableComponent* GetItemThrowable() const { return ItemThrowable; }
+
+	float GetAttackPower() const { return AttackPower; }
+
+	float GetDamageMultiplier() const { return DamageMultiplier; }
+	float GetAttackPowerMultiplier() const { return AttackPower * AttackPowerMultiplier; }
+	float GetSpeedMultiplier() const { return SpeedMultiplier; }
+
+	void SetAttackPower(float Multiplier) { AttackPower *= Multiplier; }
+	//void ReturnAttackPower(float AttackPowerMultiplier) { AttackPower /= AttackPowerMultiplier; }
+
+	void SetAttackPowerMultiplier(float NewAttackPowerMultiplier) { AttackPowerMultiplier = NewAttackPowerMultiplier; }
+	void SetDamageMultiplier(float NewDamageMultiplier) { DamageMultiplier = NewDamageMultiplier; }
+	void SetSpeedMultiplier(float NewSpeedMultiplier) { SpeedMultiplier = NewSpeedMultiplier; }
 };

@@ -9,6 +9,7 @@
 
 #include "Enemy/PE_ToiletMechStats.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/ProjectPlayer.h"
 
 #include "DedicatedProject.h"
 
@@ -25,6 +26,18 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	AProjectPlayer* Player = Cast<AProjectPlayer>(DamageCauser);
+	if (Player)
+	{
+		float DamageMultiplier = Player->GetAttackPowerMultiplier();
+		return HealthComp->ApplyDamage(DamageAmount * DamageMultiplier);
+	}
+
+	return 0.0f;
 }
 
 // Called every frame

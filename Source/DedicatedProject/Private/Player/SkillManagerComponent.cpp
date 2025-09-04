@@ -1,6 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Player/SkillManagerComponent.h"
+#include "Player/ProjectPlayer.h"
 #include "DedicatedProject.h"
 
 
@@ -13,6 +14,8 @@ USkillManagerComponent::USkillManagerComponent()
 
 	CurrentAugmentSkill = E_Skills::None;
 	CurrentOverrideSkill = E_Skills::None;
+
+	Player = Cast<AProjectPlayer>(GetOwner());
 
 	UDataTable* SkillDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_SkillDataTable.DT_SkillDataTable"));
 	if (SkillDataTable)
@@ -86,19 +89,81 @@ void USkillManagerComponent::BeginPlay()
 
 }
 
+void USkillManagerComponent::ActivateAugmentSkill(E_Skills skill, float Multiplier, float Duration)
+{
+	if (Player)
+	{
+		switch (skill)
+		{
+		case E_Skills::AttackUp:
+			Player->SetAttackPowerMultiplier(Multiplier);
+			Player->SetAttackPower(Multiplier);
+			break;
+
+		case E_Skills::DefenseUp:
+			Player->SetDamageMultiplier(Multiplier);
+			break;
+
+		case E_Skills::SpeedUp:
+			Player->SetSpeedMultiplier(Multiplier);
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
 void USkillManagerComponent::AttackUp()
 {
+	float Multiplier = 1.5f;
 	PRINT_LOG(TEXT("Attack Up Activated"));
+	ActivateAugmentSkill(E_Skills::AttackUp, Multiplier, 10.0f);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Multiplier]()
+	{
+		if (Player)
+		{
+			Player->SetAttackPowerMultiplier(1.0f);
+			Player->SetAttackPower(Player->GetAttackPower() / Multiplier);
+			PRINT_LOG(TEXT("Attack Up Deactivated"));
+		}
+	}, 10.0f, false);
 }
 
 void USkillManagerComponent::DefenseUp()
 {
 	PRINT_LOG(TEXT("Defense Up Activated"));
+	float Multiplier = 0.5f; // 데미지 50% 감소
+	ActivateAugmentSkill(E_Skills::DefenseUp, Multiplier, 10.0f);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Multiplier]()
+	{
+		if (Player)
+		{
+			Player->SetDamageMultiplier(1.0f);
+			PRINT_LOG(TEXT("Defense Up Deactivated"));
+		}
+	}, 10.0f, false);
 }
 
 void USkillManagerComponent::SpeedUp()
 {
 	PRINT_LOG(TEXT("Speed Up Activated"));
+	float Multiplier = 1.5f; // 이동속도 50% 증가
+	ActivateAugmentSkill(E_Skills::SpeedUp, Multiplier, 10.0f);
+
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Multiplier]()
+	{
+		if (Player)
+		{
+			Player->SetSpeedMultiplier(1.0f);
+			PRINT_LOG(TEXT("Speed Up Deactivated"));
+		}
+	}, 10.0f, false);
 }
 
 void USkillManagerComponent::SightHacking()

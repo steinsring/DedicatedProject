@@ -350,7 +350,7 @@ void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {
 //TakeDamage 오버라이드
 float AProjectPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	return HealthComp->ApplyDamage(DamageAmount);
+	return HealthComp->ApplyDamage(DamageAmount * DamageMultiplier);
 }
 
 void AProjectPlayer::SprintStart(const struct FInputActionValue& inputValue)
@@ -366,27 +366,27 @@ void AProjectPlayer::SprintEnd(const struct FInputActionValue& inputValue)
 void AProjectPlayer::SprintStart_Server_Implementation()
 {
 	if (GetCharacterStats())
-		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->SprintSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->SprintSpeed * SpeedMultiplier;
 	SprintStart_Client();
 }
 
 void AProjectPlayer::SprintStart_Client_Implementation()
 {
 	if (GetCharacterStats())
-		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->SprintSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->SprintSpeed * SpeedMultiplier;
 }
 
 void AProjectPlayer::SprintEnd_Server_Implementation()
 {
 	if (GetCharacterStats())
-		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->WalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->WalkSpeed * SpeedMultiplier;
 	SprintEnd_Client();
 }
 
 void AProjectPlayer::SprintEnd_Client_Implementation()
 {
 	if (GetCharacterStats())
-		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->WalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = GetCharacterStats()->WalkSpeed * SpeedMultiplier;
 }
 
 // 이벤트 바인딩 : 아이템이 감지되었을때
