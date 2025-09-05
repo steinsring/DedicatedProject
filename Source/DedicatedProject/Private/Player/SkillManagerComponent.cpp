@@ -2,6 +2,7 @@
 
 #include "Player/SkillManagerComponent.h"
 #include "Player/ProjectPlayer.h"
+#include "Camera/CameraComponent.h"
 #include "DedicatedProject.h"
 
 
@@ -114,6 +115,43 @@ void USkillManagerComponent::ActivateAugmentSkill(E_Skills skill, float Multipli
 	}
 }
 
+AActor* USkillManagerComponent::GetHitResultActor(float Distance)
+{
+	FHitResult HitResult;
+	UCameraComponent* PlayerCamera = Player->GetPlayerCamComp();
+	if (PlayerCamera == nullptr)
+	{
+		PRINT_LOG(TEXT("PlayerCamera is null"));
+		return nullptr;
+	}
+
+	FVector Start = PlayerCamera->GetComponentLocation();
+	FVector End = Start + (PlayerCamera->GetForwardVector() * Distance);
+	
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Player);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		Start, 
+		End, 
+		ECC_Pawn, 
+		Params
+	);
+
+	FColor LineColor = bHit ? FColor::Red : FColor::Green;
+	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 1.0f);
+
+	if (bHit)
+	{
+		PRINT_LOG(TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
+		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.0f);
+		return HitResult.GetActor();
+	}
+
+	return nullptr;
+}
+
 void USkillManagerComponent::AttackUp()
 {
 	float Multiplier = 1.5f;
@@ -169,6 +207,7 @@ void USkillManagerComponent::SpeedUp()
 void USkillManagerComponent::SightHacking()
 {
 	PRINT_LOG(TEXT("Sight Hacking Activated"));
+	GetHitResultActor(1000.0f);
 }
 
 void USkillManagerComponent::Slow()
@@ -179,6 +218,7 @@ void USkillManagerComponent::Slow()
 void USkillManagerComponent::ElectricShock()
 {
 	PRINT_LOG(TEXT("Electric Shock Activated"));
+	GetHitResultActor(1000.0f);
 }
 
 void USkillManagerComponent::SeeThrough()

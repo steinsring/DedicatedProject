@@ -152,6 +152,8 @@ public:
 	// Sets default values for this character's properties
 	AProjectPlayer();
 
+	UCameraComponent* GetPlayerCamComp() const { return tpsCamComp; }
+
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 		AController* EventInstigator, AActor* DamageCauser) override;
 

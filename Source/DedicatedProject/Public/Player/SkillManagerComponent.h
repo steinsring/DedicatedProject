@@ -109,5 +109,7 @@ private:
 
 	void ActivateAugmentSkill(E_Skills skill, float Multiplier, float Duration);
 
+	AActor* GetHitResultActor(float Distance);
+
 	AProjectPlayer* Player;
 };
