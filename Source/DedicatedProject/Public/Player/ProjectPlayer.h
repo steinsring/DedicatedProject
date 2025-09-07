@@ -120,8 +120,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_Skill_Override;
-	void InputOverrideSkill(const struct FInputActionValue& inputValue);
-
+	void WhileHoldingOverrideSkill(const struct FInputActionValue& inputValue);
+	void OnReleaseOverrideSkill(const struct FInputActionValue& inputValue);
+	
 	float AttackPowerMultiplier = 1.0f;
 	float DamageMultiplier = 1.0f;
 	float SpeedMultiplier = 1.0f;

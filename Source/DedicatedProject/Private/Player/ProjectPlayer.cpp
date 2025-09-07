@@ -249,7 +249,8 @@ void AProjectPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		PlayerInput->BindAction(IA_Interact, ETriggerEvent::Triggered, this, &AProjectPlayer::Interact);
 		PlayerInput->BindAction(ia_Attack, ETriggerEvent::Started, this, &AProjectPlayer::InputAttack);
 		PlayerInput->BindAction(ia_Skill_Augment, ETriggerEvent::Started, this, &AProjectPlayer::InputAugmentSkill);
-		PlayerInput->BindAction(ia_Skill_Override, ETriggerEvent::Started, this, &AProjectPlayer::InputOverrideSkill);
+		PlayerInput->BindAction(ia_Skill_Override, ETriggerEvent::Triggered, this, &AProjectPlayer::WhileHoldingOverrideSkill);
+		PlayerInput->BindAction(ia_Skill_Override, ETriggerEvent::Completed, this, &AProjectPlayer::OnReleaseOverrideSkill);
 	}
 }
 
@@ -430,7 +431,6 @@ void AProjectPlayer::Interact()
 
 void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
 {
-	PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentAugmentSkillName());
 	//PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentAugmentSkillName());
 	E_Skills CurrentAugmentSkill = SkillManager->GetCurrentAugmentSkill();
 
@@ -454,9 +454,29 @@ void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
 	}
 }
 
-void AProjectPlayer::InputOverrideSkill(const FInputActionValue& inputValue)
+void AProjectPlayer::WhileHoldingOverrideSkill(const FInputActionValue& inputValue)
 {
-	PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentOverrideSkillName());
+	E_Skills CurrentOverrideSkill = SkillManager->GetCurrentOverrideSkill();
+
+	switch (CurrentOverrideSkill)
+	{
+	default:
+		SkillManager->GetHitResultActor(1000.f);
+		break;
+
+	case E_Skills::SeeThrough:
+		SkillManager->SeeThrough();
+		break;
+
+	case E_Skills::None:
+		//PRINT_LOG(TEXT("No Override Skill is selected"));
+		break;
+	
+	}
+}
+
+void AProjectPlayer::OnReleaseOverrideSkill(const FInputActionValue& inputValue)
+{
 	//PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentOverrideSkillName());
 	E_Skills CurrentOverrideSkill = SkillManager->GetCurrentOverrideSkill();
 
@@ -475,7 +495,7 @@ void AProjectPlayer::InputOverrideSkill(const FInputActionValue& inputValue)
 		break;
 
 	case E_Skills::SeeThrough:
-		SkillManager->SeeThrough();
+		PRINT_LOG(TEXT("SeeThrough is Deactivated"));
 		break;
 
 	case E_Skills::None:

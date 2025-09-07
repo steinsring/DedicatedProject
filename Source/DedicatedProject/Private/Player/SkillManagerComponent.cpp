@@ -117,7 +117,6 @@ void USkillManagerComponent::ActivateAugmentSkill(E_Skills skill, float Multipli
 
 AActor* USkillManagerComponent::GetHitResultActor(float Distance)
 {
-	FHitResult HitResult;
 	UCameraComponent* PlayerCamera = Player->GetPlayerCamComp();
 	if (PlayerCamera == nullptr)
 	{
@@ -125,7 +124,7 @@ AActor* USkillManagerComponent::GetHitResultActor(float Distance)
 		return nullptr;
 	}
 
-	FVector Start = PlayerCamera->GetComponentLocation();
+	FVector Start = Player->GetActorLocation();
 	FVector End = Start + (PlayerCamera->GetForwardVector() * Distance);
 	
 	FCollisionQueryParams Params;
@@ -207,7 +206,7 @@ void USkillManagerComponent::SpeedUp()
 void USkillManagerComponent::SightHacking()
 {
 	PRINT_LOG(TEXT("Sight Hacking Activated"));
-	GetHitResultActor(1000.0f);
+	//GetHitResultActor(1000.0f);
 }
 
 void USkillManagerComponent::Slow()
@@ -218,10 +217,10 @@ void USkillManagerComponent::Slow()
 void USkillManagerComponent::ElectricShock()
 {
 	PRINT_LOG(TEXT("Electric Shock Activated"));
-	GetHitResultActor(1000.0f);
+	//GetHitResultActor(1000.0f);
 }
 
 void USkillManagerComponent::SeeThrough()
 {
-	PRINT_LOG(TEXT("See Through Activated"));
+	//PRINT_LOG(TEXT("See Through Activated"));
 }

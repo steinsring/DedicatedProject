@@ -72,6 +72,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetOverrideSkill(E_Skills skill);
 
+	AActor* GetHitResultActor(float Distance);
+
 	UFUNCTION(BlueprintCallable)
 	bool IsSkillUnlocked(FName SkillName) const;
 
@@ -109,7 +111,7 @@ private:
 
 	void ActivateAugmentSkill(E_Skills skill, float Multiplier, float Duration);
 
-	AActor* GetHitResultActor(float Distance);
+	FHitResult HitResult;
 
 	AProjectPlayer* Player;
 };
