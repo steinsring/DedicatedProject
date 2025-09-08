@@ -18,12 +18,10 @@ class DEDICATEDPROJECT_API UPE_Inventory : public UUserWidget
 
 private:
 	UPROPERTY()
-	TArray<UOverlay*> InventorySlots;				// 인벤토리 슬롯 배열
+	TArray<UPE_InventorySlot*> InventorySlots;				// 인벤토리 슬롯 배열
 
 	UPROPERTY(VisibleAnywhere, Category = UI)
 	TSubclassOf<UPE_InventorySlot> InventoryWidget;
-
-	UPE_InventorySlot* FindInventorySlot(const int SlotNumber) const;
 
 protected:
 	virtual void NativeConstruct() override;

@@ -156,12 +156,13 @@ void ACharacterCommon::ApplyStun(float Duration)
 
 void ACharacterCommon::EndStun()
 {
+	bIsStunned = false;
 	if (UCommon_AnimInstance* CommonAnim = Cast<UCommon_AnimInstance>(BaseAnimInstance))
 	{
 		CommonAnim->EndStunMontage();
 	}
 
-	// BT 재개
+	// BT 재개 
 	if (AAIController* AI = Cast<AAIController>(GetController()))
 	{
 		if (UBrainComponent* Brain = AI->GetBrainComponent())

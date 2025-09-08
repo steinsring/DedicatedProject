@@ -46,6 +46,7 @@ void UPE_InventorySlot::SetItem(FName ItemID)
 	if (IsValid(IconImage))
 	{
 		IconImage->SetBrushFromTexture(SearchedItemData->Icon, true);
+		IconImage->SetVisibility(ESlateVisibility::Visible);
 		Stack += SearchedItemData->Quantity;
 		Number->SetText(FText::AsNumber(Stack));
 		PRINT_LOG(TEXT("Set Item Icon Success"));
@@ -68,6 +69,7 @@ void UPE_InventorySlot::UseItem()
 	{
 		Stack = 0;
 		IconImage->SetBrushFromTexture(nullptr);
+		IconImage->SetVisibility(ESlateVisibility::Hidden);
 		Number->SetText(FText::FromString(TEXT(" ")));
 		ID = NAME_None;
 		return;
