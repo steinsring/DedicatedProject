@@ -33,6 +33,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<AActor*> WayPoints;
+
+	void DisableDetect(float Duration = 10.0f);
 	
 private:
 	UPROPERTY()

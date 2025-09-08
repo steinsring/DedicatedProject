@@ -3,6 +3,8 @@
 #include "Player/SkillManagerComponent.h"
 #include "Player/ProjectPlayer.h"
 #include "Camera/CameraComponent.h"
+#include "Enemy/PE_AIController.h"
+#include "Enemy/Enemy.h"
 #include "DedicatedProject.h"
 
 
@@ -115,13 +117,13 @@ void USkillManagerComponent::ActivateAugmentSkill(E_Skills skill, float Multipli
 	}
 }
 
-AActor* USkillManagerComponent::GetHitResultActor(float Distance)
+void USkillManagerComponent::GetHitResultActor(float Distance)
 {
 	UCameraComponent* PlayerCamera = Player->GetPlayerCamComp();
 	if (PlayerCamera == nullptr)
 	{
 		PRINT_LOG(TEXT("PlayerCamera is null"));
-		return nullptr;
+		return;
 	}
 
 	FVector Start = Player->GetActorLocation();
@@ -145,10 +147,10 @@ AActor* USkillManagerComponent::GetHitResultActor(float Distance)
 	{
 		PRINT_LOG(TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
 		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.0f);
-		return HitResult.GetActor();
+		HitActor = HitResult.GetActor();
 	}
 
-	return nullptr;
+	return;
 }
 
 void USkillManagerComponent::AttackUp()
@@ -206,7 +208,28 @@ void USkillManagerComponent::SpeedUp()
 void USkillManagerComponent::SightHacking()
 {
 	PRINT_LOG(TEXT("Sight Hacking Activated"));
-	//GetHitResultActor(1000.0f);
+
+	if (!HitActor)
+	{
+		PRINT_LOG(TEXT("No Actor Hit"));
+		return;
+	}
+
+	AEnemy* HitEnemy = Cast<AEnemy>(HitActor);
+	if (!HitEnemy)
+	{
+		PRINT_LOG(TEXT("Hit Actor is not an Enemy"));
+		return;
+	}
+
+	APE_AIController* EnemyController = Cast<APE_AIController>(HitEnemy->GetController());
+	if (!EnemyController)
+	{
+		PRINT_LOG(TEXT("EnemyController is null"));
+		return;
+	}
+
+	EnemyController->DisableDetect(10.0f);
 }
 
 void USkillManagerComponent::Slow()
@@ -218,6 +241,21 @@ void USkillManagerComponent::ElectricShock()
 {
 	PRINT_LOG(TEXT("Electric Shock Activated"));
 	//GetHitResultActor(1000.0f);
+
+	if (!HitActor)
+	{
+		PRINT_LOG(TEXT("No Actor Hit"));
+		return;
+	}
+
+	AEnemy* HitEnemy = Cast<AEnemy>(HitActor);
+	if (!HitEnemy)
+	{
+		PRINT_LOG(TEXT("Hit Actor is not an Enemy"));
+		return;
+	}
+
+	HitEnemy->ApplyStun(5.0f);
 }
 
 void USkillManagerComponent::SeeThrough()

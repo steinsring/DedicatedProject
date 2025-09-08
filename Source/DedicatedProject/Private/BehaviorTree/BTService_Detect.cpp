@@ -20,6 +20,12 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
+	UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
+	if (nullptr == BB) return;
+
+	bool bCanDetect = BB->GetValueAsBool("bCanDetect");
+	if (!bCanDetect) return;
+
 	APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 	if (nullptr == ControllingPawn) return;
 
@@ -58,7 +64,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		}
 	}
 
-	OwnerComp.GetBlackboardComponent()->ClearValue(APE_AIController::TargetKey);
+	BB->ClearValue(APE_AIController::TargetKey);
 	// 감지되는 것이 없을 경우엔 빨간색
 	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
 }

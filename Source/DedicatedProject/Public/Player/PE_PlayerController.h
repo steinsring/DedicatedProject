@@ -18,6 +18,6 @@ class DEDICATEDPROJECT_API APE_PlayerController : public APlayerController
 public:
 	APE_PlayerController();
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
-	USkillManagerComponent* SkillManager;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
+	USkillManagerComponent* SkillManager;*/
 };

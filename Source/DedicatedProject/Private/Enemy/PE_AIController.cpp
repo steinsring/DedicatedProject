@@ -47,6 +47,7 @@ void APE_AIController::OnPossess(APawn* InPawn)
 	{
 		//AIController가 Pawn을 소유했을때, HomePos의 위치를 Pawn의 위치로 세팅해준다.
 		BBComp->SetValueAsVector(HomePosKey, InPawn->GetActorLocation());
+		BBComp->SetValueAsBool("bCanDetect", true);
 		if (!RunBehaviorTree(BTAsset))
 		{
 			//
@@ -176,4 +177,27 @@ void APE_AIController::CollectChildrenWayPoints()
 	}
 
 	UE_LOG(LogTemp, Error, TEXT("CollectChildrenWayPoints : Collected %d WayPoints"), WayPoints.Num());
+}
+
+void APE_AIController::DisableDetect(float Duration)
+{
+	if (BBComp)
+	{
+		BBComp->ClearValue(TargetKey);
+		BBComp->SetValueAsBool("bCanDetect", false);
+
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			TimerHandle,
+			FTimerDelegate::CreateLambda([this]()
+			{
+				if (BBComp)
+				{
+					BBComp->SetValueAsBool("bCanDetect", true);
+				}
+			}),
+			Duration, 
+			false
+		);
+	}
 }

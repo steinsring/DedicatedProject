@@ -460,7 +460,7 @@ void AProjectPlayer::WhileHoldingOverrideSkill(const FInputActionValue& inputVal
 
 	switch (CurrentOverrideSkill)
 	{
-	default:
+	default: //(SightHacking, ElectricShock)
 		SkillManager->GetHitResultActor(1000.f);
 		break;
 
