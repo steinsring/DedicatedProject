@@ -151,6 +151,7 @@ void ACharacterCommon::ApplyStun(float Duration)
 		{
 			Brain->PauseLogic(TEXT("Stun"));
 		}
+		AI->StopMovement();
 	}
 }
 
