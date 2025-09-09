@@ -17,6 +17,9 @@ private:
 	TObjectPtr<class UBoxComponent> GenerateArea; //스폰될 맵의 전체 크기
 	TArray<AActor*> MapList;
 
+	UPROPERTY(VisibleAnywhere, Category = "Generator System")
+	TObjectPtr<UStaticMeshComponent> BoxFaces[6];
+
 public:	
 	// Sets default values for this actor's properties
 	APE_MapGenerator();
