@@ -455,7 +455,24 @@ void APE_MapGenerator::SpawnEnemies()
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
-				AActor* Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
+				E_EnemyType EnemyType = SP->EnemyType;
+				AActor* Enemy = nullptr;
+				switch (EnemyType)
+				{	
+				case E_EnemyType::ToiletMech:
+					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
+					break;
+				case E_EnemyType::Boss:
+					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
+					break;
+				case E_EnemyType::Minion:
+					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
+					break;
+				default:
+					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
+					break;
+				}
+
 				if (Enemy)
 				{
 					PRINT_LOG(TEXT("My Log : %s "), TEXT("Enemy Spawned"));
@@ -471,10 +488,12 @@ void APE_MapGenerator::SpawnEnemies()
 
 					TArray<UChildActorComponent*> TargetPointComps;
 					SP->GetComponents<UChildActorComponent>(TargetPointComps); // ✅ SpawnPoint 액터에서 가져오기
-					PRINT_LOG(TEXT("My Log : %s %d"), TEXT("TargetPointComps Count : "), TargetPointComps.Num());
+					PRINT_LOG(TEXT("My Log : %s %d"), TEXT("TargetPointComps Count : "), SP->NumOfWayPoints);
 
-					for (auto* TargetComp : TargetPointComps)
+					int TargetPointCount = SP->NumOfWayPoints;
+					for (int i = 0; i < TargetPointCount; ++i)
 					{
+						auto* TargetComp = TargetPointComps.IsValidIndex(i) ? TargetPointComps[i] : nullptr;
 						if (ATargetPoint* TP = Cast<ATargetPoint>(TargetComp->GetChildActor()))
 						{
 							PRINT_LOG(TEXT("My Log : %s %s"), TEXT("Child Actor is TargetPoint"), *TP->GetName());

@@ -3,6 +3,7 @@
 
 #include "Enemy/SpawnPoint.h"
 
+ASpawnPoint::ASpawnPoint()
+{
 
-
-
+}
