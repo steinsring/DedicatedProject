@@ -478,7 +478,7 @@ void APE_MapGenerator::SpawnEnemies()
 					PRINT_LOG(TEXT("My Log : %s "), TEXT("Enemy Spawned"));
 					auto* CompActor = Cast<UChildActorComponent>(Comp);
 
-					// 스폰한 ToiletMechTest의 AIController를 가져옴
+					// 스폰한 Enemy의 AIController를 가져옴
 					APE_AIController* EnemyController = Cast<APE_AIController>(Enemy->GetInstigatorController());
 					if (!EnemyController)
 					{
