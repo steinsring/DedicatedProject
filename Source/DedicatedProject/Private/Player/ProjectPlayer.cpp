@@ -20,6 +20,7 @@
 #include <GameFramework/SpringArmComponent.h> //3인칭 카메라암
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetComponent.h"
+#include "Fuel/PE_FuelComponent.h"
 #include "Player/PE_ItemThrowableComponent.h"
 
 
@@ -97,6 +98,10 @@ AProjectPlayer::AProjectPlayer()
 		ItemThrowable = CreateDefaultSubobject<UPE_ItemThrowableComponent>(TEXT("ItemThrowable"));
 		ItemThrowable->SetupAttachment(RootComponent);
 		ItemThrowable->SetRelativeLocation(FVector(4.f, -11.f, 80.f));
+
+		// FuelComponent 세팅
+		FuelComponent = CreateDefaultSubobject<UPE_FuelComponent>(TEXT("FuelComponent"));
+		FuelComponent->SetupAttachment(GetMesh(), TEXT("FX_backpack"));					// BackPack소켓에 직접 부착
 	}
 	else
 	{
@@ -111,16 +116,6 @@ AProjectPlayer::AProjectPlayer()
 	else
 	{
 		PRINT_ERROR_LOG(TEXT("HPBarWidgetAsset is NULL"));
-	}
-
-	static ConstructorHelpers::FClassFinder<UUserWidget> HUDInventory(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_Inventory.WB_Inventory_C'"));
-	if (HUDInventory.Succeeded())
-	{
-		InventoryWidgetClass = HUDInventory.Class;
-	}
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("HUDInventory is NULL"));
 	}
 
 	CharacterDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_CharacterStats.DT_CharacterStats"));
@@ -506,6 +501,13 @@ void AProjectPlayer::OnReleaseOverrideSkill(const FInputActionValue& inputValue)
 
 void AProjectPlayer::AddItemToInventory(FName PickupID)
 {
-	InventoryComponent->AddItem(PickupID);
-	PRINT_LOG(TEXT("ItemPickupID : %s"), *PickupID.ToString());
+	if (PickupID == "Fuel")
+	{
+		FuelComponent->AddFuel(PickupID);
+	}
+	else
+	{
+		InventoryComponent->AddItem(PickupID);
+	}
+	//PRINT_LOG(TEXT("ItemPickupID : %s"), *PickupID.ToString());
 }

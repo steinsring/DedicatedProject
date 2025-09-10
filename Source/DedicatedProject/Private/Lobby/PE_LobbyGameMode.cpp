@@ -15,7 +15,8 @@ APE_LobbyGameMode::APE_LobbyGameMode()
 
 	// 플레이어 캐릭터 블루프린트 가져오기
 	static ConstructorHelpers::FClassFinder<APawn>PlayerPawnBPClass(TEXT("/Game/BluePrints/Lobby/BP_LobbyPawn.BP_LobbyPawn_C"));
-	if (PlayerPawnBPClass.Class != nullptr) {
+	if (PlayerPawnBPClass.Class != nullptr) 
+	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 }
