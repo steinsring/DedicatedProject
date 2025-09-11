@@ -30,12 +30,28 @@ void UPE_GameInstance::Init()
     }
 }
 
+static FName MakePIESessionName(UWorld* World)
+{// 에디터 PIE에서만 고유 세션명 사용 (단일 프로세스 PIE 콜백 섞임 방지)
+#if WITH_EDITOR
+    if (GEngine && World)
+    {
+        if (const FWorldContext* Ctx = GEngine->GetWorldContextFromWorld(World))
+        {
+            return FName(*FString::Printf(TEXT("GameSession_%d"), Ctx->PIEInstance));
+        }
+    }
+#endif
+    // 패키징/실게임에서는 공통 이름 사용
+    return NAME_GameSession;
+}
+
 void UPE_GameInstance::CreateSession(const int32 MaxPlayers, const bool bIsLAN, const bool bIsLobby)
 {
     // SessionInterface가 없는경우 종료
     if (!SessionInterface.IsValid()) return;
 
-    FName SessionName = NAME_GameSession;                                   // session 이름
+    // session 이름
+    const FName SessionName = MakePIESessionName(GetWorld());                 
 
     // 같은 이름의 기존 세션이 있다면 제거
     auto ExistingSession = SessionInterface->GetNamedSession(SessionName);
@@ -70,11 +86,15 @@ void UPE_GameInstance::CreateSession(const int32 MaxPlayers, const bool bIsLAN, 
 
 void UPE_GameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
+    // 1) 내 월드의 고유 세션명만 처리
+    const FName MyName = MakePIESessionName(GetWorld());
+    if (SessionName != MyName) return;
+
     if (bWasSuccessful)
     { //세션을 성공적으로 만들었다면
         PRINT_LOG(TEXT("My Log : %s"), TEXT("Session Created Success"));
         SessionInterface->StartSession(SessionName);
-        UGameplayStatics::OpenLevel(GetWorld(), "ServerEntry1", true, "listen");    // ServerEntry1 맵으로 이동
+        UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "?listen");    // ServerEntry1 맵으로 이동
     }
     else 
     {

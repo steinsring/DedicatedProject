@@ -130,12 +130,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UPE_InventoryComponent> InventoryComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class UPE_Inventory> InventoryWidgetClass;
-
-	UPROPERTY()
-	TObjectPtr<UPE_Inventory> InventoryWidget;
-
 	class UInputAction* ia_SkillTree;
 
 	class UInputAction* ia_SkillChoice;
@@ -148,6 +142,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
 	TObjectPtr<class UPE_ItemThrowableComponent> ItemThrowable;	// 던지는 아이템
+
+	// Fuel -------------------------------------------------------------------------
+	UPROPERTY(VisibleAnywhere, Category = "Fuel")
+	TObjectPtr<class UPE_FuelComponent> FuelComponent;	// FuelComponent
 
 public:
 	// Sets default values for this character's properties

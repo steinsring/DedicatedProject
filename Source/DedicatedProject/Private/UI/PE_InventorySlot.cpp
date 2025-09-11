@@ -32,7 +32,7 @@ void UPE_InventorySlot::FindItemData(FName ItemID)
 		if (Row->ItemID == ItemID)
 		{
 			SearchedItemData = Row;
-			PRINT_LOG(TEXT("Find Item Success"));
+			//PRINT_LOG(TEXT("Find Item Success"));
 			ID = ItemID;
 			return;
 		}
@@ -49,7 +49,7 @@ void UPE_InventorySlot::SetItem(FName ItemID)
 		IconImage->SetVisibility(ESlateVisibility::Visible);
 		Stack += SearchedItemData->Quantity;
 		Number->SetText(FText::AsNumber(Stack));
-		PRINT_LOG(TEXT("Set Item Icon Success"));
+		//PRINT_LOG(TEXT("Set Item Icon Success"));
 	}
 	else
 	{

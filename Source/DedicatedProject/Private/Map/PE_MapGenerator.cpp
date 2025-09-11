@@ -22,6 +22,44 @@ APE_MapGenerator::APE_MapGenerator()
 	//GenerateArea->SetupAttachment(RootComponent);
 	GenerateArea->SetBoxExtent(FVector(MapSizeX, MapSizeY, MapSizeZ));
 
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeMesh(TEXT("/Engine/BasicShapes/Cube.Cube"));
+
+	for (int32 i = 0; i < 6; i++)
+	{
+		FString Name = FString::Printf(TEXT("BoxFace_%d"), i);
+		BoxFaces[i] = CreateDefaultSubobject<UStaticMeshComponent>(*Name);
+		BoxFaces[i]->SetStaticMesh(CubeMesh.Object);
+		BoxFaces[i]->SetupAttachment(GenerateArea);
+		BoxFaces[i]->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+
+	// GenerateArea 크기 가져오기
+	FVector Extent = FVector(MapSizeX, MapSizeY, MapSizeZ);
+
+	// 각 면 배치 (앞/뒤/좌/우/위/아래)
+	BoxFaces[0]->SetRelativeLocation(FVector(Extent.X, 0, 0));  // +X
+	BoxFaces[1]->SetRelativeLocation(FVector(-Extent.X, 0, 0));  // -X
+	BoxFaces[2]->SetRelativeLocation(FVector(0, Extent.Y, 0));  // +Y
+	BoxFaces[3]->SetRelativeLocation(FVector(0, -Extent.Y, 0));  // -Y
+	BoxFaces[4]->SetRelativeLocation(FVector(0, 0, Extent.Z));  // +Z
+	BoxFaces[5]->SetRelativeLocation(FVector(0, 0, -Extent.Z));  // -Z
+
+	// 각 면의 크기를 맞추기 (두께는 100 정도로 가정)
+	for (int32 i = 0; i < 6; i++)
+	{
+		FVector Scale = FVector::OneVector;
+
+		if (i < 2) // X축 방향 벽
+			Scale = FVector(100.0f, Extent.Y * 2, Extent.Z * 2);
+		else if (i < 4) // Y축 방향 벽
+			Scale = FVector(Extent.X * 2, 100.0f, Extent.Z * 2);
+		else // Z축 방향 벽 (바닥/천장)
+			Scale = FVector(Extent.X * 2, Extent.Y * 2, 100.0f);
+
+		BoxFaces[i]->SetWorldScale3D(Scale / 100.0f);
+		// ⚠️ Cube 기본 크기가 100이므로 실제 크기 /100
+	}
+
 	TArray<FString> BPRoom1Paths = {
 		TEXT("/Game/Asset/HomeMade/NodeEntry1/BP_CommonNode1.BP_CommonNode1_C")
 	};

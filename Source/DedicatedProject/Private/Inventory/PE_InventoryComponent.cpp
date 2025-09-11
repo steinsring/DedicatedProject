@@ -79,12 +79,14 @@ void UPE_InventoryComponent::BeginPlay()
 	}
 
 	// 소유자에서 컨트롤러 가져오기
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if (!OwnerPawn) return;
+	APlayerController* PlayerController = Cast<APlayerController>(OwnerPawn->GetController());
 	if (!PlayerController)
 	{
 		return;
 	}
-	PRINT_LOG(TEXT("Is Begin twice?"));
+	//PRINT_LOG(TEXT("Is Begin twice?"));
 	// 위젯 생성
 	InventoryWidget = CreateWidget<UPE_Inventory>(PlayerController, InventoryWidgetClass);
 	if (InventoryWidget)
