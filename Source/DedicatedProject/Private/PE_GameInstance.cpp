@@ -94,7 +94,7 @@ void UPE_GameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSucce
     { //세션을 성공적으로 만들었다면
         PRINT_LOG(TEXT("My Log : %s"), TEXT("Session Created Success"));
         SessionInterface->StartSession(SessionName);
-        UGameplayStatics::OpenLevel(GetWorld(), "Lobby", true, "?listen");    // ServerEntry1 맵으로 이동
+        UGameplayStatics::OpenLevel(GetWorld(), "/Game/Maps/Lobby", true, "listen");    // Lobby 맵으로 이동
     }
     else 
     {
