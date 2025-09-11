@@ -21,6 +21,8 @@ class DEDICATEDPROJECT_API ASpawnPoint : public ATargetPoint
 	
 public:
 	ASpawnPoint();
+
+	void OnConstruction(const FTransform& Transform) override;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnPoint")
 	E_EnemyType EnemyType;
@@ -30,4 +32,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnPoint")
 	TArray<FVector> WayPointsPos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpawnPoint")
+	TArray<ATargetPoint*> WayPoints;
 };

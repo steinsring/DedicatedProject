@@ -524,22 +524,33 @@ void APE_MapGenerator::SpawnEnemies()
 						continue;
 					}
 
-					TArray<UChildActorComponent*> TargetPointComps;
-					SP->GetComponents<UChildActorComponent>(TargetPointComps); // ✅ SpawnPoint 액터에서 가져오기
-					PRINT_LOG(TEXT("My Log : %s %d"), TEXT("TargetPointComps Count : "), SP->NumOfWayPoints);
+					//TArray<UChildActorComponent*> TargetPointComps;
+					//SP->GetComponents<UChildActorComponent>(TargetPointComps); // ✅ SpawnPoint 액터에서 가져오기
+					//PRINT_LOG(TEXT("My Log : %s %d"), TEXT("TargetPointComps Count : "), TargetPointComps.Num());
 
-					int TargetPointCount = SP->NumOfWayPoints;
-					for (int i = 0; i < TargetPointCount; ++i)
+					//int TargetPointCount = TargetPointComps.Num();
+					////int TargetPointCount = SP->NumOfWayPoints;
+					//for (int i = 0; i < TargetPointCount; ++i)
+					//{
+					//	auto* TargetComp = TargetPointComps.IsValidIndex(i) ? TargetPointComps[i] : nullptr;
+					//	if (ATargetPoint* TP = Cast<ATargetPoint>(TargetComp->GetChildActor()))
+					//	{
+					//		PRINT_LOG(TEXT("My Log : %s %s"), TEXT("Child Actor is TargetPoint : "), *TP->GetName());
+					//		EnemyController->WayPoints.Add(TP);
+					//	}
+					//}
+
+					for (ATargetPoint* TP : SP->WayPoints)
 					{
-						auto* TargetComp = TargetPointComps.IsValidIndex(i) ? TargetPointComps[i] : nullptr;
-						if (ATargetPoint* TP = Cast<ATargetPoint>(TargetComp->GetChildActor()))
+						if (TP)
 						{
-							PRINT_LOG(TEXT("My Log : %s %s"), TEXT("Child Actor is TargetPoint"), *TP->GetName());
+							PRINT_LOG(TEXT("My Log : %s %s"), TEXT("Child Actor is TargetPoint : "), *TP->GetName());
 							EnemyController->WayPoints.Add(TP);
 						}
 					}
 				}
 			}
+
 			else
 			{
 				PRINT_LOG(TEXT("My Log : %s "), TEXT("Child Actor is not SpawnPoint"));
