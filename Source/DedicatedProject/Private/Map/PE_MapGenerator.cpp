@@ -510,45 +510,6 @@ void APE_MapGenerator::SpawnEnemies()
 					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
 					break;
 				}
-
-				if (Enemy)
-				{
-					PRINT_LOG(TEXT("My Log : %s "), TEXT("Enemy Spawned"));
-					auto* CompActor = Cast<UChildActorComponent>(Comp);
-
-					// 스폰한 Enemy의 AIController를 가져옴
-					APE_AIController* EnemyController = Cast<APE_AIController>(Enemy->GetInstigatorController());
-					if (!EnemyController)
-					{
-						PRINT_ERROR_LOG(TEXT("My Log : %s "), TEXT("EnemyController is NULL"));
-						continue;
-					}
-
-					//TArray<UChildActorComponent*> TargetPointComps;
-					//SP->GetComponents<UChildActorComponent>(TargetPointComps); // ✅ SpawnPoint 액터에서 가져오기
-					//PRINT_LOG(TEXT("My Log : %s %d"), TEXT("TargetPointComps Count : "), TargetPointComps.Num());
-
-					//int TargetPointCount = TargetPointComps.Num();
-					////int TargetPointCount = SP->NumOfWayPoints;
-					//for (int i = 0; i < TargetPointCount; ++i)
-					//{
-					//	auto* TargetComp = TargetPointComps.IsValidIndex(i) ? TargetPointComps[i] : nullptr;
-					//	if (ATargetPoint* TP = Cast<ATargetPoint>(TargetComp->GetChildActor()))
-					//	{
-					//		PRINT_LOG(TEXT("My Log : %s %s"), TEXT("Child Actor is TargetPoint : "), *TP->GetName());
-					//		EnemyController->WayPoints.Add(TP);
-					//	}
-					//}
-
-					for (ATargetPoint* TP : SP->WayPoints)
-					{
-						if (TP)
-						{
-							PRINT_LOG(TEXT("My Log : %s %s"), TEXT("Child Actor is TargetPoint : "), *TP->GetName());
-							EnemyController->WayPoints.Add(TP);
-						}
-					}
-				}
 			}
 
 			else
