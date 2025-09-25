@@ -46,3 +46,21 @@ void UPE_FuelComponent::AddFuel_Server_Implementation(FName ItemID)
 	FuelWidgetInstance->AddFuel(ItemID);
 }
 
+void UPE_FuelComponent::UseFuel(int32 Quantity)
+{
+	UseFuel_Server(Quantity);
+}
+
+void UPE_FuelComponent::UseFuel_Server_Implementation(int32 Quantity)
+{
+	FuelWidgetInstance->UseFuel(Quantity);
+}
+
+bool UPE_FuelComponent::HasEnoughFuel(int32 Quantity) const
+{
+	if (FuelWidgetInstance->GetCurrentFuel() >= Quantity)
+	{
+		return true;
+	}
+	return false;
+}

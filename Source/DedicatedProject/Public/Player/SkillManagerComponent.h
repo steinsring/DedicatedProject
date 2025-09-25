@@ -5,27 +5,10 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Player/PE_SkillDataTable.h"
+#include "Fuel/PE_FuelComponent.h"
 #include "SkillManagerComponent.generated.h"
 
 class AProjectPlayer; // forward declaration
-
-
-//UENUM(BlueprintType)
-//enum class E_AugmentSkills : uint8
-//{
-//	AttackUp		UMETA(DisplayName = "AttackUp"),
-//	DefenseUp		UMETA(DisplayName = "DefenseUp"),
-//	SpeedUp			UMETA(DisplayName = "SpeedUp")
-//};
-//
-//UENUM(BlueprintType)
-//enum class E_OverrideSkills : uint8
-//{
-//	SightHacking	UMETA(DisplayName = "SightHacking"),
-//	Slow			UMETA(DisplayName = "Slow"),
-//	ElectricShock	UMETA(DisplayName = "ElectricShock"),
-//	SeeThrough		UMETA(DisplayName = "SeeThrough")
-//};
 
 UENUM(BlueprintType)
 enum class E_Skills : uint8
@@ -61,10 +44,10 @@ public:
 	TArray<FPE_SkillDataTable> Skills;
 
 	UFUNCTION(BlueprintCallable)
-	void UnlockSkill(FName SkillName);
+	void UnlockSkill(E_Skills Skill);
 
 	UFUNCTION(BlueprintCallable)
-	void LockSkill(FName SkillName);
+	void LockSkill(E_Skills Skille);
 
 	UFUNCTION(BlueprintCallable)
 	void SetAugmentSkill(E_Skills skill);
@@ -75,7 +58,7 @@ public:
 	void GetHitResultActor(float Distance);
 
 	UFUNCTION(BlueprintCallable)
-	bool IsSkillUnlocked(FName SkillName) const;
+	bool IsSkillUnlocked(E_Skills Skill) const;
 
 	FString GetCurrentAugmentSkillName() const
 	{
@@ -90,13 +73,13 @@ public:
 	E_Skills GetCurrentAugmentSkill() const { return CurrentAugmentSkill; }
 	E_Skills GetCurrentOverrideSkill() const { return CurrentOverrideSkill; }
 
-	void AttackUp();
-	void DefenseUp();
-	void SpeedUp();
-	void SightHacking();
-	void Slow();
-	void ElectricShock();
-	void SeeThrough();
+	int32 AttackUp();
+	int32 DefenseUp();
+	int32 SpeedUp();
+	int32 SightHacking();
+	int32 Slow();
+	int32 ElectricShock();
+	int32 SeeThrough();
 
 protected:
 	// Called when the game starts

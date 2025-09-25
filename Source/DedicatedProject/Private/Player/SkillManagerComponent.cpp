@@ -33,31 +33,18 @@ USkillManagerComponent::USkillManagerComponent()
 }
 
 
-void USkillManagerComponent::UnlockSkill(FName SkillName)
+void USkillManagerComponent::UnlockSkill(E_Skills Skill)
 {
-	for (auto& Skill : Skills)
-	{
-		FName SkillNameToName = FName(Skill.SkillName.ToString());
-		if (SkillNameToName == SkillName)
-		{
-			Skill.bIsUnlocked = true;
-			PRINT_LOG(TEXT("Skill %s unlocked!"), *SkillName.ToString());
-			return; // Exit after unlocking the skill
-		}
-	}
+	int32 SkillIndex = static_cast<int32>(Skill);
+	Skills[SkillIndex].bIsUnlocked = true;
+	PRINT_LOG(TEXT("Skill %s unlocked!"), *Skills[SkillIndex].SkillName.ToString());
 }
 
-void USkillManagerComponent::LockSkill(FName SkillName)
+void USkillManagerComponent::LockSkill(E_Skills Skill)
 {
-	for (auto& Skill : Skills)
-	{
-		FName SkillNameToName = FName(Skill.SkillName.ToString());
-		if (SkillNameToName == SkillName)
-		{
-			Skill.bIsUnlocked = false;
-			return; // Exit after locking the skill
-		}
-	}
+	int32 SkillIndex = static_cast<int32>(Skill);
+	Skills[SkillIndex].bIsUnlocked = true;
+	PRINT_LOG(TEXT("Skill %s unlocked!"), *Skills[SkillIndex].SkillName.ToString());
 }
 
 void USkillManagerComponent::SetAugmentSkill(E_Skills skill)
@@ -70,17 +57,10 @@ void USkillManagerComponent::SetOverrideSkill(E_Skills skill)
 	CurrentOverrideSkill = skill;
 }
 
-bool USkillManagerComponent::IsSkillUnlocked(FName SkillName) const
+bool USkillManagerComponent::IsSkillUnlocked(E_Skills Skill) const
 {
-	for (const auto& Skill : Skills)
-	{
-		FName SkillNameToName = FName(Skill.SkillName.ToString());
-		if (SkillNameToName == SkillName)
-		{
-			return Skill.bIsUnlocked;
-		}
-	}
-	return false;
+	int32 SkillIndex = static_cast<int32>(Skill);
+	return Skills[SkillIndex].bIsUnlocked;
 }
 
 // Called when the game starts
@@ -153,8 +133,11 @@ void USkillManagerComponent::GetHitResultActor(float Distance)
 	return;
 }
 
-void USkillManagerComponent::AttackUp()
+int32 USkillManagerComponent::AttackUp()
 {
+	int SkillIndex = static_cast<int32>(E_Skills::AttackUp);
+	int32 SkillCost = Skills[SkillIndex].Cost;
+
 	float Multiplier = 1.5f;
 	PRINT_LOG(TEXT("Attack Up Activated"));
 	ActivateAugmentSkill(E_Skills::AttackUp, Multiplier, 10.0f);
@@ -169,10 +152,15 @@ void USkillManagerComponent::AttackUp()
 			PRINT_LOG(TEXT("Attack Up Deactivated"));
 		}
 	}, 10.0f, false);
+
+	return SkillCost;
 }
 
-void USkillManagerComponent::DefenseUp()
+int32 USkillManagerComponent::DefenseUp()
 {
+	int SkillIndex = static_cast<int32>(E_Skills::DefenseUp);
+	int32 SkillCost = Skills[SkillIndex].Cost;
+
 	PRINT_LOG(TEXT("Defense Up Activated"));
 	float Multiplier = 0.5f; // 데미지 50% 감소
 	ActivateAugmentSkill(E_Skills::DefenseUp, Multiplier, 10.0f);
@@ -186,10 +174,15 @@ void USkillManagerComponent::DefenseUp()
 			PRINT_LOG(TEXT("Defense Up Deactivated"));
 		}
 	}, 10.0f, false);
+
+	return SkillCost;
 }
 
-void USkillManagerComponent::SpeedUp()
+int32 USkillManagerComponent::SpeedUp()
 {
+	int SkillIndex = static_cast<int32>(E_Skills::SpeedUp);
+	int32 SkillCost = Skills[SkillIndex].Cost;
+
 	PRINT_LOG(TEXT("Speed Up Activated"));
 	float Multiplier = 1.5f; // 이동속도 50% 증가
 	ActivateAugmentSkill(E_Skills::SpeedUp, Multiplier, 10.0f);
@@ -203,62 +196,80 @@ void USkillManagerComponent::SpeedUp()
 			PRINT_LOG(TEXT("Speed Up Deactivated"));
 		}
 	}, 10.0f, false);
+
+	return SkillCost;
 }
 
-void USkillManagerComponent::SightHacking()
+int32 USkillManagerComponent::SightHacking()
 {
+	int SkillIndex = static_cast<int32>(E_Skills::SightHacking);
+	int32 SkillCost = Skills[SkillIndex].Cost;
+
 	PRINT_LOG(TEXT("Sight Hacking Activated"));
 
 	if (!HitActor)
 	{
 		PRINT_LOG(TEXT("No Actor Hit"));
-		return;
+		return 0;
 	}
 
 	AEnemy* HitEnemy = Cast<AEnemy>(HitActor);
 	if (!HitEnemy)
 	{
 		PRINT_LOG(TEXT("Hit Actor is not an Enemy"));
-		return;
+		return 0;
 	}
 
 	APE_AIController* EnemyController = Cast<APE_AIController>(HitEnemy->GetController());
 	if (!EnemyController)
 	{
 		PRINT_LOG(TEXT("EnemyController is null"));
-		return;
+		return 0;
 	}
 
 	EnemyController->DisableDetect(10.0f);
+	return SkillCost;
 }
 
-void USkillManagerComponent::Slow()
+int32 USkillManagerComponent::Slow()
 {
+	int SkillIndex = static_cast<int32>(E_Skills::Slow);
+	int32 SkillCost = Skills[SkillIndex].Cost;
+
 	PRINT_LOG(TEXT("Slow Activated"));
+	return SkillCost;
 }
 
-void USkillManagerComponent::ElectricShock()
+int32 USkillManagerComponent::ElectricShock()
 {
+	int SkillIndex = static_cast<int32>(E_Skills::ElectricShock);
+	int32 SkillCost = Skills[SkillIndex].Cost;
+
 	PRINT_LOG(TEXT("Electric Shock Activated"));
 	//GetHitResultActor(1000.0f);
 
 	if (!HitActor)
 	{
 		PRINT_LOG(TEXT("No Actor Hit"));
-		return;
+		return 0;
 	}
 
 	AEnemy* HitEnemy = Cast<AEnemy>(HitActor);
 	if (!HitEnemy)
 	{
 		PRINT_LOG(TEXT("Hit Actor is not an Enemy"));
-		return;
+		return 0;
 	}
 
-	HitEnemy->ApplyStun(5.0f);
+	HitEnemy->ApplyStun(10.0f);
+	return SkillCost;
 }
 
-void USkillManagerComponent::SeeThrough()
+int32 USkillManagerComponent::SeeThrough()
 {
+	int SkillIndex = static_cast<int32>(E_Skills::SeeThrough);
+	int32 SkillCost = Skills[SkillIndex].Cost;
+
 	//PRINT_LOG(TEXT("See Through Activated"));
+	return SkillCost;
 }

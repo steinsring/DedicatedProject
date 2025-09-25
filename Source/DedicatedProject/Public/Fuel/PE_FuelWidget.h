@@ -41,4 +41,5 @@ public:
 	void AddFuel(FName ItemID);
 	void UseFuel(int32 Quantity);
 	
+	int32 GetCurrentFuel() const { return CurrentQuantity; }
 };

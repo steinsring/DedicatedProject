@@ -169,6 +169,7 @@ public:
 
 	FORCEINLINE UPE_ItemThrowableComponent* GetItemThrowable() const { return ItemThrowable; }
 
+	// Augment Skill 관련 ---------------------------------------------------------------
 	float GetAttackPower() const { return AttackPower; }
 
 	float GetDamageMultiplier() const { return DamageMultiplier; }

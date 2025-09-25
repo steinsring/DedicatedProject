@@ -52,18 +52,23 @@ void UPE_FuelWidget::AddFuel(FName ItemID)
 	}
 	float Percent = (float)CurrentQuantity / MaxQuantity;
 	FuelProgressBar->SetPercent(Percent);
-	PRINT_LOG(TEXT("Add Fuel : %d, Max : %d, persent : %f"), CurrentQuantity, MaxQuantity, Percent);
+	PRINT_LOG(TEXT("Add Fuel : %d, Max : %d, percent : %f"), CurrentQuantity, MaxQuantity, Percent);
 }
 
 void UPE_FuelWidget::UseFuel(int32 Quantity)
 {
-	if (CurrentQuantity - Quantity > 0)
+	if (CurrentQuantity - Quantity >= 0)
 	{
 		CurrentQuantity -= Quantity;
+
+		float Percent = (float)CurrentQuantity / MaxQuantity;
+		FuelProgressBar->SetPercent(Percent);
+		PRINT_LOG(TEXT("Use Fuel : %d"), Quantity);
+		PRINT_LOG(TEXT("Remain Fuel : %d, Max : %d, percent : %f"), CurrentQuantity, MaxQuantity, Percent);
 	}
 	else
 	{
-
+		PRINT_LOG(TEXT("Not enough Fuel"));
 	}
 }
 

@@ -24,6 +24,9 @@ private:
 	UFUNCTION(Server, Reliable)
 	void AddFuel_Server(FName ItemID);
 
+	UFUNCTION(Server, Reliable)
+	void UseFuel_Server(int32 Quantity);
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -32,4 +35,7 @@ public:
 	UPE_FuelComponent();
 
 	void AddFuel(FName ItemID);
+	void UseFuel(int32 Quantity);
+
+	bool HasEnoughFuel(int32 Quantity) const;
 };

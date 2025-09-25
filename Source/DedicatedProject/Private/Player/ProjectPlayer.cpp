@@ -432,15 +432,15 @@ void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
 	switch (CurrentAugmentSkill)
 	{
 	case E_Skills::AttackUp:
-		SkillManager->AttackUp();
+		FuelComponent->UseFuel(SkillManager->AttackUp());
 		break;
 
 	case E_Skills::DefenseUp:
-		SkillManager->DefenseUp();
+		FuelComponent->UseFuel(SkillManager->DefenseUp());
 		break;
 
 	case E_Skills::SpeedUp:
-		SkillManager->SpeedUp();
+		FuelComponent->UseFuel(SkillManager->SpeedUp());
 		break;
 
 	case E_Skills::None:
@@ -478,15 +478,15 @@ void AProjectPlayer::OnReleaseOverrideSkill(const FInputActionValue& inputValue)
 	switch (CurrentOverrideSkill)
 	{
 	case E_Skills::SightHacking:
-		SkillManager->SightHacking();
+		FuelComponent->UseFuel(SkillManager->SightHacking());
 		break;
 
 	case E_Skills::Slow:
-		SkillManager->Slow();
+		FuelComponent->UseFuel(SkillManager->Slow());
 		break;
 
 	case E_Skills::ElectricShock:
-		SkillManager->ElectricShock();
+		FuelComponent->UseFuel(SkillManager->ElectricShock());
 		break;
 
 	case E_Skills::SeeThrough:
