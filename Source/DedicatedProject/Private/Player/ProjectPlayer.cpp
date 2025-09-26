@@ -428,24 +428,34 @@ void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
 {
 	//PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentAugmentSkillName());
 	E_Skills CurrentAugmentSkill = SkillManager->GetCurrentAugmentSkill();
+	int32 cost = SkillManager->GetSkillCost(CurrentAugmentSkill);
 
-	switch (CurrentAugmentSkill)
+	if (FuelComponent->HasEnoughFuel(cost))
 	{
-	case E_Skills::AttackUp:
-		FuelComponent->UseFuel(SkillManager->AttackUp());
-		break;
+		FuelComponent->UseFuel(cost);
 
-	case E_Skills::DefenseUp:
-		FuelComponent->UseFuel(SkillManager->DefenseUp());
-		break;
+		switch (CurrentAugmentSkill)
+		{
+		case E_Skills::AttackUp:
+			SkillManager->AttackUp();
+			break;
 
-	case E_Skills::SpeedUp:
-		FuelComponent->UseFuel(SkillManager->SpeedUp());
-		break;
+		case E_Skills::DefenseUp:
+			SkillManager->DefenseUp();
+			break;
 
-	case E_Skills::None:
-		PRINT_LOG(TEXT("No Augment Skill is selected"));
-		break;
+		case E_Skills::SpeedUp:
+			SkillManager->SpeedUp();
+			break;
+
+		case E_Skills::None:
+			PRINT_LOG(TEXT("No Augment Skill is selected"));
+			break;
+		}
+	}
+	else
+	{
+		PRINT_LOG(TEXT("Not Enough Fuel"));
 	}
 }
 
@@ -460,7 +470,7 @@ void AProjectPlayer::WhileHoldingOverrideSkill(const FInputActionValue& inputVal
 		break;
 
 	case E_Skills::SeeThrough:
-		SkillManager->SeeThrough();
+		//SkillManager->SeeThrough();
 		break;
 
 	case E_Skills::None:
@@ -472,30 +482,39 @@ void AProjectPlayer::WhileHoldingOverrideSkill(const FInputActionValue& inputVal
 
 void AProjectPlayer::OnReleaseOverrideSkill(const FInputActionValue& inputValue)
 {
-	//PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentOverrideSkillName());
 	E_Skills CurrentOverrideSkill = SkillManager->GetCurrentOverrideSkill();
+	int32 cost = SkillManager->GetSkillCost(CurrentOverrideSkill);
 
-	switch (CurrentOverrideSkill)
+	if (FuelComponent->HasEnoughFuel(cost))
 	{
-	case E_Skills::SightHacking:
-		FuelComponent->UseFuel(SkillManager->SightHacking());
-		break;
+		FuelComponent->UseFuel(cost);
 
-	case E_Skills::Slow:
-		FuelComponent->UseFuel(SkillManager->Slow());
-		break;
+		switch (CurrentOverrideSkill)
+		{
+		case E_Skills::SightHacking:
+			SkillManager->SightHacking();
+			break;
 
-	case E_Skills::ElectricShock:
-		FuelComponent->UseFuel(SkillManager->ElectricShock());
-		break;
+		case E_Skills::Slow:
+			SkillManager->Slow();
+			break;
 
-	case E_Skills::SeeThrough:
-		PRINT_LOG(TEXT("SeeThrough is Deactivated"));
-		break;
+		case E_Skills::ElectricShock:
+			SkillManager->ElectricShock();
+			break;
 
-	case E_Skills::None:
-		PRINT_LOG(TEXT("No Override Skill is selected"));
-		break;
+		case E_Skills::SeeThrough:
+			SkillManager->SeeThrough();
+			break;
+
+		case E_Skills::None:
+			PRINT_LOG(TEXT("No Override Skill is selected"));
+			break;
+		}
+	}
+	else
+	{
+		PRINT_LOG(TEXT("Not Enough Fuel"));
 	}
 }
 

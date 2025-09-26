@@ -73,13 +73,15 @@ public:
 	E_Skills GetCurrentAugmentSkill() const { return CurrentAugmentSkill; }
 	E_Skills GetCurrentOverrideSkill() const { return CurrentOverrideSkill; }
 
-	int32 AttackUp();
-	int32 DefenseUp();
-	int32 SpeedUp();
-	int32 SightHacking();
-	int32 Slow();
-	int32 ElectricShock();
-	int32 SeeThrough();
+	void AttackUp();
+	void DefenseUp();
+	void SpeedUp();
+	void SightHacking();
+	void Slow();
+	void ElectricShock();
+	void SeeThrough();
+
+	int32 GetSkillCost(E_Skills Skill) const;
 
 protected:
 	// Called when the game starts
@@ -92,11 +94,18 @@ private:
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
 	E_Skills CurrentOverrideSkill;
 
-	void ActivateAugmentSkill(E_Skills skill, float Multiplier, float Duration);
+	void ActivateAugmentSkill(E_Skills skill, float Multiplier);
 
 	AActor* HitActor;
-
 	FHitResult HitResult;
-
 	AProjectPlayer* Player;
+
+	TArray<AActor*> DetectedItems;
+
+	void DetectItems();
+
+	float AttackUpDuration = 10.0f;
+	float DefenseUpDuration = 10.0f;
+	float SpeedUpDuration = 10.0f;
+	float SeeThroughDuration = 5.0f;
 };

@@ -2,9 +2,14 @@
 
 #include "Player/SkillManagerComponent.h"
 #include "Player/ProjectPlayer.h"
+
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "NavMesh/NavMeshBoundsVolume.h"
+
 #include "Enemy/PE_AIController.h"
 #include "Enemy/Enemy.h"
+
 #include "DedicatedProject.h"
 
 
@@ -72,7 +77,7 @@ void USkillManagerComponent::BeginPlay()
 
 }
 
-void USkillManagerComponent::ActivateAugmentSkill(E_Skills skill, float Multiplier, float Duration)
+void USkillManagerComponent::ActivateAugmentSkill(E_Skills skill, float Multiplier)
 {
 	if (Player)
 	{
@@ -133,14 +138,11 @@ void USkillManagerComponent::GetHitResultActor(float Distance)
 	return;
 }
 
-int32 USkillManagerComponent::AttackUp()
+void USkillManagerComponent::AttackUp()
 {
-	int SkillIndex = static_cast<int32>(E_Skills::AttackUp);
-	int32 SkillCost = Skills[SkillIndex].Cost;
-
 	float Multiplier = 1.5f;
 	PRINT_LOG(TEXT("Attack Up Activated"));
-	ActivateAugmentSkill(E_Skills::AttackUp, Multiplier, 10.0f);
+	ActivateAugmentSkill(E_Skills::AttackUp, Multiplier);
 
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Multiplier]()
@@ -151,19 +153,14 @@ int32 USkillManagerComponent::AttackUp()
 			Player->SetAttackPower(Player->GetAttackPower() / Multiplier);
 			PRINT_LOG(TEXT("Attack Up Deactivated"));
 		}
-	}, 10.0f, false);
-
-	return SkillCost;
+	}, AttackUpDuration, false);
 }
 
-int32 USkillManagerComponent::DefenseUp()
+void USkillManagerComponent::DefenseUp()
 {
-	int SkillIndex = static_cast<int32>(E_Skills::DefenseUp);
-	int32 SkillCost = Skills[SkillIndex].Cost;
-
 	PRINT_LOG(TEXT("Defense Up Activated"));
 	float Multiplier = 0.5f; // 데미지 50% 감소
-	ActivateAugmentSkill(E_Skills::DefenseUp, Multiplier, 10.0f);
+	ActivateAugmentSkill(E_Skills::DefenseUp, Multiplier);
 
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Multiplier]()
@@ -173,19 +170,14 @@ int32 USkillManagerComponent::DefenseUp()
 			Player->SetDamageMultiplier(1.0f);
 			PRINT_LOG(TEXT("Defense Up Deactivated"));
 		}
-	}, 10.0f, false);
-
-	return SkillCost;
+	}, DefenseUpDuration, false);
 }
 
-int32 USkillManagerComponent::SpeedUp()
+void USkillManagerComponent::SpeedUp()
 {
-	int SkillIndex = static_cast<int32>(E_Skills::SpeedUp);
-	int32 SkillCost = Skills[SkillIndex].Cost;
-
 	PRINT_LOG(TEXT("Speed Up Activated"));
 	float Multiplier = 1.5f; // 이동속도 50% 증가
-	ActivateAugmentSkill(E_Skills::SpeedUp, Multiplier, 10.0f);
+	ActivateAugmentSkill(E_Skills::SpeedUp, Multiplier);
 
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Multiplier]()
@@ -195,81 +187,164 @@ int32 USkillManagerComponent::SpeedUp()
 			Player->SetSpeedMultiplier(1.0f);
 			PRINT_LOG(TEXT("Speed Up Deactivated"));
 		}
-	}, 10.0f, false);
-
-	return SkillCost;
+	}, SpeedUpDuration, false);
 }
 
-int32 USkillManagerComponent::SightHacking()
+void USkillManagerComponent::SightHacking()
 {
-	int SkillIndex = static_cast<int32>(E_Skills::SightHacking);
-	int32 SkillCost = Skills[SkillIndex].Cost;
-
 	PRINT_LOG(TEXT("Sight Hacking Activated"));
 
 	if (!HitActor)
 	{
 		PRINT_LOG(TEXT("No Actor Hit"));
-		return 0;
+		return;
 	}
 
 	AEnemy* HitEnemy = Cast<AEnemy>(HitActor);
 	if (!HitEnemy)
 	{
 		PRINT_LOG(TEXT("Hit Actor is not an Enemy"));
-		return 0;
+		return;
 	}
 
 	APE_AIController* EnemyController = Cast<APE_AIController>(HitEnemy->GetController());
 	if (!EnemyController)
 	{
 		PRINT_LOG(TEXT("EnemyController is null"));
-		return 0;
+		return;
 	}
 
 	EnemyController->DisableDetect(10.0f);
-	return SkillCost;
 }
 
-int32 USkillManagerComponent::Slow()
+void USkillManagerComponent::Slow()
 {
-	int SkillIndex = static_cast<int32>(E_Skills::Slow);
-	int32 SkillCost = Skills[SkillIndex].Cost;
-
 	PRINT_LOG(TEXT("Slow Activated"));
-	return SkillCost;
 }
 
-int32 USkillManagerComponent::ElectricShock()
+void USkillManagerComponent::ElectricShock()
 {
-	int SkillIndex = static_cast<int32>(E_Skills::ElectricShock);
-	int32 SkillCost = Skills[SkillIndex].Cost;
-
 	PRINT_LOG(TEXT("Electric Shock Activated"));
 	//GetHitResultActor(1000.0f);
 
 	if (!HitActor)
 	{
 		PRINT_LOG(TEXT("No Actor Hit"));
-		return 0;
+		return;
 	}
 
 	AEnemy* HitEnemy = Cast<AEnemy>(HitActor);
 	if (!HitEnemy)
 	{
 		PRINT_LOG(TEXT("Hit Actor is not an Enemy"));
-		return 0;
+		return;
 	}
 
 	HitEnemy->ApplyStun(10.0f);
-	return SkillCost;
 }
 
-int32 USkillManagerComponent::SeeThrough()
-{
-	int SkillIndex = static_cast<int32>(E_Skills::SeeThrough);
-	int32 SkillCost = Skills[SkillIndex].Cost;
 
-	//PRINT_LOG(TEXT("See Through Activated"));
-	return SkillCost;
+void USkillManagerComponent::SeeThrough()
+{
+	PRINT_LOG(TEXT("See Through Activated"));
+	DetectItems();
+
+	if (UWorld* World = GetWorld())
+	{
+		FTimerHandle TimerHandle;
+		TWeakObjectPtr<USkillManagerComponent> WeakThis(this);
+		World->GetTimerManager().SetTimer(TimerHandle, [WeakThis]()
+		{
+			for (auto Item : WeakThis->DetectedItems)
+			{
+				if (Item)
+				{
+					TArray<UStaticMeshComponent*> MeshComps;
+					Item->GetComponents<UStaticMeshComponent>(MeshComps);
+					for (UStaticMeshComponent* MeshComp : MeshComps)
+					{
+						if (MeshComp)
+						{
+							MeshComp->SetRenderCustomDepth(false);
+						}
+					}
+				}
+			}
+			PRINT_LOG(TEXT("See Through Deactivated"));
+		}, WeakThis->SeeThroughDuration, false);
+	}
+}
+
+void USkillManagerComponent::DetectItems()
+{
+	//배열 초기화
+	DetectedItems.Empty();
+
+	auto ControllingPawn = Cast<APawn>(Player);
+	if (ControllingPawn == nullptr) return;
+
+	// 1. NavMeshBoundsVolume 중 현재 캐릭터가 들어 있는 볼륨 찾기
+	TArray<AActor*> NavVolumes;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ANavMeshBoundsVolume::StaticClass(), NavVolumes);
+
+	ANavMeshBoundsVolume* CurrentVolume = nullptr;
+	const FVector PawnLocation = ControllingPawn->GetActorLocation();
+	for (auto VolumeActor : NavVolumes)
+	{
+		ANavMeshBoundsVolume* Volume = Cast<ANavMeshBoundsVolume>(VolumeActor);
+		if (nullptr == Volume) continue;
+
+		FVector Origin, Extent;
+		Volume->GetActorBounds(false, Origin, Extent);
+
+		const FVector Delta = (PawnLocation - Origin).GetAbs();
+		if (Delta.X <= Extent.X && Delta.Y <= Extent.Y && Delta.Z <= Extent.Z)
+		{
+			CurrentVolume = Volume;
+			PRINT_LOG(TEXT("Volume Selected"));
+			break;
+		}
+	}
+	if (nullptr == CurrentVolume) return;
+
+	// 2. 현재 NavMeshBoundsVolume 안에 있는 Item 찾기
+	FVector VolumeOrigin, VolumeExtent;
+	CurrentVolume->GetActorBounds(false, VolumeOrigin, VolumeExtent);
+
+	TArray<AActor*> AllActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), AllActors);
+	for (AActor* CurActor : AllActors)
+	{
+		APE_BasePickup* Item = Cast<APE_BasePickup>(CurActor);
+		if (nullptr == Item) continue;
+
+		FVector Loc = Item->GetActorLocation();
+		FVector Delta = (Loc - VolumeOrigin).GetAbs();
+		if (Delta.X <= VolumeExtent.X && Delta.Y <= VolumeExtent.Y && Delta.Z <= VolumeExtent.Z)
+		{
+			DetectedItems.Add(Item);
+
+			// 아이템 하이라이트 처리
+			TArray<UStaticMeshComponent*> MeshComps;
+			Item->GetComponents<UStaticMeshComponent>(MeshComps);
+			for (UStaticMeshComponent* MeshComp : MeshComps)
+			{
+				if (MeshComp)
+				{
+					MeshComp->SetRenderCustomDepth(true);
+					MeshComp->SetCustomDepthStencilValue(1); // SeeThrough용 Stencil 값
+				}
+			}
+		}
+	}
+}
+
+int32 USkillManagerComponent::GetSkillCost(E_Skills Skill) const
+{
+	int32 SkillIndex = static_cast<int32>(Skill);
+	if (Skills.IsValidIndex(SkillIndex))
+	{
+		return Skills[SkillIndex].Cost;
+	}
+	return 0;
 }
