@@ -83,6 +83,25 @@ public:
 
 	int32 GetSkillCost(E_Skills Skill) const;
 
+	//Skill RPC
+	UFUNCTION()
+	void UseAugmentSkill(E_Skills Skill);
+
+	UFUNCTION(Server, Reliable)
+	void UseAugmentSkill_Server(E_Skills Skill);
+
+	UFUNCTION()
+	void UseOverrideSkill(E_Skills Skill);
+
+	UFUNCTION(Server, Reliable)
+	void UseOverrideSkill_Server(E_Skills Skill);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void UseOverrideSkill_Multicast(E_Skills Skill);
+
+	UFUNCTION(Client, Reliable)
+	void SeeThrough_Client();
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -95,6 +114,9 @@ private:
 	E_Skills CurrentOverrideSkill;
 
 	void ActivateAugmentSkill(E_Skills skill, float Multiplier);
+
+	void HandleAugmentSkill(E_Skills Skill);
+	void HandleOverrideSkill(E_Skills Skill);
 
 	AActor* HitActor;
 	FHitResult HitResult;

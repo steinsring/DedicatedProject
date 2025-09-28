@@ -18,24 +18,35 @@ public:
 	// Sets default values for this component's properties
 	UHealthComponent();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void OnRep_CurrentHealth();
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
 	void SetHP(float NewHP);
-	float ApplyDamage(float DamageAmount);
+
+	UFUNCTION(Server, Reliable)
+	void ApplyDamage_Server(float DamageAmount);
+
 	float GetHPRatio();
+
 	float GetCurrentHealth() const { return CurrentHealth; }
+
 	float GetMaxHealth() const { return MaxHealth; }
 
 	FOnHPIsZeroDelegate OnHPIsZero; // HP가 0이 되었을 때 호출되는 델리게이트
 	FOnHPChangedDelegate OnHPChanged;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Actor Stat")
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, EditAnywhere, Category = "Actor Stat")
 	float CurrentHealth;
 
 	UPROPERTY(EditAnywhere, Category = "Actor Stat")

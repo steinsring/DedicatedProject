@@ -18,7 +18,7 @@ USkillManagerComponent::USkillManagerComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	CurrentAugmentSkill = E_Skills::None;
 	CurrentOverrideSkill = E_Skills::None;
@@ -35,6 +35,8 @@ USkillManagerComponent::USkillManagerComponent()
 			Skills.Add(*Skill);
 		}
 	}
+
+	SetIsReplicatedByDefault(true); // 컴포넌트가 기본적으로 복제되도록 설정
 }
 
 
@@ -77,6 +79,43 @@ void USkillManagerComponent::BeginPlay()
 
 }
 
+//////////////////Augment Skill////////////////////
+
+void USkillManagerComponent::UseAugmentSkill(E_Skills Skill)
+{
+	if (GetOwnerRole() < ROLE_Authority)
+	{
+		UseAugmentSkill_Server(Skill);
+	}
+	else
+	{
+		HandleAugmentSkill(Skill);
+	}
+}
+
+void USkillManagerComponent::UseAugmentSkill_Server_Implementation(E_Skills Skill)
+{
+	HandleAugmentSkill(Skill);
+}
+
+void USkillManagerComponent::HandleAugmentSkill(E_Skills Skill)
+{
+	switch (Skill)
+	{
+	case E_Skills::AttackUp:
+		AttackUp();
+		break;
+	case E_Skills::DefenseUp:
+		DefenseUp();
+		break;
+	case E_Skills::SpeedUp:
+		SpeedUp();
+		break;
+	default:
+		break;
+	}
+}
+
 void USkillManagerComponent::ActivateAugmentSkill(E_Skills skill, float Multiplier)
 {
 	if (Player)
@@ -102,41 +141,6 @@ void USkillManagerComponent::ActivateAugmentSkill(E_Skills skill, float Multipli
 	}
 }
 
-void USkillManagerComponent::GetHitResultActor(float Distance)
-{
-	UCameraComponent* PlayerCamera = Player->GetPlayerCamComp();
-	if (PlayerCamera == nullptr)
-	{
-		PRINT_LOG(TEXT("PlayerCamera is null"));
-		return;
-	}
-
-	FVector Start = Player->GetActorLocation();
-	FVector End = Start + (PlayerCamera->GetForwardVector() * Distance);
-	
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(Player);
-
-	bool bHit = GetWorld()->LineTraceSingleByChannel(
-		HitResult,
-		Start, 
-		End, 
-		ECC_Pawn, 
-		Params
-	);
-
-	FColor LineColor = bHit ? FColor::Red : FColor::Green;
-	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 1.0f);
-
-	if (bHit)
-	{
-		PRINT_LOG(TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
-		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.0f);
-		HitActor = HitResult.GetActor();
-	}
-
-	return;
-}
 
 void USkillManagerComponent::AttackUp()
 {
@@ -189,6 +193,102 @@ void USkillManagerComponent::SpeedUp()
 		}
 	}, SpeedUpDuration, false);
 }
+
+//////////////////Override Skill////////////////////
+
+void USkillManagerComponent::UseOverrideSkill(E_Skills Skill)
+{
+	if (GetOwnerRole() < ROLE_Authority)
+	{
+		UseOverrideSkill_Server(Skill);
+	}
+	else
+	{
+		HandleOverrideSkill(Skill);
+	}
+}
+
+void USkillManagerComponent::UseOverrideSkill_Server_Implementation(E_Skills Skill)
+{
+	HandleOverrideSkill(Skill);
+	UseOverrideSkill_Multicast(Skill);
+}
+
+void USkillManagerComponent::UseOverrideSkill_Multicast_Implementation(E_Skills Skill)
+{
+	switch (Skill)
+	{
+	case E_Skills::SightHacking:
+		//몬스터 눈 부분에 지지직 거리는 이펙트
+		break;
+
+	case E_Skills::ElectricShock:
+		//몬스터 몸 부분에 전기 이펙트
+		break;
+
+	default:
+		break;
+	}
+}
+
+void USkillManagerComponent::HandleOverrideSkill(E_Skills Skill)
+{
+	switch (Skill)
+	{
+	case E_Skills::SightHacking:
+		SightHacking();
+		break;
+	case E_Skills::Slow:
+		Slow();
+		break;
+	case E_Skills::ElectricShock:
+		ElectricShock();
+		break;
+	case E_Skills::SeeThrough:
+		SeeThrough_Client();
+		break;
+	default:
+		break;
+	}
+}
+
+void USkillManagerComponent::GetHitResultActor(float Distance)
+{
+	UCameraComponent* PlayerCamera = Player->GetPlayerCamComp();
+	if (PlayerCamera == nullptr)
+	{
+		PRINT_LOG(TEXT("PlayerCamera is null"));
+		return;
+	}
+
+	FVector Start = Player->GetActorLocation();
+	FVector End = Start + (PlayerCamera->GetForwardVector() * Distance);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(Player);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		Start,
+		End,
+		ECC_Pawn,
+		Params
+	);
+
+	FColor LineColor = bHit ? FColor::Red : FColor::Green;
+	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 1.0f);
+
+	if (bHit)
+	{
+		PRINT_LOG(TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
+		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.0f);
+		HitActor = HitResult.GetActor();
+	}
+
+	return;
+}
+
+
 
 void USkillManagerComponent::SightHacking()
 {
@@ -243,6 +343,11 @@ void USkillManagerComponent::ElectricShock()
 	HitEnemy->ApplyStun(10.0f);
 }
 
+//See Through는 Client에서 실행
+void USkillManagerComponent::SeeThrough_Client_Implementation()
+{
+	SeeThrough();
+}
 
 void USkillManagerComponent::SeeThrough()
 {

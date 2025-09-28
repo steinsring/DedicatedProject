@@ -346,7 +346,10 @@ void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {
 //TakeDamage 오버라이드
 float AProjectPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	return HealthComp->ApplyDamage(DamageAmount * DamageMultiplier);
+	float CalculatedDamage = DamageAmount * DamageMultiplier;
+	HealthComp->ApplyDamage_Server(CalculatedDamage);
+
+	return CalculatedDamage;
 }
 
 void AProjectPlayer::SprintStart(const struct FInputActionValue& inputValue)
@@ -433,25 +436,7 @@ void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
 	if (FuelComponent->HasEnoughFuel(cost))
 	{
 		FuelComponent->UseFuel(cost);
-
-		switch (CurrentAugmentSkill)
-		{
-		case E_Skills::AttackUp:
-			SkillManager->AttackUp();
-			break;
-
-		case E_Skills::DefenseUp:
-			SkillManager->DefenseUp();
-			break;
-
-		case E_Skills::SpeedUp:
-			SkillManager->SpeedUp();
-			break;
-
-		case E_Skills::None:
-			PRINT_LOG(TEXT("No Augment Skill is selected"));
-			break;
-		}
+		SkillManager->UseAugmentSkill(CurrentAugmentSkill);
 	}
 	else
 	{
@@ -488,29 +473,7 @@ void AProjectPlayer::OnReleaseOverrideSkill(const FInputActionValue& inputValue)
 	if (FuelComponent->HasEnoughFuel(cost))
 	{
 		FuelComponent->UseFuel(cost);
-
-		switch (CurrentOverrideSkill)
-		{
-		case E_Skills::SightHacking:
-			SkillManager->SightHacking();
-			break;
-
-		case E_Skills::Slow:
-			SkillManager->Slow();
-			break;
-
-		case E_Skills::ElectricShock:
-			SkillManager->ElectricShock();
-			break;
-
-		case E_Skills::SeeThrough:
-			SkillManager->SeeThrough();
-			break;
-
-		case E_Skills::None:
-			PRINT_LOG(TEXT("No Override Skill is selected"));
-			break;
-		}
+		SkillManager->UseOverrideSkill(CurrentOverrideSkill);
 	}
 	else
 	{

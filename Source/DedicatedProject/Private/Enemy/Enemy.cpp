@@ -34,7 +34,10 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	if (Player)
 	{
 		float DamageMultiplier = Player->GetAttackPowerMultiplier();
-		return HealthComp->ApplyDamage(DamageAmount * DamageMultiplier);
+		float CalculatedDamage = DamageAmount * DamageMultiplier;
+		HealthComp->ApplyDamage_Server(CalculatedDamage);
+
+		return CalculatedDamage;
 	}
 
 	return 0.0f;

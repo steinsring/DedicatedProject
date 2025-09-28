@@ -115,7 +115,9 @@ void ACharacterCommon::SetHitbox(ECollisionEnabled::Type CollisionEnabled, UCaps
 
 float ACharacterCommon::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	return HealthComp->ApplyDamage(DamageAmount);
+	HealthComp->ApplyDamage_Server(DamageAmount);
+
+	return DamageAmount;
 }
 
 void ACharacterCommon::ApplyStun(float Duration)
