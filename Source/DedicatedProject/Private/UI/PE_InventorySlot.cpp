@@ -32,7 +32,6 @@ void UPE_InventorySlot::FindItemData(FName ItemID)
 		if (Row->ItemID == ItemID)
 		{
 			SearchedItemData = Row;
-			//PRINT_LOG(TEXT("Find Item Success"));
 			ID = ItemID;
 			return;
 		}

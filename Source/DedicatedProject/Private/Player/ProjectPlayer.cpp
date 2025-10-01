@@ -6,6 +6,8 @@
 #include "Engine/DataTable.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h" //EnhancedInput 사용을 위함
+#include "InputAction.h"
+#include "InputMappingContext.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 
@@ -21,6 +23,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetComponent.h"
 #include "Fuel/PE_FuelComponent.h"
+#include <Components/SpotLightComponent.h>
 #include "Player/PE_ItemThrowableComponent.h"
 
 
@@ -86,28 +89,36 @@ AProjectPlayer::AProjectPlayer()
 		//AIControllerClass = APE_AIController::StaticClass();
 		//AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-		//히트박스 세팅
+		//히트박스 세팅-------------------------------------------------------------------------------
 		RightFootHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RightFootHitBox"));
 		RightFootHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("foot_r")); //메쉬의 발에 히트박스 추가
 		RightFootHitBox->SetCapsuleHalfHeight(30.0f); //높이 설정
 		RightFootHitBox->SetCapsuleRadius(20.0f); //반지름 설정
 
+		// InventoryComponent 초기화 --------------------------------------------------------------------
 		InventoryComponent = CreateDefaultSubobject<UPE_InventoryComponent>(TEXT("InventoryComponent"));
 
-		// 던지는 아이템
+		// 던지는 아이템 -----------------------------------------------------------------------------
 		ItemThrowable = CreateDefaultSubobject<UPE_ItemThrowableComponent>(TEXT("ItemThrowable"));
 		ItemThrowable->SetupAttachment(RootComponent);
 		ItemThrowable->SetRelativeLocation(FVector(4.f, -11.f, 80.f));
 
-		// FuelComponent 세팅
+		// FuelComponent 세팅------------------------------------------------------------------------
 		FuelComponent = CreateDefaultSubobject<UPE_FuelComponent>(TEXT("FuelComponent"));
 		FuelComponent->SetupAttachment(GetMesh(), TEXT("FX_backpack"));					// BackPack소켓에 직접 부착
+
+		// SpotLight 생성----------------------------------------------------------------------------
+		SpotLightComp = CreateDefaultSubobject<USpotLightComponent>(TEXT("SpotLight"));
+		SpotLightComp->SetupAttachment(GetMesh(), TEXT("HealthBar"));
+		SpotLightComp->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+		SpotLightComp->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
 	}
 	else
 	{
 		PRINT_ERROR_LOG(TEXT("Player Skeletal Mesh is NULL"));
 	}
 
+	// 체력 --------------------------------------------------------------------------
 	static ConstructorHelpers::FClassFinder<UUserWidget> HPBarWidgetAsset(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_HPBar.WB_HPBar_C'"));
 	if (HPBarWidgetAsset.Succeeded())
 	{
@@ -118,6 +129,7 @@ AProjectPlayer::AProjectPlayer()
 		PRINT_ERROR_LOG(TEXT("HPBarWidgetAsset is NULL"));
 	}
 
+	// 스킬 --------------------------------------------------------------------------
 	CharacterDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_CharacterStats.DT_CharacterStats"));
 	SkillManager = CreateDefaultSubobject<USkillManagerComponent>(TEXT("SkillManager"));
 
@@ -129,6 +141,28 @@ AProjectPlayer::AProjectPlayer()
 	{
 		PRINT_LOG(TEXT("❌ SkillManagerComponent is NOT Created"));
 	}
+
+	// 플레이어 Input Action 초기화 --------------------------------------------------------------------------
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCPlayer(TEXT("/Game/Inputs/IMC_ProjectPlayer.IMC_ProjectPlayer"));
+	if (IMCPlayer.Succeeded())	imc_ProjectPlayer = IMCPlayer.Object;
+	static ConstructorHelpers::FObjectFinder<UInputAction> IALookUp(TEXT("/Game/Inputs/IA_LookUp.IA_LookUp"));
+	if (IALookUp.Succeeded())	ia_LookUp = IALookUp.Object;
+	static ConstructorHelpers::FObjectFinder<UInputAction> IATurn(TEXT("/Game/Inputs/IA_Turn.IA_Turn"));
+	if (IATurn.Succeeded())	ia_Turn = IATurn.Object;
+	static ConstructorHelpers::FObjectFinder<UInputAction> IAMove(TEXT("/Game/Inputs/IA_PlayerMove.IA_PlayerMove"));
+	if (IAMove.Succeeded())	ia_Move = IAMove.Object;
+	static ConstructorHelpers::FObjectFinder<UInputAction> IAJump(TEXT("/Game/Inputs/IA_PlayerJump.IA_PlayerJump"));
+	if (IAJump.Succeeded())	ia_Jump = IAJump.Object;
+	static ConstructorHelpers::FObjectFinder<UInputAction> IAAttack(TEXT("/Game/Inputs/IA_Attack.IA_Attack"));
+	if (IAAttack.Succeeded())	ia_Attack = IAAttack.Object;
+	static ConstructorHelpers::FObjectFinder<UInputAction> IASprint(TEXT("/Game/Inputs/IA_Sprint.IA_Sprint"));
+	if (IASprint.Succeeded())	ia_Sprint = IASprint.Object;
+	static ConstructorHelpers::FObjectFinder<UInputAction> IAInteract(TEXT("/Game/Inputs/IA_Interact.IA_Interact"));
+	if (IAInteract.Succeeded())	IA_Interact = IAInteract.Object;
+	static ConstructorHelpers::FObjectFinder<UInputAction> IASkillAugment(TEXT("/Game/Inputs/IA_Skill_Augment.IA_Skill_Augment"));
+	if (IASkillAugment.Succeeded())	ia_Skill_Augment = IASkillAugment.Object;
+	static ConstructorHelpers::FObjectFinder<UInputAction> IASkillOverride(TEXT("/Game/Inputs/IA_Skill_Override.IA_Skill_Override"));
+	if (IASkillOverride.Succeeded())	ia_Skill_Override = IASkillOverride.Object;
 }
 
 // Called when the game starts or when spawned
