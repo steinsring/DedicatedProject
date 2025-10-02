@@ -12,6 +12,9 @@ struct DEDICATEDPROJECT_API FPE_ItemDataTable : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
+	FName ItemTag;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
 	FName ItemID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")

@@ -11,6 +11,7 @@
 #include "ProjectPlayer.generated.h"
 
 
+
 class UPE_HPBarWidget;
 class UPE_Inventory;
 class UPE_InventoryComponent;
@@ -35,13 +36,13 @@ private:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
 
-	//카메라 관련
+	//카메라 컴포넌트 --------------------------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArmComp; //카메라 암 위치
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* tpsCamComp; //카메라
 
-	//입력관련 속성
+	// 플레이어 화면 조작--------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputMappingContext* imc_ProjectPlayer; //만들어둔 IMC_ProjectPlayer
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -54,34 +55,34 @@ private:
 	//상하 회전 입력 처리
 	void LookUp(const struct FInputActionValue& inputValue);
 
-	//이동 관련
+	// 플레이어 이동 --------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_Move;
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
 	float walkSpeed = 600;
-	//이동방향
 	FVector direction;
 	void Move(const struct FInputActionValue& inputValue);
 
-	//점프 입력 이벤트 처리
+	// 점프 --------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_Jump;
 	void InputJump(const struct FInputActionValue& inputValue);
 
+	// 공격 --------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_Attack; // 공격 입력 액션
 	void InputAttack(const struct FInputActionValue& inputValue);
 	//void Attack();
 
 protected:
-	//캐릭터 스탯 관련
+	//캐릭터 스탯 관련 --------------------------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character Data", meta = (AllowPrivateAccess = "true"))
 	class UDataTable* CharacterDataTable; //블루프린트에서 데이터 테이블을 직접 참조
 	struct FPE_CharacterStats* CharacterStats; // 데이터 테이블에서 단일 행을 참조해 캐릭터 스탯으로 사용
 	void UpdateCharacterStats(int32 CharacterLevel);
 	FORCEINLINE FPE_CharacterStats* GetCharacterStats() const { return CharacterStats; } //스탯 구조체를 위한 Getter함수
 
-	//달리기 관련
+	//달리기 관련 --------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* ia_Sprint;
 private:
@@ -97,7 +98,7 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void SprintEnd_Client();
 
-	// 아이템 감지 관련
+	// 아이템 감지 관련 --------------------------------------------------------------------------
 	UPROPERTY(VisibleAnywhere)
 	UBoxComponent* InteractionZone;																				// 아이템 감지 범위 오브젝트
 	UPROPERTY()
@@ -110,10 +111,12 @@ private:
 	void OnItemOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,								// 아이템이 감지 범위 오브젝트에서 벗어났을 때
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	// 상호작용 --------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Interact;
 	void Interact();																							// 플레이어가 E키를 클릭했을 때
 	
+	// --------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_Skill_Augment;
 	void InputAugmentSkill(const struct FInputActionValue& inputValue);
@@ -146,6 +149,10 @@ private:
 	// Fuel -------------------------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = "Fuel")
 	TObjectPtr<class UPE_FuelComponent> FuelComponent;	// FuelComponent
+
+	// Light -------------------------------------------------------------------------
+	UPROPERTY(VisibleAnywhere, Category = "Light")
+	TObjectPtr<class USpotLightComponent> SpotLightComp;
 
 public:
 	// Sets default values for this character's properties
