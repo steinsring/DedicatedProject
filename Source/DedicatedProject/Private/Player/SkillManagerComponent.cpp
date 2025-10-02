@@ -442,6 +442,8 @@ void USkillManagerComponent::DetectItems()
 			}
 		}
 	}
+
+	PRINT_LOG(TEXT("Detected Items Count: %d"), DetectedItems.Num());
 }
 
 int32 USkillManagerComponent::GetSkillCost(E_Skills Skill) const
