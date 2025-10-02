@@ -46,6 +46,10 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		CollisionQueryParam
 	);
 
+	FVector Forward = ControllingPawn->GetActorForwardVector();
+	float FOV = 90.0f;
+	float CasHalfFOV = FMath::Cos(FMath::DegreesToRadians(FOV * 0.5f));
+
 	if (bResult)
 	{
 		for (auto const& OverlapResult : OverlapResults)
@@ -53,18 +57,49 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			AProjectPlayer* DetectedPlayer = Cast<AProjectPlayer>(OverlapResult.GetActor());
 			if (DetectedPlayer && DetectedPlayer->GetController()->IsPlayerController())
 			{
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject(APE_AIController::TargetKey, DetectedPlayer);
-				DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f); // 감지 성공 시 초록색
+				FVector DirToPlayer = (DetectedPlayer->GetActorLocation() - ControllingPawn->GetActorLocation()).GetSafeNormal();
+				float Dot = FVector::DotProduct(Forward, DirToPlayer);
 
-				//ai로부터 감지한 플레이어까지 파란색 라인을 그려
-				DrawDebugPoint(World, DetectedPlayer->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
-				DrawDebugLine(World, ControllingPawn->GetActorLocation(), DetectedPlayer->GetActorLocation(), FColor::Blue, false, 0.2f);
-				return;
+				if (Dot >= CasHalfFOV)
+				{
+					//시야각 안에 플레이어가 들어왔을 때
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject(APE_AIController::TargetKey, DetectedPlayer);
+					//DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f); // 감지 성공 시 초록색
+					DrawDebugCone(
+						World, 
+						ControllingPawn->GetActorLocation(), 
+						Forward, 
+						DetectRadius, 
+						FMath::DegreesToRadians(FOV * 0.5f), 
+						FMath::DegreesToRadians(FOV * 0.5f), 
+						16, 
+						FColor::Green, 
+						false, 
+						0.2f
+					);
+
+					//ai로부터 감지한 플레이어까지 파란색 라인을 그려
+					DrawDebugPoint(World, DetectedPlayer->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
+					DrawDebugLine(World, ControllingPawn->GetActorLocation(), DetectedPlayer->GetActorLocation(), FColor::Blue, false, 0.2f);
+					return;
+				}
 			}
 		}
 	}
 
 	BB->ClearValue(APE_AIController::TargetKey);
 	// 감지되는 것이 없을 경우엔 빨간색
-	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
+	//DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
+	DrawDebugCone(
+		World,
+		ControllingPawn->GetActorLocation(),
+		Forward,
+		DetectRadius,
+		FMath::DegreesToRadians(FOV * 0.5f),
+		FMath::DegreesToRadians(FOV * 0.5f),
+		16,
+		FColor::Red,
+		false,
+		0.2f
+	);
 }

@@ -496,7 +496,7 @@ void APE_MapGenerator::SpawnEnemies()
 				E_EnemyType EnemyType = SP->EnemyType;
 				AActor* Enemy = nullptr;
 				switch (EnemyType)
-				{	
+				{
 				case E_EnemyType::ToiletMech:
 					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
 					break;
@@ -509,6 +509,12 @@ void APE_MapGenerator::SpawnEnemies()
 				default:
 					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
 					break;
+				}
+
+				APE_AIController* AIController = Cast<APE_AIController>(Enemy->GetInstigatorController());
+				if (AIController)
+				{
+					AIController->WayPoints = SP->WayPoints;
 				}
 			}
 

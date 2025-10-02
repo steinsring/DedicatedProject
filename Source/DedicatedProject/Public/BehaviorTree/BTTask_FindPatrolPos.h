@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/TargetPoint.h"
 #include "BehaviorTree/BTTaskNode.h"
 #include "BTTask_FindPatrolPos.generated.h"
 
@@ -21,7 +22,7 @@ public:
 
 private:
 	UPROPERTY()
-	TArray<AActor*> PatrolPoints;
+	TArray<ATargetPoint*> PatrolPoints;
 
 	int32 CurrentPatrolIndex = 0;
 };

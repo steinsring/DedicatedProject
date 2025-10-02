@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Engine/TargetPoint.h"
 //#include "BehaviorTree/BehaviorTree.h"
 //#include "BehaviorTree/BlackboardData.h"
 #include "PE_AIController.generated.h"
@@ -32,7 +33,7 @@ public:
 	void CollectChildrenWayPoints();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<AActor*> WayPoints;
+	TArray<ATargetPoint*> WayPoints;
 
 	void DisableDetect(float Duration = 10.0f);
 	
