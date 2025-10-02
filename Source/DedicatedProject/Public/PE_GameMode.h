@@ -15,7 +15,9 @@ class DEDICATEDPROJECT_API APE_GameMode : public AGameMode
 	GENERATED_BODY()
 
 private:
-
+	UPROPERTY()
+	FVector TargetLocation;
+	bool bHasTarget = false;
 	
 public:
 	APE_GameMode(); //게임모드 생성자
@@ -24,9 +26,11 @@ public:
 	UFUNCTION()
 	void PlacePawnIfReady(APlayerController* PC);
 
-	UPROPERTY()
-	FVector TargetLocation;
-	bool bHasTarget = false;
+	FVector GetTargetLocation()	const { return TargetLocation; }
+	void SetTargetLocation(FVector Location) { TargetLocation = Location; }
+	bool GetbHasTarget()	const { return bHasTarget; }
+	void SetbHasTarget(bool bHas) { bHasTarget = bHas; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -573,8 +573,8 @@ void APE_MapGenerator::GenerateMap() {
 	APE_GameMode* GameMode = Cast<APE_GameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 	if (GameMode)
 	{
-		GameMode->TargetLocation = Location;
-		GameMode->bHasTarget = true;
+		GameMode->SetTargetLocation(Location);
+		GameMode->SetbHasTarget(true);
 
 		// 이미 접속 중인 컨트롤러들 처리 시도
 		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)

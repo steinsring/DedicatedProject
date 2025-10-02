@@ -117,12 +117,12 @@ void UPE_Inventory::AddItemToInventory(const FName ItemID)
 	// 조명을 인벤토리에 추가 --------------------------------------------------------------------
 	else if (SearchedItemData->ItemTag == "Light")
 	{
-
+		LightSlot_1->SetItem(ItemID);
 	}
 	// 장비를 인벤토리에 추가 --------------------------------------------------------------------
 	else if (SearchedItemData->ItemTag == "Weapon")
 	{
-
+		WeaponSlot_1->SetItem(ItemID);
 	}
 	// 잘못된 Tag -------------------------------------------------------------------------------
 	else
