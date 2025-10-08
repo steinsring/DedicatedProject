@@ -20,4 +20,6 @@ public:
 	
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
 	USkillManagerComponent* SkillManager;*/
+
+
 };

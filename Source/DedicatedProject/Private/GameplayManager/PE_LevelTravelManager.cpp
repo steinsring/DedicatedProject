@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "DedicatedProject.h"
+#include "PE_GameInstance.h"
 
 
 // Sets default values
@@ -27,7 +28,6 @@ APE_LevelTravelManager::APE_LevelTravelManager()
 	}
 
 	bReplicates = true;
-	PRINT_LOG(TEXT("My Log : %s"), "level travel test 0");
 }
 
 // Called when the game starts or when spawned
@@ -45,14 +45,59 @@ void APE_LevelTravelManager::Tick(float DeltaTime)
 
 void APE_LevelTravelManager::Interact(AActor* Interactor)
 {
-	PRINT_LOG(TEXT("My Log : %s"), "level travel test 1");
-	UWorld* World = GetWorld();
-	if (World->GetAuthGameMode() == nullptr) return;
-	PRINT_LOG(TEXT("My Log : %s"), "level travel test 2");
-	// 게임 맵 이름 (패키징 시 프로젝트에 포함되어 있어야 함)
-	static const TCHAR* TargetMap = TEXT("/Game/Maps/InGameMap1"); // 본인 경로로 교체
+	LevelTravel();
+}
 
-	// 모두 이동: 서버가 listen으로 열고 클라가 자동 따라옴
-	World->ServerTravel(FString::Printf(TEXT("%s?listen"), TargetMap));
+void APE_LevelTravelManager::LevelTravel_Implementation()
+{
+	if (bTravelInProgress) // 중복 호출 방지
+	{
+		PRINT_LOG(TEXT("Travel skipped: already in progress"));
+		return;
+	}
+	bTravelInProgress = true;
+
+	UWorld* World = GetWorld();
+	if (World->GetAuthGameMode() == nullptr)
+	{
+		PRINT_ERROR_LOG(TEXT("Travel To Level : %s"), TEXT("World is Null"));
+		bTravelInProgress = false;
+		return;
+	}
+
+	UPE_GameInstance* GameInstance = GetGameInstance<UPE_GameInstance>();
+	if (GameInstance == nullptr)
+	{
+		PRINT_ERROR_LOG(TEXT("Travel To Level : %s"), TEXT("GameInstance is Null"));
+		bTravelInProgress = false;
+		return;
+	}
+
+	// 스테이지 정보를 GameInstance에서 가져와서 세팅
+	int32 CurrentStage = GameInstance->GetCurrentLevelCount();
+	int32 MaxStage = GameInstance->GetMaxTravelLevelCount();
+	int32 NextStage = CurrentStage + 1;
+	GameInstance->NotifyLevelTravelTriggered(NextStage);
+	Multicast_NotifyLevelTravelTriggered(NextStage);
+
+	if (NextStage <= MaxStage)
+	{
+		PRINT_LOG(TEXT("Travel To Next Level : %s, Current Level : %d"), TEXT("Stage End"), CurrentStage);
+		World->ServerTravel(FString::Printf(TEXT("%s?listen"), TEXT("/Game/Maps/InGameMap1")));
+	}
+	else 
+	{
+		PRINT_LOG(TEXT("Travel To Lobby : %s"), TEXT("Game End"));
+		GameInstance->ResetLevelTravelCount();
+		World->ServerTravel(FString::Printf(TEXT("%s?listen"), TEXT("/Game/Maps/Lobby")));
+	}
+}
+
+void APE_LevelTravelManager::Multicast_NotifyLevelTravelTriggered_Implementation(int32 NextStage)
+{
+	if (UPE_GameInstance* GameInstance = GetGameInstance<UPE_GameInstance>())
+	{
+		GameInstance->NotifyLevelTravelTriggered(NextStage);
+	}
 }
 

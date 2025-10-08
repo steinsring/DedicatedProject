@@ -111,7 +111,7 @@ AProjectPlayer::AProjectPlayer()
 		// SpotLight 생성----------------------------------------------------------------------------
 		SpotLightComp = CreateDefaultSubobject<USpotLightComponent>(TEXT("SpotLight"));
 		SpotLightComp->SetupAttachment(GetMesh(), TEXT("HealthBar"));
-		SpotLightComp->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+		SpotLightComp->SetRelativeLocation(FVector(0.f, 70.f, 0.f));
 		SpotLightComp->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
 	}
 	else
@@ -276,7 +276,7 @@ void AProjectPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		PlayerInput->BindAction(ia_Jump, ETriggerEvent::Started, this, &AProjectPlayer::InputJump);
 		PlayerInput->BindAction(ia_Sprint, ETriggerEvent::Started, this, &AProjectPlayer::SprintStart);
 		PlayerInput->BindAction(ia_Sprint, ETriggerEvent::Completed, this, &AProjectPlayer::SprintEnd);
-		PlayerInput->BindAction(IA_Interact, ETriggerEvent::Triggered, this, &AProjectPlayer::Interact);
+		PlayerInput->BindAction(IA_Interact, ETriggerEvent::Started, this, &AProjectPlayer::Interact);
 		PlayerInput->BindAction(ia_Attack, ETriggerEvent::Started, this, &AProjectPlayer::InputAttack);
 		PlayerInput->BindAction(ia_Skill_Augment, ETriggerEvent::Started, this, &AProjectPlayer::InputAugmentSkill);
 		PlayerInput->BindAction(ia_Skill_Override, ETriggerEvent::Triggered, this, &AProjectPlayer::WhileHoldingOverrideSkill);
@@ -454,7 +454,6 @@ void AProjectPlayer::OnItemOverlapEnd(UPrimitiveComponent* OverlappedComp, AActo
 
 void AProjectPlayer::Interact()
 {
-	bool bHasAuthority = false;
 	if (FocusedItem)
 	{
 		FocusedItem->Interact(this);

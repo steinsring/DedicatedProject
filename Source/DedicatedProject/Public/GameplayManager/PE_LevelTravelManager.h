@@ -18,18 +18,21 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<class UStaticMeshComponent> InteractMesh; // 액터의 메시
 
-public:	
-	// Sets default values for this actor's properties
-	APE_LevelTravelManager();
+	// 레벨 관리----------------------------------------------------------------------------
+	UFUNCTION(Server,Reliable)
+	void LevelTravel();
+
+	UFUNCTION(NetMulticast, Reliable)					// 모든 클라+서버에서 실행
+	void Multicast_NotifyLevelTravelTriggered(int32 NextStage);
+
+	bool bTravelInProgress = false;						// 재진입 가드
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
+	APE_LevelTravelManager();
 	virtual void Tick(float DeltaTime) override;
-
 	virtual void Interact(class AActor* Interactor) override;
 	
 };
