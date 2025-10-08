@@ -90,6 +90,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void UseAugmentSkill_Server(E_Skills Skill);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void UseAugmentSkill_Multicast(E_Skills Skill);
+
 	UFUNCTION()
 	void UseOverrideSkill(E_Skills Skill);
 
@@ -99,8 +102,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void UseOverrideSkill_Multicast(E_Skills Skill);
 
-	UFUNCTION(Client, Reliable)
-	void SeeThrough_Client();
+	bool bIsAugmentSkillInCoolTime = false;
+	bool bIsOverrideSkillInCoolTime = false;
 
 protected:
 	// Called when the game starts
@@ -115,9 +118,6 @@ private:
 
 	void ActivateAugmentSkill(E_Skills skill, float Multiplier);
 
-	void HandleAugmentSkill(E_Skills Skill);
-	void HandleOverrideSkill(E_Skills Skill);
-
 	AActor* HitActor;
 	FHitResult HitResult;
 	AProjectPlayer* Player;
@@ -126,8 +126,13 @@ private:
 
 	void DetectItems();
 
+	FTimerHandle AugmentSkillCoolTimeTimerHandle;
+	FTimerHandle OverrideSkillCoolTimeTimerHandle;
+
 	float AttackUpDuration = 10.0f;
 	float DefenseUpDuration = 10.0f;
 	float SpeedUpDuration = 10.0f;
 	float SeeThroughDuration = 5.0f;
+
+	void StartSkillCoolTime(E_SkillType SkillType, E_Skills Skill);
 };

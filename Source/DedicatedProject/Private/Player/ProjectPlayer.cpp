@@ -468,14 +468,14 @@ void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
 	E_Skills CurrentAugmentSkill = SkillManager->GetCurrentAugmentSkill();
 	int32 cost = SkillManager->GetSkillCost(CurrentAugmentSkill);
 
-	if (FuelComponent->HasEnoughFuel(cost))
+	if (FuelComponent->HasEnoughFuel(cost) && !SkillManager->bIsAugmentSkillInCoolTime)
 	{
 		FuelComponent->UseFuel(cost);
 		SkillManager->UseAugmentSkill(CurrentAugmentSkill);
 	}
 	else
 	{
-		PRINT_LOG(TEXT("Not Enough Fuel"));
+		PRINT_LOG(TEXT("Not Enough Fuel Or In CoolTime"));
 	}
 }
 
@@ -505,14 +505,14 @@ void AProjectPlayer::OnReleaseOverrideSkill(const FInputActionValue& inputValue)
 	E_Skills CurrentOverrideSkill = SkillManager->GetCurrentOverrideSkill();
 	int32 cost = SkillManager->GetSkillCost(CurrentOverrideSkill);
 
-	if (FuelComponent->HasEnoughFuel(cost))
+	if (FuelComponent->HasEnoughFuel(cost) && !SkillManager->bIsOverrideSkillInCoolTime)
 	{
 		FuelComponent->UseFuel(cost);
 		SkillManager->UseOverrideSkill(CurrentOverrideSkill);
 	}
 	else
 	{
-		PRINT_LOG(TEXT("Not Enough Fuel"));
+		PRINT_LOG(TEXT("Not Enough Fuel Or In Cool Time"));
 	}
 }
 

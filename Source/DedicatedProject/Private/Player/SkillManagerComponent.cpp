@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 
+#include "Item/PE_BasePickup.h"
 #include "Enemy/PE_AIController.h"
 #include "Enemy/Enemy.h"
 
@@ -83,22 +84,39 @@ void USkillManagerComponent::BeginPlay()
 
 void USkillManagerComponent::UseAugmentSkill(E_Skills Skill)
 {
+	//쿨타임 중이면 사용 불가
+	if (bIsAugmentSkillInCoolTime)
+	{
+		PRINT_LOG(TEXT("Augment Skill is in Cool Time"));
+		return;
+	}
+
+	if (!GetWorld())
+	{
+		PRINT_LOG(TEXT("World is null"));
+		return;
+	}
+
+	//서버가 아닌 경우
 	if (GetOwnerRole() < ROLE_Authority)
 	{
 		UseAugmentSkill_Server(Skill);
 	}
+	//서버(호스트)인 경우
 	else
 	{
-		HandleAugmentSkill(Skill);
+		UseAugmentSkill_Multicast(Skill);
 	}
+
+	StartSkillCoolTime(E_SkillType::Augment, Skill);
 }
 
 void USkillManagerComponent::UseAugmentSkill_Server_Implementation(E_Skills Skill)
 {
-	HandleAugmentSkill(Skill);
+	UseAugmentSkill_Multicast(Skill);
 }
 
-void USkillManagerComponent::HandleAugmentSkill(E_Skills Skill)
+void USkillManagerComponent::UseAugmentSkill_Multicast_Implementation(E_Skills Skill)
 {
 	switch (Skill)
 	{
@@ -118,6 +136,8 @@ void USkillManagerComponent::HandleAugmentSkill(E_Skills Skill)
 
 void USkillManagerComponent::ActivateAugmentSkill(E_Skills skill, float Multiplier)
 {
+	bIsAugmentSkillInCoolTime = true;
+
 	if (Player)
 	{
 		switch (skill)
@@ -194,44 +214,44 @@ void USkillManagerComponent::SpeedUp()
 	}, SpeedUpDuration, false);
 }
 
+
 //////////////////Override Skill////////////////////
 
 void USkillManagerComponent::UseOverrideSkill(E_Skills Skill)
 {
+	//쿨타임 중이면 사용 불가
+	if (bIsOverrideSkillInCoolTime)
+	{
+		PRINT_LOG(TEXT("Override Skill is in Cool Time"));
+		return;
+	}
+
+	if (!GetWorld())
+	{
+		PRINT_LOG(TEXT("World is null"));
+		return;
+	}
+
+	//서버가 아닌 경우
 	if (GetOwnerRole() < ROLE_Authority)
 	{
-		UseOverrideSkill_Server(Skill);
+		UseOverrideSkill_Server(Skill); //서버에 요청
 	}
+	//서버(호스트)인 경우
 	else
 	{
-		HandleOverrideSkill(Skill);
+		UseOverrideSkill_Multicast(Skill); //서버(호스트)면 바로 실행
 	}
+
+	StartSkillCoolTime(E_SkillType::Override, Skill);
 }
 
 void USkillManagerComponent::UseOverrideSkill_Server_Implementation(E_Skills Skill)
 {
-	HandleOverrideSkill(Skill);
 	UseOverrideSkill_Multicast(Skill);
 }
 
 void USkillManagerComponent::UseOverrideSkill_Multicast_Implementation(E_Skills Skill)
-{
-	switch (Skill)
-	{
-	case E_Skills::SightHacking:
-		//몬스터 눈 부분에 지지직 거리는 이펙트
-		break;
-
-	case E_Skills::ElectricShock:
-		//몬스터 몸 부분에 전기 이펙트
-		break;
-
-	default:
-		break;
-	}
-}
-
-void USkillManagerComponent::HandleOverrideSkill(E_Skills Skill)
 {
 	switch (Skill)
 	{
@@ -245,7 +265,8 @@ void USkillManagerComponent::HandleOverrideSkill(E_Skills Skill)
 		ElectricShock();
 		break;
 	case E_Skills::SeeThrough:
-		SeeThrough_Client();
+		if (Player->IsLocallyControlled())
+			SeeThrough();
 		break;
 	default:
 		break;
@@ -287,8 +308,6 @@ void USkillManagerComponent::GetHitResultActor(float Distance)
 
 	return;
 }
-
-
 
 void USkillManagerComponent::SightHacking()
 {
@@ -341,12 +360,6 @@ void USkillManagerComponent::ElectricShock()
 	}
 
 	HitEnemy->ApplyStun(10.0f);
-}
-
-//See Through는 Client에서 실행
-void USkillManagerComponent::SeeThrough_Client_Implementation()
-{
-	SeeThrough();
 }
 
 void USkillManagerComponent::SeeThrough()
@@ -444,6 +457,53 @@ void USkillManagerComponent::DetectItems()
 	}
 
 	PRINT_LOG(TEXT("Detected Items Count: %d"), DetectedItems.Num());
+}
+
+////////////////////////////////////////////////////////////////////
+
+void USkillManagerComponent::StartSkillCoolTime(E_SkillType SkillType, E_Skills Skill)
+{
+	if (!GetWorld())
+	{
+		PRINT_LOG(TEXT("World is null"));
+		return;
+	}
+
+	PRINT_LOG(TEXT("Skill Cool Time Started"));
+	switch (SkillType)
+	{	
+	case E_SkillType::Augment:
+		bIsAugmentSkillInCoolTime = true;
+		break;
+	case E_SkillType::Override:
+		bIsOverrideSkillInCoolTime = true;
+		break;
+	default:
+		break;
+	}
+
+	int32 SkillIndex = static_cast<int32>(Skill);
+	float CoolTime = Skills[SkillIndex].CoolTime;
+
+	FTimerHandle TimerHandle = (SkillType == E_SkillType::Augment) ? AugmentSkillCoolTimeTimerHandle : OverrideSkillCoolTimeTimerHandle;
+	TWeakObjectPtr<USkillManagerComponent> WeakThis(this);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [WeakThis, SkillType]()
+	{
+		if (!WeakThis.IsValid()) return;
+
+		switch (SkillType)
+		{
+		case E_SkillType::Augment:
+			WeakThis->bIsAugmentSkillInCoolTime = false;
+			break;
+		case E_SkillType::Override:
+			WeakThis->bIsOverrideSkillInCoolTime = false;
+			break;
+		default:
+			break;
+		}
+		PRINT_LOG(TEXT("Skill Cool Time Ended"));
+	}, CoolTime, false);
 }
 
 int32 USkillManagerComponent::GetSkillCost(E_Skills Skill) const
