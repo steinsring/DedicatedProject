@@ -8,6 +8,7 @@
 #include "Player/ProjectPlayer.h"
 #include "Map/PE_MapGenerator.h"
 #include "UObject/ConstructorHelpers.h"
+#include "GameplayManager/PE_LevelTravelManager.h"
 
 APE_GameMode::APE_GameMode() { //생성자
 	GameStateClass = APE_GameState::StaticClass(); // 게임 스테이트
@@ -36,8 +37,12 @@ void APE_GameMode::BeginPlay()
 		);
 	}
 
-    
+    FVector LevelTravelLocation(-300.f, 1082.f, -218.f);
 
+    GetWorld()->SpawnActor<APE_LevelTravelManager>(
+        TargetLocation + LevelTravelLocation,                // 위치
+        FRotator::ZeroRotator              // 회전
+    );
 }
 
 // 이유는 모르겠는데 서버가 PostLogin을 스킵해서 강제로 실행하도록함. 이것을 하지 않으면 서버가 아닌 다른 클라이언트들은 character가 아닌 spectator로 생성이 되었음.
@@ -96,10 +101,12 @@ void APE_GameMode::PlacePawnIfReady(APlayerController* PC)
     {
         // 이동 복제: Pawn은 기본적으로 ReplicateMovement 켜두세요
         // Character라면 TeleportTo 권장(스윕 OFF, 텔레포트 ON)
-        P->TeleportTo(TargetLocation, P->GetActorRotation(), /*bIsATest=*/false, /*bNoCheck=*/true);
+        FVector PlayerLocation(-100.f, 1082.f, -100.f);
+
+        P->TeleportTo(TargetLocation + PlayerLocation, P->GetActorRotation(), /*bIsATest=*/false, /*bNoCheck=*/true);
 
         // (선택) 클라 보정이 필요하면:
-        PC->ClientSetLocation(TargetLocation, PC->GetControlRotation());
+        PC->ClientSetLocation(TargetLocation + PlayerLocation, PC->GetControlRotation());
     }
 }
 

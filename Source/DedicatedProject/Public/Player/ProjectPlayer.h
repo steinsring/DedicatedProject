@@ -7,7 +7,6 @@
 #include "CharacterCommon.h"
 #include "SkillManagerComponent.h"
 #include <Components/BoxComponent.h>
-#include <Item/PE_BasePickup.h>
 #include "ProjectPlayer.generated.h"
 
 
@@ -98,11 +97,11 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void SprintEnd_Client();
 
-	// 아이템 감지 관련 --------------------------------------------------------------------------
-	UPROPERTY(VisibleAnywhere)
+	// 상호작용 --------------------------------------------------------------------------
+	UPROPERTY(VisibleAnywhere, Category = "Interact")
 	UBoxComponent* InteractionZone;																				// 아이템 감지 범위 오브젝트
-	UPROPERTY()
-	APE_BasePickup* FocusedItem;																				// 감지한 아이템
+	UPROPERTY(VisibleAnywhere, Category = "Interact")
+	TScriptInterface<class IPE_Interactable> FocusedItem;																				// 감지한 아이템
 
 	UFUNCTION()
 	void OnItemOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,							// 아이템이 감지 범위 오브젝트와 충돌했을 때
@@ -111,7 +110,6 @@ private:
 	void OnItemOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,								// 아이템이 감지 범위 오브젝트에서 벗어났을 때
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	// 상호작용 --------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Interact;
 	void Interact();																							// 플레이어가 E키를 클릭했을 때

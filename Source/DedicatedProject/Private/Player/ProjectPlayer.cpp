@@ -23,8 +23,9 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/WidgetComponent.h"
 #include "Fuel/PE_FuelComponent.h"
-#include <Components/SpotLightComponent.h>
+#include <Components/SpotLightComponent.h>		// 조명
 #include "Player/PE_ItemThrowableComponent.h"
+#include "PE_Interactable.h"
 
 
 // Sets default values
@@ -431,23 +432,23 @@ void AProjectPlayer::OnItemOverlapBegin(
 	bool bFromSweep,													// 이동중 Sweep으로 감지된 경우 true
 	const FHitResult& SweepResult)										// Sweep일 때 유효한 Hit 정보 (충돌 지점 좌표)
 {
-	APE_BasePickup* OverlappedItem = Cast<APE_BasePickup>(OtherActor);	// 감지된 액터를 아이템으로 변환. PE_BasePickup클래스가 아닐경우 nullptr반환
-	if (OverlappedItem)
-	{// PE_BasePickup 클래스(또는 상속)인 경우
-		FocusedItem = OverlappedItem;									// 플레이어가 바라보고있는 아이템을 저장
-		//Item->GetMesh()->SetRenderCustomDepth(true);			
-	}
+	if (OtherActor && OtherActor->GetClass()->ImplementsInterface(UPE_Interactable::StaticClass()))
+    {
+        // FocusedItem 채우기: UObject* + Interface* 둘 다 세팅
+        FocusedItem.SetObject(OtherActor);
+        FocusedItem.SetInterface(Cast<IPE_Interactable>(OtherActor));
+
+        // 외곽선 등 효과를 주고 싶으면 GetObject()로 액터를 꺼내서 처리
+    }
 }
 
 // 이벤트 바인딩 : 아이템이 감지범위 밖으로 나갔을때
 void AProjectPlayer::OnItemOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	APE_BasePickup* OverlappedItem = Cast<APE_BasePickup>(OtherActor);
-	if (OverlappedItem && OverlappedItem == FocusedItem)
+	if (OtherActor && FocusedItem && FocusedItem.GetObject() == OtherActor)
 	{
-		//OverlappedItem->GetMesh()->SetRenderCustomDepth(false);	// 추후 외곽선 표시를 위함
-		FocusedItem = nullptr;										// 바라보고있는 아이템 해제
+		FocusedItem = nullptr; // 비우기
 	}
 }
 
