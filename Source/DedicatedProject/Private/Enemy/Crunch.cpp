@@ -4,6 +4,8 @@
 #include "Enemy/Crunch.h"
 #include "Enemy/PE_AIController.h"
 
+#include "Enemy/PE_ToiletMechStats.h"
+
 ACrunch::ACrunch()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -72,8 +74,36 @@ ACrunch::ACrunch()
 
 void ACrunch::BeginPlay()
 {
+	Super::BeginPlay();
+
+	//데이터 테이블에서 AttackPower 가져오기
+	if (DataTable)
+	{
+		//디버깅용
+		static const FString ContextString(TEXT("ToiletMech Stats Lookup"));
+
+		FPE_ToiletMechStats* StatsRow = DataTable->FindRow<FPE_ToiletMechStats>(FName("Default"), ContextString);
+
+		if (StatsRow)
+		{
+			AttackPower = StatsRow->AttackPower;
+			UE_LOG(LogTemp, Warning, TEXT("Row 'Default' found in EnemyDataTable"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Row 'Default' not found in EnemyDataTable"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("EnemyDataTable is null"));
+	}
 }
 
 void ACrunch::PostInitializeComponents()
 {
+	Super::PostInitializeComponents();
+
+	//LeftHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMechTest::OnHitboxOverlap);
+	//RightHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMechTest::OnHitboxOverlap);
 }

@@ -36,20 +36,20 @@ UToiletMech_AnimInstance::UToiletMech_AnimInstance()
 	}
 }
 
-void UToiletMech_AnimInstance::PlayStunMontage(float Duration)
-{
-	IsStuned = true;
-	StunDuration = Duration;
-
-	if (!StunMontage)
-	{
-		PRINT_LOG(TEXT("StunMontage is NULL"));
-		return;
-	}
-	Montage_Play(StunMontage, Duration);
-}
-
-void UToiletMech_AnimInstance::EndStunMontage()
-{
-	IsStuned = false;
-}
+//void UToiletMech_AnimInstance::PlayStunMontage(float Duration)
+//{
+//	IsStuned = true;
+//	StunDuration = Duration;
+//
+//	if (!StunMontage)
+//	{
+//		PRINT_LOG(TEXT("StunMontage is NULL"));
+//		return;
+//	}
+//	Montage_Play(StunMontage, Duration);
+//}
+//
+//void UToiletMech_AnimInstance::EndStunMontage()
+//{
+//	IsStuned = false;
+//}

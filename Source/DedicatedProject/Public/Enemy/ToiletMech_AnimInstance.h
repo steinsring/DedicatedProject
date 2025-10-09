@@ -16,8 +16,8 @@ class DEDICATEDPROJECT_API UToiletMech_AnimInstance : public UEnemy_AnimInstance
 
 public:
 	UToiletMech_AnimInstance();
-	virtual void PlayStunMontage(float Duration = 1.0f) override;
-	virtual void EndStunMontage() override;
+	//virtual void PlayStunMontage(float Duration = 1.0f) override;
+	//virtual void EndStunMontage() override;
 	
 private:
 

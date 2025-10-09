@@ -47,3 +47,21 @@ UAnimMontage* UEnemy_AnimInstance::GetRandomAttackMontage()
 	
 	return AttackMontages[RandomIndex];
 }
+
+void UEnemy_AnimInstance::PlayStunMontage(float Duration)
+{
+	IsStuned = true;
+	StunDuration = Duration;
+
+	if (!StunMontage)
+	{
+		PRINT_LOG(TEXT("StunMontage is NULL"));
+		return;
+	}
+	Montage_Play(StunMontage, Duration);
+}
+
+void UEnemy_AnimInstance::EndStunMontage()
+{
+	IsStuned = false;
+}

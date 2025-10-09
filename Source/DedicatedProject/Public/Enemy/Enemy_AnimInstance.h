@@ -18,4 +18,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Animation")
 	UAnimMontage* GetRandomAttackMontage();
+
+	virtual void PlayStunMontage(float Duration = 1.0f) override;
+	virtual void EndStunMontage() override;
 };
