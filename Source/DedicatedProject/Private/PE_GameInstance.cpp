@@ -223,7 +223,17 @@ void UPE_GameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCo
     }
 }
 
+// 스테이지 관리 -------------------------------------------------------------------------
+void UPE_GameInstance::NotifyLevelTravelTriggered(int32 Stage)
+{
+    LevelTravelCount = Stage;
+}
 
+// 초기화용
+void UPE_GameInstance::ResetLevelTravelCount()
+{
+    LevelTravelCount = 1;
+}
 
 
 

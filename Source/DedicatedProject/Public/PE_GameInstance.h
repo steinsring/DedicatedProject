@@ -26,6 +26,13 @@ private:
     void OnFindSessionsSuccess();
     void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
+    // 스테이지 관리  ---------------------------------------------------------------
+    UPROPERTY(VisibleAnywhere, Category = "LevelTravel")
+    int32 LevelTravelCount = 1;
+
+    UPROPERTY(EditAnywhere, Category = "LevelTravel")
+    int32 MaxTravelBeforeLobby = 3;
+
 	
 public:
     virtual void Init() override;                                                               // 초기화, session을 위한 Online Subsystem 준비
@@ -39,4 +46,12 @@ public:
     void SetFindSessionsWidget(UPE_FindSessions* InWidget);
     
     void JoinFoundSession(const FOnlineSessionSearchResult& Result);                            // Session 참가 함수
+
+
+    // 스테이지 관리  ---------------------------------------------------------------
+    void NotifyLevelTravelTriggered(int32 Stage);
+    void ResetLevelTravelCount();
+    int32 GetCurrentLevelCount() const { return LevelTravelCount; }
+    int32 GetMaxTravelLevelCount() const { return MaxTravelBeforeLobby; }
+    bool IsGameEnd() const { return LevelTravelCount <= MaxTravelBeforeLobby; }
 };  
