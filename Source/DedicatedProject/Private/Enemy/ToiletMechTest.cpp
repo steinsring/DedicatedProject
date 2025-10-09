@@ -30,7 +30,7 @@ AToiletMechTest::AToiletMechTest()
 
 		//ProjectPlayer 불루프린트 클래스에 애니메이션 블루프린트를 세팅해준다.
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		static ConstructorHelpers::FClassFinder<UAnimInstance> MechAnim(TEXT("/Game/BluePrints/AB_ToiletAnimBlueprint.AB_ToiletAnimBlueprint_C"));
+		static ConstructorHelpers::FClassFinder<UAnimInstance> MechAnim(TEXT("/Game/BluePrints/Enemy/AB_ToiletAnimBlueprint.AB_ToiletAnimBlueprint_C"));
 		if (MechAnim.Succeeded())
 		{
 			GetMesh()->SetAnimInstanceClass(MechAnim.Class);
