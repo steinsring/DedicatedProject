@@ -483,6 +483,11 @@ void USkillManagerComponent::StartSkillCoolTime(E_SkillType SkillType, E_Skills 
 	}
 
 	int32 SkillIndex = static_cast<int32>(Skill);
+	if (!Skills.IsValidIndex(SkillIndex))
+	{
+		PRINT_LOG(TEXT("Invalid Skill Index"));
+		return;
+	}
 	float CoolTime = Skills[SkillIndex].CoolTime;
 
 	FTimerHandle TimerHandle = (SkillType == E_SkillType::Augment) ? AugmentSkillCoolTimeTimerHandle : OverrideSkillCoolTimeTimerHandle;

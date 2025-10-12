@@ -59,15 +59,11 @@ AToiletMechTest::AToiletMechTest()
 		RightHandHitBox->SetRelativeLocation(FVector(-15.0f, -6.0f, 0.0f));
 		RightHandHitBox->SetRelativeRotation(FRotator(0.0f, 83.0f, 16.0f));
 
-		UE_LOG(LogTemp, Warning, TEXT("ToiletMechTest: Hitboxes initialized."));
+		//UE_LOG(LogTemp, Warning, TEXT("ToiletMechTest: Hitboxes initialized."));
 
 		//공격을 안할 처음에는 콜리전을 꺼준다.(공격 실행시 켜주고 공격 끝나면 꺼주어야 함)
 		LeftHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		RightHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		//HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthStat"));
-
-		//IsAttacking = false; 
 	}
 
 	//데이터 테이블을 불러오기

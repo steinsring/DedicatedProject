@@ -21,11 +21,14 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		return EBTNodeResult::Failed;
 	auto EnemyAnimInstance = Cast<UEnemy_AnimInstance>(Enemy->GetMesh()->GetAnimInstance());
 	if (nullptr == EnemyAnimInstance)
+	{
+		PRINT_LOG(TEXT("EnemyAnimInstance is NULL"));
 		return EBTNodeResult::Failed;
+	}
 	auto RandomMontage = EnemyAnimInstance->GetRandomAttackMontage();
 	if (nullptr == RandomMontage)
 	{
-		//PRINT_LOG(TEXT("RandomMontage is NULL"));
+		PRINT_LOG(TEXT("RandomMontage is NULL"));
 		return EBTNodeResult::Failed;
 	}
 

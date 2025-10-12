@@ -23,4 +23,11 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void PostInitializeComponents() override;
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HitBox")
+	UCapsuleComponent* LeftHandHitBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "HitBox")
+	UCapsuleComponent* RightHandHitBox;
 };

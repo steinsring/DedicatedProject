@@ -4,6 +4,8 @@
 #include "Enemy/Crunch.h"
 #include "Enemy/PE_AIController.h"
 
+#include "Components/CapsuleComponent.h"
+
 #include "Enemy/PE_ToiletMechStats.h"
 
 ACrunch::ACrunch()
@@ -25,7 +27,7 @@ ACrunch::ACrunch()
 
 		//ProjectPlayer 불루프린트 클래스에 애니메이션 블루프린트를 세팅해준다.
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		static ConstructorHelpers::FClassFinder<UAnimInstance> MechAnim(TEXT("/Game/ParagonCrunch/Characters/Heroes/Crunch/Crunch_AnimBlueprint.Crunch_AnimBlueprint"));
+		static ConstructorHelpers::FClassFinder<UAnimInstance> MechAnim(TEXT("/Game/BluePrints/Enemy/AB_CrunchAnimBlueprint.AB_CrunchAnimBlueprint_C"));
 		if (MechAnim.Succeeded())
 		{
 			GetMesh()->SetAnimInstanceClass(MechAnim.Class);
@@ -37,32 +39,28 @@ ACrunch::ACrunch()
 		AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 		//히트박스 세팅
-		//LeftHandHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("LeftHandHitbox"));
-		//RightHandHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RightHandHitbox"));
+		LeftHandHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("LeftHandHitbox"));
+		RightHandHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RightHandHitbox"));
 
-		//LeftHandHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_l"));
-		//RightHandHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_r"));
+		LeftHandHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_l"));
+		RightHandHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_r"));
 
 		////왼손
-		//LeftHandHitBox->SetCapsuleHalfHeight(30.0f);
-		//LeftHandHitBox->SetCapsuleRadius(20.0f);
+		LeftHandHitBox->SetCapsuleHalfHeight(20.0f);
+		LeftHandHitBox->SetCapsuleRadius(20.0f);
 		//LeftHandHitBox->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
 
 		////오른손
-		//RightHandHitBox->SetCapsuleHalfHeight(56.0f);
-		//RightHandHitBox->SetCapsuleRadius(20.0f);
+		RightHandHitBox->SetCapsuleHalfHeight(20.0f);
+		RightHandHitBox->SetCapsuleRadius(20.0f);
 		//RightHandHitBox->SetRelativeLocation(FVector(-15.0f, -6.0f, 0.0f));
 		//RightHandHitBox->SetRelativeRotation(FRotator(0.0f, 83.0f, 16.0f));
 
-		//UE_LOG(LogTemp, Warning, TEXT("ToiletMechTest: Hitboxes initialized."));
+		UE_LOG(LogTemp, Warning, TEXT("Crunch: Hitboxes initialized."));
 
 		////공격을 안할 처음에는 콜리전을 꺼준다.(공격 실행시 켜주고 공격 끝나면 꺼주어야 함)
-		//LeftHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		//RightHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-		//HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthStat"));
-
-		//IsAttacking = false; 
+		LeftHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		RightHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
 	//데이터 테이블을 불러오기
@@ -104,6 +102,6 @@ void ACrunch::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	//LeftHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMechTest::OnHitboxOverlap);
-	//RightHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMechTest::OnHitboxOverlap);
+	LeftHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &ACrunch::OnHitboxOverlap);
+	RightHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &ACrunch::OnHitboxOverlap);
 }
