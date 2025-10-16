@@ -511,7 +511,14 @@ void AProjectPlayer::OnReleaseOverrideSkill(const FInputActionValue& inputValue)
 	}
 	else
 	{
-		PRINT_LOG(TEXT("Not Enough Fuel Or In Cool Time"));
+		if (!FuelComponent->HasEnoughFuel(cost))
+		{
+			PRINT_LOG(TEXT("Not Enough Fuel"));
+		}
+		else
+		{
+			PRINT_LOG(TEXT("In CoolTime"));
+		}
 	}
 }
 

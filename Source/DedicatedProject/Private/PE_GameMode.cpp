@@ -16,7 +16,7 @@ APE_GameMode::APE_GameMode() { //생성자
 	PlayerControllerClass = APE_PlayerController::StaticClass(); // 플레이어 컨트롤러
 
 	// 플레이어 캐릭터 블루프린트 가져오기
-	static ConstructorHelpers::FClassFinder<APawn>PlayerPawnBPClass(TEXT("/Game/BluePrints/BP_ProjectPlayer.BP_ProjectPlayer_C"));
+	static ConstructorHelpers::FClassFinder<APawn>PlayerPawnBPClass(TEXT("/Game/BluePrints/Player/BP_ProjectPlayer.BP_ProjectPlayer_C"));
 	if (PlayerPawnBPClass.Class != nullptr) {
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}

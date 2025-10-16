@@ -122,6 +122,14 @@ float ACharacterCommon::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 void ACharacterCommon::ApplyStun(float Duration)
 {
+	if (!HasAuthority())
+		return;
+	
+	ApplyStun_NetMulticast(Duration);
+}
+
+void ACharacterCommon::ApplyStun_NetMulticast_Implementation(float Duration)
+{
 	if (bIsStunned) return;
 	bIsStunned = true;
 
@@ -146,14 +154,17 @@ void ACharacterCommon::ApplyStun(float Duration)
 		CommonAnim->PlayStunMontage(Duration); // 스턴 Anim 재생
 	}
 
-	// 4) BT 일시정지
-	if (APE_AIController* AI = Cast<APE_AIController>(GetController()))
+	if (HasAuthority())
 	{
-		if (UBrainComponent* Brain = AI->GetBrainComponent())
+		// 4) BT 일시정지
+		if (APE_AIController* AI = Cast<APE_AIController>(GetController()))
 		{
-			Brain->PauseLogic(TEXT("Stun"));
+			if (UBrainComponent* Brain = AI->GetBrainComponent())
+			{
+				Brain->PauseLogic(TEXT("Stun"));
+			}
+			AI->StopMovement();
 		}
-		AI->StopMovement();
 	}
 }
 

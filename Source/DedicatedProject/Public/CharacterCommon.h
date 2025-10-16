@@ -53,8 +53,8 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 		AController* EventInstigator, AActor* DamageCauser) override;
 
-	UFUNCTION(BlueprintCallable)
-	void ApplyStun(float Duration);	// 스턴이 적용되었을 때 현재 BT, Anim 종료 및 Stun 실행. 외부에서 호출하는 stun 시작점
+	UFUNCTION()
+	void ApplyStun(float Duration);	// 스턴이 적용되었을 때 현재 BT, Anim 종료 및 Stun 실행. 내부에서 호출하는 stun 시작점
 
 private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
@@ -71,6 +71,9 @@ private:
 	bool bIsStunned = false;
 
 	FTimerHandle StunTimer;		// 스턴 시간
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ApplyStun_NetMulticast(float Duration);	// 스턴이 적용되었을 때 현재 BT, Anim 종료 및 Stun 실행. 외부에서 호출하는 stun 시작점
 
 	UFUNCTION()
 	void EndStun();	// 스턴 종료시

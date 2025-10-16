@@ -344,22 +344,24 @@ void USkillManagerComponent::Slow()
 void USkillManagerComponent::ElectricShock()
 {
 	PRINT_LOG(TEXT("Electric Shock Activated"));
-	//GetHitResultActor(1000.0f);
 
+	GetHitResultActor(1000.f);
 	if (!HitActor)
 	{
 		PRINT_LOG(TEXT("No Actor Hit"));
 		return;
 	}
 
-	AEnemy* HitEnemy = Cast<AEnemy>(HitActor);
-	if (!HitEnemy)
+	if (GetOwnerRole() == ROLE_Authority)
 	{
-		PRINT_LOG(TEXT("Hit Actor is not an Enemy"));
-		return;
+		AEnemy* HitEnemy = Cast<AEnemy>(HitActor);
+		if (!HitEnemy)
+		{
+			PRINT_LOG(TEXT("Hit Actor is not an Enemy"));
+			return;
+		}
+		HitEnemy->ApplyStun(10.0f);
 	}
-
-	HitEnemy->ApplyStun(10.0f);
 }
 
 void USkillManagerComponent::SeeThrough()
