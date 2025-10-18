@@ -31,6 +31,12 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UHealthComponent* HealthComp;
 
+	UFUNCTION(Server, Reliable)
+	void PlayAttackMontage_Server(UAnimMontage* AnimMontage);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void PlayAttackMontage_Multicast(UAnimMontage* AnimMontage);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

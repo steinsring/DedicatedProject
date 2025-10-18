@@ -71,8 +71,25 @@ void ACharacterCommon::Attack(UAnimMontage* AnimMontage)
 	if (IsAttacking) return;
 
 	HitActors.Empty();
-	BaseAnimInstance->PlayAttackMontage(AnimMontage);
+	if (HasAuthority())
+	{
+		PlayAttackMontage_Multicast(AnimMontage);
+	}
+	else
+	{
+		PlayAttackMontage_Server(AnimMontage);
+	}
 	IsAttacking = true;
+}
+
+void ACharacterCommon::PlayAttackMontage_Server_Implementation(UAnimMontage* AnimMontage)
+{
+	PlayAttackMontage_Multicast(AnimMontage);
+}
+
+void ACharacterCommon::PlayAttackMontage_Multicast_Implementation(UAnimMontage* AnimMontage)
+{
+	BaseAnimInstance->PlayAttackMontage(AnimMontage);
 }
 
 void ACharacterCommon::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
