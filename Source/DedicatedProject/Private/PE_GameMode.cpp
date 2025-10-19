@@ -43,6 +43,8 @@ void APE_GameMode::BeginPlay()
         TargetLocation + LevelTravelLocation,                // 위치
         FRotator::ZeroRotator              // 회전
     );
+
+
 }
 
 // 이유는 모르겠는데 서버가 PostLogin을 스킵해서 강제로 실행하도록함. 이것을 하지 않으면 서버가 아닌 다른 클라이언트들은 character가 아닌 spectator로 생성이 되었음.
@@ -71,7 +73,14 @@ void APE_GameMode::PostLogin(APlayerController* NewPlayer)
     }
 
     PlacePawnIfReady(NewPlayer);
+
+    // PlayerState 초기화--------------------------------------------------------------
 	
+    if (APE_PlayerState* PlayerState = NewPlayer->GetPlayerState<APE_PlayerState>())
+    {
+        AllPlayerState.Add(PlayerState);
+        PlayerState->InitializeDefaultData(); // 이미 되어 있으면 내부에서 무시
+    }
 }
 
 void APE_GameMode::SetPlayerLocation(FVector PlayerStartLocation)

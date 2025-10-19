@@ -12,7 +12,7 @@
 UPE_AnimInstance::UPE_AnimInstance()
 {
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> BasicAttackPattern
-	(TEXT("/Game/Retargetting/SK_Mannequin_Skeleton_BasicAttack_Montage.SK_Mannequin_Skeleton_BasicAttack_Montage"));
+	(TEXT("/Game/ParagonWraith/Characters/Heroes/Wraith/Animations/Fire_A_Slow_Montage.Fire_A_Slow_Montage"));
 	if (BasicAttackPattern.Succeeded())
 	{
 		PRINT_LOG(TEXT("BasicAttackPattern is loaded successfully"));

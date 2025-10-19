@@ -23,6 +23,8 @@ class DEDICATEDPROJECT_API AProjectPlayer : public ACharacterCommon
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void PossessedBy(AController* NewController) override;   // 서버에서만 호출되는 소유자 지정 완료 콜백.
+	virtual void OnRep_Controller() override;                        // 클라이언트에서 호출되는 Controller 복제본 후 클라의 Pawn에서 콜백.
 
 	UPROPERTY()
 	class UPE_AnimInstance* PlayerAnim;
@@ -34,6 +36,11 @@ private:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
+
+	// Init
+	void InitForController(class APE_PlayerController* PlayerController);	// 컴포넌트 초기화
+	void InitForHPBar(class APE_PlayerController* PlayerController);		// HP 위젯 초기화
+	
 
 	//카메라 컴포넌트 --------------------------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = Camera)
