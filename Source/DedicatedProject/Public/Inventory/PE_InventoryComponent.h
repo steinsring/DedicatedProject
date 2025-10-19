@@ -22,15 +22,7 @@ private:
 	UPROPERTY()
 	int32 MaxSlots = 4;
 
-	// 인벤토리 위젯 클래스
-	UPROPERTY(VisibleAnywhere, Category = "UI")
-	TSubclassOf<class UPE_Inventory> InventoryWidgetClass;
-
-	// 실제 생성된 인벤토리 위젯 인스턴스
-	UPROPERTY()
-	TObjectPtr<UPE_Inventory> InventoryWidget;
-
-	// 인벤토리 슬롯 지정을 위한 입력
+	// 인벤토리 슬롯 지정을 위한 입력------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = "Input")
 	TObjectPtr<UInputMappingContext> InventoryMappingContext;					
 
@@ -42,11 +34,22 @@ private:
 	void ItemSlotSelect(const FInputActionInstance& Instance);		// 키보트 숫자를 눌렀을때 바인딩 된 함수
 	int32 SelectedSlotNumber = 0;
 
-	UFUNCTION(Server, Reliable)
-	void UseItem_Server();
+	// 연결된 Inventroy UI ------------------------------------------------------
+	UPROPERTY(VisibleAnywhere, Category = "Inventory UI")
+	TObjectPtr<UPE_Inventory> InventoryWidget;								// 실제 생성된 인벤토리 위젯 인스턴스
 
 	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
-	TObjectPtr<class UPE_ItemThrowableComponent> ItemThrowableComponent;	// 던지는 아이템
+	TObjectPtr<class UPE_ItemThrowableComponent> ItemThrowableComponent;	// 던지는 아이템 컴포넌트
+
+	// 연결된 플레이어 클래스------------------------------------------------------
+	UPROPERTY()
+	TObjectPtr<class APE_PlayerController> MyPlayerController;
+
+	UPROPERTY()
+	TObjectPtr<class APE_PlayerState> MyPlayerState;
+
+	UFUNCTION(Server, Reliable)
+	void UseItem_Server();
 
 public:	
 	// Sets default values for this component's properties
@@ -68,5 +71,11 @@ public:
 
 	void UseItem();											// 인벤토리에서 아이템을 사용
 
-	void SetComponent(TObjectPtr<class UPE_ItemThrowableComponent> Component);
+	void SetItemThrowableComponent(const TObjectPtr<class UPE_ItemThrowableComponent> ThrowableComponent) { ItemThrowableComponent = ThrowableComponent; }
+
+	void SetPlayerController(const TObjectPtr<class APE_PlayerController> PlayerController) { MyPlayerController = PlayerController; }
+
+	void SetPlayerState(const TObjectPtr<class APE_PlayerState> PlayerState) { MyPlayerState = PlayerState; }
+
+	void InitInputAction(const TObjectPtr<class APE_PlayerController> PlayerController);
 };

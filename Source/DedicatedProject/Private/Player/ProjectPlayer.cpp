@@ -26,6 +26,8 @@
 #include <Components/SpotLightComponent.h>		// 조명
 #include "Player/PE_ItemThrowableComponent.h"
 #include "PE_Interactable.h"
+#include "Player/PE_PlayerController.h"
+#include "Player/PE_PlayerState.h"
 
 
 // Sets default values
@@ -171,29 +173,102 @@ void AProjectPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PlayerAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
+	if (PlayerAnim && PlayerAnim->BasicAttack)
+	{
+		PRINT_LOG(TEXT("✅ PlayerAnim 초기화 완료: BasicAttack is valid"));
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("❌ InitPlayerAnim: BasicAttack is NULL"));
+	}
+
+	FString OwnerName = GetName();
+	PRINT_LOG(TEXT("My Character name : %s"), *OwnerName);
+	
+	UpdateCharacterStats(1); //캐릭터 스탯 설정
+
+	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapBegin);				// 이벤트 바인딩 : 아이템 감지 범위에 아이템 콜리전이 충돌했을때 
+	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapEnd);					// 이벤트 바인딩 : 충돌범위에서 아이템이 빠져나갔을때
+}
+
+// 서버: Possess 직후
+void AProjectPlayer::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	InitForController(Cast<APE_PlayerController>(NewController));
+}
+
+// 클라: 컨트롤러 복제 도착/변경시
+void AProjectPlayer::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+	InitForController(Cast<APE_PlayerController>(Controller));
+	InitForHPBar(Cast<APE_PlayerController>(Controller));			//위젯은 클라이언트에서만 접근
+}
+
+void AProjectPlayer::InitForController(APE_PlayerController* PlayerController)
+{
 	//EnhancedInputSystem에 imc_TPS등록
 	//오류가 난다면 TPSProjec.Build.cs에 모듈에서 EnhancedInput을 추가해 주자.
-	APlayerController* pc = Cast<APlayerController>(Controller); //현재 플레이어의 APlayerController를 가져온다.
+	//APE_PlayerController* PlayerController = Cast<APE_PlayerController>(Controller); //현재 플레이어의 APlayerController를 가져온다.
 
-	if (pc)
+	//NULL 체크 -------------------------------------------------------------------
+	if (!PlayerController)
 	{
-		FInputModeGameOnly InputMode;
-		pc->SetInputMode(InputMode); //게임에만 입력을 받도록 설정
-		pc->bShowMouseCursor = false; //마우스 커서 숨김
+		PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
+		return;
+	}
 
-		auto subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer()); //입력 서브시스템을 가져와서
-		if (subsystem)
-		{
-			subsystem->AddMappingContext(imc_ProjectPlayer, 0); //입력 컨텍스트에 등록한다.
-		}
-		else
-		{
-			PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
-		}
+	if (!InventoryComponent)
+	{
+		PRINT_ERROR_LOG(TEXT("InventoryComponent is NULL"));
+		return;
+	}
 
+	if (!ItemThrowable)
+	{
+		PRINT_ERROR_LOG(TEXT("ItemThrowableComponent is NULL"));
+		return;
+	}
+
+	//InventoryComponent 초기화 -------------------------------------------------------------------
+	InventoryComponent->SetItemThrowableComponent(ItemThrowable);
+	InventoryComponent->SetPlayerController(PlayerController);
+	InventoryComponent->InitInputAction(PlayerController);
+
+	if (APE_PlayerState* MyPlayerState = PlayerController->GetPlayerState<APE_PlayerState>())
+	{
+		InventoryComponent->SetPlayerState(MyPlayerState);
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("PlayerState is NOT setting in InventoryComponent"));
+	}
+
+	//MappingContext 초기화 -------------------------------------------------------------------
+	FInputModeGameOnly InputMode;
+	PlayerController->SetInputMode(InputMode); //게임에만 입력을 받도록 설정
+	PlayerController->bShowMouseCursor = false; //마우스 커서 숨김
+
+	auto subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()); //입력 서브시스템을 가져와서
+	if (subsystem)
+	{
+		subsystem->AddMappingContext(imc_ProjectPlayer, 0); //입력 컨텍스트에 등록한다.
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("subsystem is NULL"));
+	}
+}
+
+void AProjectPlayer::InitForHPBar(class APE_PlayerController* PlayerController)
+{
+	if (PlayerController)
+	{
 		if (HPBarWidgetClass)
 		{
-			HPBarWidget = CreateWidget<UPE_HPBarWidget>(pc, HPBarWidgetClass);
+			HPBarWidget = CreateWidget<UPE_HPBarWidget>(PlayerController, HPBarWidgetClass);
 			if (HPBarWidget)
 			{
 				HPBarWidget->AddToViewport();
@@ -213,36 +288,7 @@ void AProjectPlayer::BeginPlay()
 	{
 		PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
 	}
-
-	PlayerAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
-	if (PlayerAnim && PlayerAnim->BasicAttack)
-	{
-		PRINT_LOG(TEXT("✅ PlayerAnim 초기화 완료: BasicAttack is valid"));
-	}
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("❌ InitPlayerAnim: BasicAttack is NULL"));
-	}
-
-	FString OwnerName = GetName();
-	PRINT_LOG(TEXT("My Character name : %s"), *OwnerName);
-	
-	UpdateCharacterStats(1); //캐릭터 스탯 설정
-
-	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapBegin);				// 이벤트 바인딩 : 아이템 감지 범위에 아이템 콜리전이 충돌했을때 
-	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapEnd);					// 이벤트 바인딩 : 충돌범위에서 아이템이 빠져나갔을때
-
-	if (ItemThrowable && InventoryComponent)
-	{
-		InventoryComponent->SetComponent(ItemThrowable);
-	}
-	else
-	{
-		PRINT_LOG(TEXT("ItemThrowableComponent is NOT setting in InventoryComponent"));
-	}
 }
-
-
 
 // Called every frame
 void AProjectPlayer::Tick(float DeltaTime)
@@ -322,7 +368,7 @@ void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
 	if (true)
 	{
 		InventoryComponent->UseItem();
-		//ItemThrowable->Throw();
+		PRINT_LOG(TEXT("UseItem"));
 	}
 	else
 	{
@@ -335,6 +381,7 @@ void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
        return;  
    }  
 
+   
    if (PlayerAnim->BasicAttack)  
    {  
        UAnimMontage* AttackMontage = Cast<UAnimMontage>(PlayerAnim->BasicAttack);  
@@ -350,7 +397,7 @@ void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
    else  
    {  
        PRINT_ERROR_LOG(TEXT("BasicAttack is NULL"));  
-   }  
+   }
 }
  
 void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {

@@ -18,6 +18,9 @@ private:
 	UPROPERTY()
 	FVector TargetLocation;
 	bool bHasTarget = false;
+
+	UPROPERTY()
+	TArray<TObjectPtr<class APE_PlayerState>> AllPlayerState;
 	
 public:
 	APE_GameMode(); //게임모드 생성자

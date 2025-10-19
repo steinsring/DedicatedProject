@@ -12,6 +12,8 @@ APE_ItemGranadeEMP::APE_ItemGranadeEMP()
 	{
 		GetItemThrowableMesh()->SetStaticMesh(StaticMesh.Object);
 	}
+
+	bReplicates = true;
 }
 
 void APE_ItemGranadeEMP::BeginPlay()

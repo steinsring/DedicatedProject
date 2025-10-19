@@ -14,12 +14,21 @@ UCLASS()
 class DEDICATEDPROJECT_API APE_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Inventory")
+	TSubclassOf<class UPE_Inventory> InventoryWidgetBPClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "Inventory")
+	TObjectPtr<class UPE_Inventory> InventoryWidget;				// 실제 생성된 인벤토리 위젯 인스턴스
+protected:
+	virtual void BeginPlay() override;
 	
 public:
 	APE_PlayerController();
-	
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
-	USkillManagerComponent* SkillManager;*/
 
+	void InitializeDefaultData();		// Gamemode의 PostLogin에서 호출
+
+	void InitInventoryUI();				// Inventory UI 생성
 
 };
