@@ -20,6 +20,9 @@ protected:
 	UPROPERTY(EditAnywhere)
 	FName PickupID = "Test";
 
+	UPROPERTY(EditAnywhere)
+	int32 PickupQuantity = 1;
+
 public:
 	virtual void Interact(class AActor* Interactor) override;
 

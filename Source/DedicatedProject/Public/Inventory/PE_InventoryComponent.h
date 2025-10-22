@@ -42,14 +42,9 @@ private:
 	TObjectPtr<class UPE_ItemThrowableComponent> ItemThrowableComponent;	// 던지는 아이템 컴포넌트
 
 	// 연결된 플레이어 클래스------------------------------------------------------
-	UPROPERTY()
-	TObjectPtr<class APE_PlayerController> MyPlayerController;
-
-	UPROPERTY()
-	TObjectPtr<class APE_PlayerState> MyPlayerState;
 
 	UFUNCTION(Server, Reliable)
-	void UseItem_Server();
+	void UseItem_Server(APE_PlayerController* PlayerController);
 
 public:	
 	// Sets default values for this component's properties
@@ -62,20 +57,20 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	// 인벤토리 UI 변경 함수 ------------------------------------------------------------------------------
+	UFUNCTION()
+	bool AddItem(FName ItemID, int32 ItemQuantity, class AProjectPlayer* Interactor);													// 인벤토리에 아이템을 추가
 
 	UFUNCTION()
-	bool AddItem(FName ItemID);								// 인벤토리에 아이템을 추가
+	bool RemoveItem(UPE_InventoryItemBase* Item);								// 인벤토리에서 아이템을 제거
 
-	UFUNCTION()
-	bool RemoveItem(UPE_InventoryItemBase* Item);			// 인벤토리에서 아이템을 제거
+	void UseItem(APE_PlayerController* PlayerController);																// 인벤토리에서 아이템을 사용
 
-	void UseItem();											// 인벤토리에서 아이템을 사용
+	void SetInventoryUI(const TArray<struct FItemData> ServerInventoryData);	// 서버에서 인벤토리 UI 세팅
 
+	// 기본 변수 세팅 함수 ------------------------------------------------------------------------------
 	void SetItemThrowableComponent(const TObjectPtr<class UPE_ItemThrowableComponent> ThrowableComponent) { ItemThrowableComponent = ThrowableComponent; }
-
-	void SetPlayerController(const TObjectPtr<class APE_PlayerController> PlayerController) { MyPlayerController = PlayerController; }
-
-	void SetPlayerState(const TObjectPtr<class APE_PlayerState> PlayerState) { MyPlayerState = PlayerState; }
 
 	void InitInputAction(const TObjectPtr<class APE_PlayerController> PlayerController);
 };

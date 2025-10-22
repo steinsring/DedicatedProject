@@ -177,7 +177,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	USkillManagerComponent* GetSkillManager() const { return SkillManager; }
 
-	void AddItemToInventory(FName PickupID);
+	void AddItemToInventory(FName ID, int32 Quantity);
 
 	FORCEINLINE UPE_ItemThrowableComponent* GetItemThrowable() const { return ItemThrowable; }
 

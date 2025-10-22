@@ -25,6 +25,7 @@ void APE_PlayerController::InitializeDefaultData()
 
 void APE_PlayerController::InitInventoryUI()
 {
+	if (!IsLocalController()) return;
 	// Inventory UI 생성 ----------------------------------------------------------------------
 	InventoryWidget = CreateWidget<UPE_Inventory>(this, InventoryWidgetBPClass);
 	if (InventoryWidget)

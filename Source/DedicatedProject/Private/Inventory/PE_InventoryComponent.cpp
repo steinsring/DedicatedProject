@@ -12,6 +12,8 @@
 #include "UI/PE_Inventory.h"
 #include "Player/PE_PlayerState.h"
 #include "Player/PE_PlayerController.h"
+#include "Inventory/FItemData.h"
+#include "Player/ProjectPlayer.h"
 
 // Sets default values for this component's properties
 UPE_InventoryComponent::UPE_InventoryComponent()
@@ -19,7 +21,7 @@ UPE_InventoryComponent::UPE_InventoryComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
+	
 	// IMC 로드 ----------------------------------------------------------------------
 	static const TCHAR* IMCPath = TEXT("/Game/Inputs/IMC_Inventory.IMC_Inventory");
 	if (UInputMappingContext* IMC = LoadObject<UInputMappingContext>(nullptr, IMCPath))
@@ -84,33 +86,6 @@ void UPE_InventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*
-	// 소유자에서 컨트롤러 가져오기
-	APawn* OwnerPawn = Cast<APawn>(GetOwner());
-	if (!OwnerPawn) return;
-	APE_PlayerController* PlayerController = Cast<APE_PlayerController>(OwnerPawn->GetController());
-
-	if (!PlayerController)	return;
-	else PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
-
-	MyPlayerController = PlayerController;
-
-	// 컴포넌트의 owner가 ProjectPlayer클래스인지 확인
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-	{// 해당 캐릭터의 컨트롤러를 가져와서
-		Subsystem->AddMappingContext(InventoryMappingContext, 1);	// 매핑 컨텍스트 초기화
-	}
-	else PRINT_ERROR_LOG(TEXT("Subsystem is NULL"));
-
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(MyPlayerController->InputComponent))
-	{// 마찬가지로 액션 초기화
-		for (TObjectPtr<UInputAction> ItemSlotAction : ItemSlotActions)
-		{
-			EnhancedInputComponent->BindAction(ItemSlotAction, ETriggerEvent::Triggered, this, &UPE_InventoryComponent::ItemSlotSelect);
-		}
-	}
-	else PRINT_ERROR_LOG(TEXT("EnhancedInputComponent is NULL"));
-	*/
 }
 
 void UPE_InventoryComponent::ItemSlotSelect(const FInputActionInstance& Instance)
@@ -137,9 +112,10 @@ void UPE_InventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	// ...
 }
 
-bool UPE_InventoryComponent::AddItem(FName ItemID)
+bool UPE_InventoryComponent::AddItem(FName ItemID, int32 ItemQuantity, AProjectPlayer* Interactor)
 {
-	InventoryWidget->AddItemToInventory(ItemID);
+	APE_PlayerState* ClientPlayerState = Interactor->GetPlayerState<APE_PlayerState>();
+	ClientPlayerState->AddItem_Server(ItemID, ItemQuantity);
 	return true;
 }
 
@@ -148,20 +124,25 @@ bool UPE_InventoryComponent::RemoveItem(UPE_InventoryItemBase* Item)
 	return true;
 }
 
-void UPE_InventoryComponent::UseItem()
+void UPE_InventoryComponent::SetInventoryUI(const TArray<FItemData> ServerInventoryData)
 {
-	UseItem_Server();
+	InventoryWidget->SetInventoryData(ServerInventoryData);
 }
 
-void UPE_InventoryComponent::UseItem_Server_Implementation()
+void UPE_InventoryComponent::UseItem(APE_PlayerController* PlayerController)
 {
-	if (!MyPlayerState)
+	UseItem_Server(PlayerController);
+}
+
+void UPE_InventoryComponent::UseItem_Server_Implementation(APE_PlayerController* PlayerController)
+{
+	if (!PlayerController)
 	{
-		PRINT_ERROR_LOG(TEXT("PlayerState is NULL"));
+		PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
 		return;
 	}
-
-	MyPlayerState->UseItem(SelectedSlotNumber);
+	APE_PlayerState* ClientPlayerState = PlayerController->GetPlayerState<APE_PlayerState>();
+	ClientPlayerState->UseItem(SelectedSlotNumber);
 
 	// itemthrowcomponent에 접근해서 throw()를 실행
 	if (ItemThrowableComponent)

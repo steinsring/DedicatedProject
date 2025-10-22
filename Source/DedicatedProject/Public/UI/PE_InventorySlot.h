@@ -39,7 +39,7 @@ public:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
 	UTextBlock* Number;
 
-	void SetItem(FName ItemID);
+	void SetItem(FName ItemID, int32 ItemQuantity);
 
 	FName GetSlotInformation();
 

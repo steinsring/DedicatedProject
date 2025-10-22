@@ -25,7 +25,7 @@ APE_GameMode::APE_GameMode() { //생성자
 void APE_GameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
+    /*
 	if (HasAuthority()) {
 		UE_LOG(LogTemp, Warning, TEXT("서버에서 던전 생성 시작"));
 
@@ -35,7 +35,7 @@ void APE_GameMode::BeginPlay()
 			FRotator::ZeroRotator,          // 회전
 			SpawnParams
 		);
-	}
+	}*/
 
     FVector LevelTravelLocation(-300.f, 1082.f, -218.f);
 

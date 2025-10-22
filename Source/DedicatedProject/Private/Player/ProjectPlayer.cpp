@@ -234,17 +234,7 @@ void AProjectPlayer::InitForController(APE_PlayerController* PlayerController)
 
 	//InventoryComponent 초기화 -------------------------------------------------------------------
 	InventoryComponent->SetItemThrowableComponent(ItemThrowable);
-	InventoryComponent->SetPlayerController(PlayerController);
 	InventoryComponent->InitInputAction(PlayerController);
-
-	if (APE_PlayerState* MyPlayerState = PlayerController->GetPlayerState<APE_PlayerState>())
-	{
-		InventoryComponent->SetPlayerState(MyPlayerState);
-	}
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("PlayerState is NOT setting in InventoryComponent"));
-	}
 
 	//MappingContext 초기화 -------------------------------------------------------------------
 	FInputModeGameOnly InputMode;
@@ -367,7 +357,8 @@ void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
 {  
 	if (true)
 	{
-		InventoryComponent->UseItem();
+		APE_PlayerController* MyPlayerController = this->GetController<APE_PlayerController>();
+		InventoryComponent->UseItem(MyPlayerController);
 		PRINT_LOG(TEXT("UseItem"));
 	}
 	else
@@ -569,15 +560,14 @@ void AProjectPlayer::OnReleaseOverrideSkill(const FInputActionValue& inputValue)
 	}
 }
 
-void AProjectPlayer::AddItemToInventory(FName PickupID)
+void AProjectPlayer::AddItemToInventory(FName ID, int32 Quantity)
 {
-	if (PickupID == "Fuel")
+	if (ID == "Fuel")
 	{
-		FuelComponent->AddFuel(PickupID);
+		FuelComponent->AddFuel(ID);
 	}
 	else
 	{
-		InventoryComponent->AddItem(PickupID);
+		InventoryComponent->AddItem(ID, Quantity, this);
 	}
-	//PRINT_LOG(TEXT("ItemPickupID : %s"), *PickupID.ToString());
 }

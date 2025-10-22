@@ -45,7 +45,7 @@ public:
 	TObjectPtr<UPE_InventorySlot> WeaponSlot_1 = nullptr;
 
 	// 아이템 추가 함수
-	void AddItemToInventory(const FName ItemID);
+	void SetInventoryData(const TArray<struct FItemData> ServerInventoryData);
 
 	// 슬롯 선택시 해당 아이템 반환
 	void ItemSlotSelect(const int KeyboardNumber);
