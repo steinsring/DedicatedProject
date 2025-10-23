@@ -38,7 +38,6 @@ private:
 	virtual void PostInitializeComponents() override;
 
 	// Init
-	void InitForController(class APE_PlayerController* PlayerController);	// 컴포넌트 초기화
 	void InitForHPBar(class APE_PlayerController* PlayerController);		// HP 위젯 초기화
 	
 

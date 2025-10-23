@@ -63,6 +63,7 @@ void UPE_InventoryComponent::InitInputAction(const TObjectPtr<APE_PlayerControll
 		PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
 		return;
 	}
+	CachedPC = PlayerController;
 
 	// 컴포넌트의 owner가 ProjectPlayer클래스인지 확인
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -91,13 +92,20 @@ void UPE_InventoryComponent::BeginPlay()
 void UPE_InventoryComponent::ItemSlotSelect(const FInputActionInstance& Instance)
 {
 	const UInputAction* TriggeredAction = Instance.GetSourceAction();
+	APE_PlayerController* PC = CachedPC.Get();
+
+	if (!PC || !PC->IsLocalController())
+	{
+		PRINT_ERROR_LOG(TEXT("ItemSlotSelect: PC invalid or not local"));
+		return;
+	}
 
 	for (int32 i = 0; i < NumItemSlots; ++i)
 	{
 		if (ItemSlotActions[i] == TriggeredAction)
 		{
 			// 슬롯 번호 i 전달
-			InventoryWidget->ItemSlotSelect(i);
+			PC->ItemSlotSelect(i);
 			SelectedSlotNumber = i;
 			break;
 		}
@@ -126,7 +134,7 @@ bool UPE_InventoryComponent::RemoveItem(UPE_InventoryItemBase* Item)
 
 void UPE_InventoryComponent::SetInventoryUI(const TArray<FItemData> ServerInventoryData)
 {
-	InventoryWidget->SetInventoryData(ServerInventoryData);
+	//InventoryWidget->SetInventoryData(ServerInventoryData);
 }
 
 void UPE_InventoryComponent::UseItem(APE_PlayerController* PlayerController)

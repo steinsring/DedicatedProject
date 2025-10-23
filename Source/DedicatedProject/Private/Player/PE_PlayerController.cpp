@@ -4,7 +4,7 @@
 #include "Player/PE_PlayerController.h"
 #include "DedicatedProject.h"
 #include "UI/PE_Inventory.h"
-
+#include "Inventory/PE_InventoryComponent.h"
 APE_PlayerController::APE_PlayerController()
 {
 	// Inventory UI 로드 ----------------------------------------------------------------------
@@ -41,5 +41,10 @@ void APE_PlayerController::InitInventoryUI()
 void APE_PlayerController::BeginPlay()
 {
 	InitInventoryUI();
+}
+
+void APE_PlayerController::ItemSlotSelect(int32 i)
+{ // 선택 위젯 슬롯 변경
+	InventoryWidget->ItemSlotSelect(i);
 }
 

@@ -21,6 +21,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	TObjectPtr<class UPE_Inventory> InventoryWidget;				// 실제 생성된 인벤토리 위젯 인스턴스
+
+	UPROPERTY(VisibleAnywhere, Category = "Inventory")
+	TObjectPtr<class UPE_InventoryComponent> InventoryComponent;	// 인벤토리 컴포넌트
 protected:
 	virtual void BeginPlay() override;
 	
@@ -31,4 +34,5 @@ public:
 
 	void InitInventoryUI();				// Inventory UI 생성
 
+	void ItemSlotSelect(int32 i);
 };

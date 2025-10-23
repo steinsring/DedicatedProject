@@ -52,9 +52,7 @@ bool APE_PlayerState::IsEmptySlot(const int32 SlotNumber)
 // 여기서 아이템 이미 있으면 추가, 없으면 가장 가까운 빈 슬롯에 추가
 void APE_PlayerState::AddItem_Server_Implementation(const FName ItemID, const int32 ItemQuantity)
 {
-	PRINT_LOG(TEXT("AddItem in playerstate1"));
 	if (!HasAuthority()) return;	//서버 전용
-	PRINT_LOG(TEXT("AddItem in playerstate"));
 	int32 EmptySlotNum = -1;
 
 	for (int32 i = 0; i < InventoryData.Num(); i++)
@@ -63,6 +61,8 @@ void APE_PlayerState::AddItem_Server_Implementation(const FName ItemID, const in
 		if (InventoryData[i].ItemID == ItemID)
 		{
 			InventoryData[i].Quantity += ItemQuantity;
+			PRINT_LOG(TEXT("InventoryData[%d].ItemID : %s"), i, *InventoryData[i].ItemID.ToString());
+			PRINT_LOG(TEXT("InventoryData[%d].Quantity : %d"), i, InventoryData[i].Quantity);
 			return;
 		}
 
@@ -78,6 +78,8 @@ void APE_PlayerState::AddItem_Server_Implementation(const FName ItemID, const in
 	{
 		InventoryData[EmptySlotNum].ItemID = ItemID;
 		InventoryData[EmptySlotNum].Quantity = ItemQuantity;
+		PRINT_LOG(TEXT("InventoryData[%d].ItemID : %s"), EmptySlotNum, *InventoryData[EmptySlotNum].ItemID.ToString());
+		PRINT_LOG(TEXT("InventoryData[%d].Quantity : %d"), EmptySlotNum, InventoryData[EmptySlotNum].Quantity);
 	}
 }
 

@@ -98,13 +98,14 @@ AProjectPlayer::AProjectPlayer()
 		RightFootHitBox->SetCapsuleHalfHeight(30.0f); //높이 설정
 		RightFootHitBox->SetCapsuleRadius(20.0f); //반지름 설정
 
-		// InventoryComponent 초기화 --------------------------------------------------------------------
-		InventoryComponent = CreateDefaultSubobject<UPE_InventoryComponent>(TEXT("InventoryComponent"));
-
 		// 던지는 아이템 -----------------------------------------------------------------------------
 		ItemThrowable = CreateDefaultSubobject<UPE_ItemThrowableComponent>(TEXT("ItemThrowable"));
 		ItemThrowable->SetupAttachment(RootComponent);
 		ItemThrowable->SetRelativeLocation(FVector(4.f, -11.f, 80.f));
+
+		// InventoryComponent 초기화 --------------------------------------------------------------------
+		InventoryComponent = CreateDefaultSubobject<UPE_InventoryComponent>(TEXT("InventoryComponent"));
+		InventoryComponent->SetItemThrowableComponent(ItemThrowable);
 
 		// FuelComponent 세팅------------------------------------------------------------------------
 		FuelComponent = CreateDefaultSubobject<UPE_FuelComponent>(TEXT("FuelComponent"));
@@ -196,60 +197,13 @@ void AProjectPlayer::BeginPlay()
 void AProjectPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	InitForController(Cast<APE_PlayerController>(NewController));
 }
 
 // 클라: 컨트롤러 복제 도착/변경시
 void AProjectPlayer::OnRep_Controller()
 {
 	Super::OnRep_Controller();
-	InitForController(Cast<APE_PlayerController>(Controller));
 	InitForHPBar(Cast<APE_PlayerController>(Controller));			//위젯은 클라이언트에서만 접근
-}
-
-void AProjectPlayer::InitForController(APE_PlayerController* PlayerController)
-{
-	//EnhancedInputSystem에 imc_TPS등록
-	//오류가 난다면 TPSProjec.Build.cs에 모듈에서 EnhancedInput을 추가해 주자.
-	//APE_PlayerController* PlayerController = Cast<APE_PlayerController>(Controller); //현재 플레이어의 APlayerController를 가져온다.
-
-	//NULL 체크 -------------------------------------------------------------------
-	if (!PlayerController)
-	{
-		PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
-		return;
-	}
-
-	if (!InventoryComponent)
-	{
-		PRINT_ERROR_LOG(TEXT("InventoryComponent is NULL"));
-		return;
-	}
-
-	if (!ItemThrowable)
-	{
-		PRINT_ERROR_LOG(TEXT("ItemThrowableComponent is NULL"));
-		return;
-	}
-
-	//InventoryComponent 초기화 -------------------------------------------------------------------
-	InventoryComponent->SetItemThrowableComponent(ItemThrowable);
-	InventoryComponent->InitInputAction(PlayerController);
-
-	//MappingContext 초기화 -------------------------------------------------------------------
-	FInputModeGameOnly InputMode;
-	PlayerController->SetInputMode(InputMode); //게임에만 입력을 받도록 설정
-	PlayerController->bShowMouseCursor = false; //마우스 커서 숨김
-
-	auto subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()); //입력 서브시스템을 가져와서
-	if (subsystem)
-	{
-		subsystem->AddMappingContext(imc_ProjectPlayer, 0); //입력 컨텍스트에 등록한다.
-	}
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("subsystem is NULL"));
-	}
 }
 
 void AProjectPlayer::InitForHPBar(class APE_PlayerController* PlayerController)
@@ -301,7 +255,25 @@ void AProjectPlayer::Tick(float DeltaTime)
 void AProjectPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	//EnhancedInputSystem에 imc_TPS등록
+	//오류가 난다면 TPSProjec.Build.cs에 모듈에서 EnhancedInput을 추가해 주자.
 
+	//MappingContext 초기화 -------------------------------------------------------------------
+	FInputModeGameOnly InputMode;
+	APE_PlayerController* MyPlayerController = Cast<APE_PlayerController>(Controller);
+	MyPlayerController->SetInputMode(InputMode); //게임에만 입력을 받도록 설정
+	MyPlayerController->bShowMouseCursor = false; //마우스 커서 숨김
+	auto subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(MyPlayerController->GetLocalPlayer()); //입력 서브시스템을 가져와서
+	if (subsystem)
+	{
+		subsystem->AddMappingContext(imc_ProjectPlayer, 0); //입력 컨텍스트에 등록한다.
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("subsystem is NULL"));
+	}
+	
+	// InputAction 바인드 -------------------------------------------------------------------------
 	auto PlayerInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	if (PlayerInput)
 	{
@@ -318,6 +290,8 @@ void AProjectPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		PlayerInput->BindAction(ia_Skill_Override, ETriggerEvent::Triggered, this, &AProjectPlayer::WhileHoldingOverrideSkill);
 		PlayerInput->BindAction(ia_Skill_Override, ETriggerEvent::Completed, this, &AProjectPlayer::OnReleaseOverrideSkill);
 	}
+
+	InventoryComponent->InitInputAction(MyPlayerController);
 }
 
 void AProjectPlayer::PostInitializeComponents()

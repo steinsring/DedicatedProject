@@ -35,13 +35,12 @@ private:
 	int32 SelectedSlotNumber = 0;
 
 	// 연결된 Inventroy UI ------------------------------------------------------
-	UPROPERTY(VisibleAnywhere, Category = "Inventory UI")
-	TObjectPtr<UPE_Inventory> InventoryWidget;								// 실제 생성된 인벤토리 위젯 인스턴스
-
 	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
 	TObjectPtr<class UPE_ItemThrowableComponent> ItemThrowableComponent;	// 던지는 아이템 컴포넌트
 
 	// 연결된 플레이어 클래스------------------------------------------------------
+	UPROPERTY(Transient)
+	TWeakObjectPtr<APE_PlayerController> CachedPC; // 로컬 컨트롤러만 가리키도록
 
 	UFUNCTION(Server, Reliable)
 	void UseItem_Server(APE_PlayerController* PlayerController);
