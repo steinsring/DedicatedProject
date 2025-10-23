@@ -2,6 +2,7 @@
 
 #include "BehaviorTree/BTTask_Attack.h"
 #include "DedicatedProject.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Enemy/PE_AIController.h"
 #include "Enemy/Enemy_AnimInstance.h"
 #include "Enemy/Enemy.h"
@@ -46,6 +47,8 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 	if (!IsAttacking)
 	{
+		UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
+		BB->SetValueAsBool(TEXT("bShouldWander"), true);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

@@ -87,10 +87,10 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	//	}
 	//}
 
-	FVector Forward = ControllingPawn->GetActorForwardVector();
-	FVector Center = ControllingPawn->GetActorLocation();
 	UWorld* World = ControllingPawn->GetWorld();
 	if (!World) return;
+	FVector Forward = ControllingPawn->GetActorForwardVector();
+	FVector Center = ControllingPawn->GetActorLocation();
 
 	FVector BoxExtent(300.0f, 300.0f, 100.0f);
 	FQuat Rotation = ControllingPawn->GetActorQuat();
