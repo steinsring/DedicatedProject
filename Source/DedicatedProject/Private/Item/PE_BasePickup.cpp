@@ -7,13 +7,7 @@
 
 void APE_BasePickup::Interact(AActor* Interactor)
 {
-	//PRINT_LOG(TEXT("Item : Test"));
-	if (HasAuthority()) // 서버가 아니면 서버에게 처리 위임
-	{
-		PRINT_LOG(TEXT("Item : Server"));
-		ServerInteract(Interactor);
-		return;
-	}
+	ServerInteract(Interactor);
 }
 
 void APE_BasePickup::ServerInteract_Implementation(AActor* Interactor)
@@ -22,7 +16,7 @@ void APE_BasePickup::ServerInteract_Implementation(AActor* Interactor)
 	if (AProjectPlayer* Player = Cast<AProjectPlayer>(Interactor))
 	{
 		PRINT_LOG(TEXT("Item : Pickup"));
-		Player->AddItemToInventory(PickupID);
+		Player->AddItemToInventory(PickupID, PickupQuantity);
 		Destroy();
 		PRINT_LOG(TEXT("Item : Destroy"));
 	}

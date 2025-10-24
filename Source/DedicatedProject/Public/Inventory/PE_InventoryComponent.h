@@ -35,21 +35,15 @@ private:
 	int32 SelectedSlotNumber = 0;
 
 	// 연결된 Inventroy UI ------------------------------------------------------
-	UPROPERTY(VisibleAnywhere, Category = "Inventory UI")
-	TObjectPtr<UPE_Inventory> InventoryWidget;								// 실제 생성된 인벤토리 위젯 인스턴스
-
 	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
 	TObjectPtr<class UPE_ItemThrowableComponent> ItemThrowableComponent;	// 던지는 아이템 컴포넌트
 
 	// 연결된 플레이어 클래스------------------------------------------------------
-	UPROPERTY()
-	TObjectPtr<class APE_PlayerController> MyPlayerController;
-
-	UPROPERTY()
-	TObjectPtr<class APE_PlayerState> MyPlayerState;
+	UPROPERTY(Transient)
+	TWeakObjectPtr<APE_PlayerController> CachedPC; // 로컬 컨트롤러만 가리키도록
 
 	UFUNCTION(Server, Reliable)
-	void UseItem_Server();
+	void UseItem_Server(APE_PlayerController* PlayerController);
 
 public:	
 	// Sets default values for this component's properties
@@ -62,20 +56,20 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	// 인벤토리 UI 변경 함수 ------------------------------------------------------------------------------
+	UFUNCTION()
+	bool AddItem(FName ItemID, int32 ItemQuantity, class AProjectPlayer* Interactor);													// 인벤토리에 아이템을 추가
 
 	UFUNCTION()
-	bool AddItem(FName ItemID);								// 인벤토리에 아이템을 추가
+	bool RemoveItem(UPE_InventoryItemBase* Item);								// 인벤토리에서 아이템을 제거
 
-	UFUNCTION()
-	bool RemoveItem(UPE_InventoryItemBase* Item);			// 인벤토리에서 아이템을 제거
+	void UseItem(APE_PlayerController* PlayerController);																// 인벤토리에서 아이템을 사용
 
-	void UseItem();											// 인벤토리에서 아이템을 사용
+	void SetInventoryUI(const TArray<struct FItemData> ServerInventoryData);	// 서버에서 인벤토리 UI 세팅
 
+	// 기본 변수 세팅 함수 ------------------------------------------------------------------------------
 	void SetItemThrowableComponent(const TObjectPtr<class UPE_ItemThrowableComponent> ThrowableComponent) { ItemThrowableComponent = ThrowableComponent; }
-
-	void SetPlayerController(const TObjectPtr<class APE_PlayerController> PlayerController) { MyPlayerController = PlayerController; }
-
-	void SetPlayerState(const TObjectPtr<class APE_PlayerState> PlayerState) { MyPlayerState = PlayerState; }
 
 	void InitInputAction(const TObjectPtr<class APE_PlayerController> PlayerController);
 };

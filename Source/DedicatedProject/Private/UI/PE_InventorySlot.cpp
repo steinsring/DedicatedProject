@@ -5,6 +5,7 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "DedicatedProject.h"
+#include "Inventory/FItemData.h"
 
 
 void UPE_InventorySlot::NativeConstruct()
@@ -32,23 +33,34 @@ void UPE_InventorySlot::FindItemData(FName ItemID)
 		if (Row->ItemID == ItemID)
 		{
 			SearchedItemData = Row;
-			ID = ItemID;
 			return;
 		}
 	}
 	PRINT_LOG(TEXT("Find Item Fail"));
 }
 
-void UPE_InventorySlot::SetItem(FName ItemID)
+void UPE_InventorySlot::SetItem(FName ItemID, int32 ItemQuantity)
 {
+	// 아이템을 다쓴 경우
+	if (ItemID == NAME_None)
+	{
+		ID = NAME_None;
+		Stack = 0;
+		IconImage->SetBrushFromTexture(nullptr);
+		IconImage->SetVisibility(ESlateVisibility::Hidden);
+		Number->SetText(FText::FromString(TEXT(" ")));
+		return;
+	}
+
+	// 아이템이 남은 경우
 	FindItemData(ItemID);
 	if (IsValid(IconImage))
 	{
+		ID = ItemID;
+		Stack = ItemQuantity;
 		IconImage->SetBrushFromTexture(SearchedItemData->Icon, true);
 		IconImage->SetVisibility(ESlateVisibility::Visible);
-		Stack += SearchedItemData->Quantity;
 		Number->SetText(FText::AsNumber(Stack));
-		//PRINT_LOG(TEXT("Set Item Icon Success"));
 	}
 	else
 	{

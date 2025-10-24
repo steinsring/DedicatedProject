@@ -7,6 +7,7 @@
 #include "Components/Overlay.h"
 #include "UI/PE_InventorySlot.h"
 #include "DedicatedProject.h"
+#include "Inventory/FItemData.h"
 
 void UPE_Inventory::NativeConstruct()
 {
@@ -68,67 +69,11 @@ FPE_ItemDataTable* UPE_Inventory::FindItemData(FName ItemID)
 	return nullptr;
 }
 
-void UPE_Inventory::AddItemToInventory(const FName ItemID)
+void UPE_Inventory::SetInventoryData(const TArray<FItemData> ServerInventoryData)
 {
-	PRINT_LOG(TEXT("Try Add Item To Inventory"));
-	SearchedItemData = FindItemData(ItemID);
-	// NULL Check---------------------------------------------------------------------------------
-	if (!SearchedItemData)
+	for (int32 i = 0; i < ItemSlots.Num(); i++)
 	{
-		PRINT_ERROR_LOG(TEXT("Find Item Fail"));
-		return;
-	}
-
-	// 아이템을 인벤토리에 추가 --------------------------------------------------------------------
-	if (SearchedItemData->ItemTag == "Item")
-	{
-		UPE_InventorySlot* FoundSlot = nullptr;
-		for (UPE_InventorySlot* InvenSlot : ItemSlots)
-		{
-			if (InvenSlot->GetSlotInformation() == ItemID)
-			{// 슬롯에 아이템이 같은경우 stack 추가
-				FoundSlot = InvenSlot;
-				break;
-			}
-		}
-
-		// FoundSlot이 nullptr인경우 인벤토리안에 습득한 아이템과 같은 아이템이 없어 빈 슬롯에 추가
-		if (!FoundSlot)
-		{
-			for (UPE_InventorySlot* InvenSlot : ItemSlots)
-			{
-				if (InvenSlot->GetSlotInformation().IsNone())
-				{
-					FoundSlot = InvenSlot;
-					break; // 첫 번째만 찾고 끝내려면 break
-				}
-			}
-		}
-
-		if (FoundSlot)
-		{
-			FoundSlot->SetItem(ItemID);
-		}
-		else // 모든 인벤토리 슬롯이 가득찬 경우
-		{
-			PRINT_LOG(TEXT("All Inventory Slot are Full"));
-		}
-	}
-	// 조명을 인벤토리에 추가 --------------------------------------------------------------------
-	else if (SearchedItemData->ItemTag == "Light")
-	{
-		LightSlot_1->SetItem(ItemID);
-	}
-	// 장비를 인벤토리에 추가 --------------------------------------------------------------------
-	else if (SearchedItemData->ItemTag == "Weapon")
-	{
-		WeaponSlot_1->SetItem(ItemID);
-	}
-	// 잘못된 Tag -------------------------------------------------------------------------------
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("Incorrect ItemTag"));
-		return;
+		ItemSlots[i]->SetItem(ServerInventoryData[i].ItemID, ServerInventoryData[i].Quantity);
 	}
 }
 

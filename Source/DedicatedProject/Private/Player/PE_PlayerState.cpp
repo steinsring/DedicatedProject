@@ -33,7 +33,7 @@ void APE_PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 // 인벤토리 데이터가 변경될경우 자동으로 호출
 void APE_PlayerState::OnRep_InventoryData()
 {
-
+	MyInventoryComponent->SetInventoryUI(InventoryData);
 }
 
 bool APE_PlayerState::IsEmptySlot(const int32 SlotNumber)
@@ -49,11 +49,46 @@ bool APE_PlayerState::IsEmptySlot(const int32 SlotNumber)
 	return false;
 }
 
+// 여기서 아이템 이미 있으면 추가, 없으면 가장 가까운 빈 슬롯에 추가
+void APE_PlayerState::AddItem_Server_Implementation(const FName ItemID, const int32 ItemQuantity)
+{
+	if (!HasAuthority()) return;	//서버 전용
+	int32 EmptySlotNum = -1;
+
+	for (int32 i = 0; i < InventoryData.Num(); i++)
+	{
+		// 이미 같은 아이템을 가지고있는경우
+		if (InventoryData[i].ItemID == ItemID)
+		{
+			InventoryData[i].Quantity += ItemQuantity;
+			PRINT_LOG(TEXT("InventoryData[%d].ItemID : %s"), i, *InventoryData[i].ItemID.ToString());
+			PRINT_LOG(TEXT("InventoryData[%d].Quantity : %d"), i, InventoryData[i].Quantity);
+			return;
+		}
+
+		// 첫번째 빈 슬롯
+		if (EmptySlotNum < 0 && InventoryData[i].ItemID == NAME_None)
+		{
+			EmptySlotNum = i;
+		}
+	}
+
+	// 같은 아이템을 가지고 있지 않은 경우
+	if (EmptySlotNum >= 0)
+	{
+		InventoryData[EmptySlotNum].ItemID = ItemID;
+		InventoryData[EmptySlotNum].Quantity = ItemQuantity;
+		PRINT_LOG(TEXT("InventoryData[%d].ItemID : %s"), EmptySlotNum, *InventoryData[EmptySlotNum].ItemID.ToString());
+		PRINT_LOG(TEXT("InventoryData[%d].Quantity : %d"), EmptySlotNum, InventoryData[EmptySlotNum].Quantity);
+	}
+}
+
 void APE_PlayerState::UseItem(const int32 SlotNumber)
 {
 	check(HasAuthority());	//서버 전용
 	if (IsEmptySlot(SlotNumber))	return;
 
+	SelectedSlotNumber = SlotNumber;
 	InventoryData[SlotNumber].Quantity -= 1;
 
 	// 개수가 0이 될경우 초기화

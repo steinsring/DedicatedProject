@@ -38,7 +38,6 @@ private:
 	virtual void PostInitializeComponents() override;
 
 	// Init
-	void InitForController(class APE_PlayerController* PlayerController);	// 컴포넌트 초기화
 	void InitForHPBar(class APE_PlayerController* PlayerController);		// HP 위젯 초기화
 	
 
@@ -177,7 +176,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	USkillManagerComponent* GetSkillManager() const { return SkillManager; }
 
-	void AddItemToInventory(FName PickupID);
+	void AddItemToInventory(FName ID, int32 Quantity);
 
 	FORCEINLINE UPE_ItemThrowableComponent* GetItemThrowable() const { return ItemThrowable; }
 
