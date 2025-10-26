@@ -43,6 +43,7 @@ void UPE_Inventory::NativeConstruct()
 			}
 		}
 	}
+
 	// 이거 어따 쓰는거지..
 	UClass* LoadedWidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/BluePrints/UI/WB_InventorySlot.WB_InventorySlot_C"));
 	if (LoadedWidgetClass)

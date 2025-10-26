@@ -123,7 +123,7 @@ void UPE_InventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 bool UPE_InventoryComponent::AddItem(FName ItemID, int32 ItemQuantity, AProjectPlayer* Interactor)
 {
 	APE_PlayerState* ClientPlayerState = Interactor->GetPlayerState<APE_PlayerState>();
-	ClientPlayerState->AddItem_Server(ItemID, ItemQuantity);
+	ClientPlayerState->AddItem(ItemID, ItemQuantity);
 	return true;
 }
 

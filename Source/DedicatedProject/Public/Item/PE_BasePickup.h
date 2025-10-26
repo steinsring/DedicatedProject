@@ -13,8 +13,6 @@ class DEDICATEDPROJECT_API APE_BasePickup : public AActor, public IPE_Interactab
 	GENERATED_BODY()
 
 private:
-	UFUNCTION(Server, Reliable)
-	void ServerInteract(class AActor* Interactor);
 
 protected:
 	UPROPERTY(EditAnywhere)

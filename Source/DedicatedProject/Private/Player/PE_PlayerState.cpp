@@ -4,6 +4,8 @@
 #include "Player/PE_PlayerState.h"
 #include "Inventory/FItemData.h"
 #include "DedicatedProject.h"
+#include "Net/UnrealNetwork.h"			//DOREPLIFETIME_CONDITION
+#include "Player/PE_PlayerController.h"
 
 void APE_PlayerState::InitializeDefaultData()
 {
@@ -26,14 +28,15 @@ void APE_PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	// 인벤토리는 보통 본인에게만 복제
-	//DOREPLIFETIME_CONDITION(APE_PlayerState, InventoryData, COND_OwnerOnly);
+	// 인벤토리는 보통 본인에게만 복제, 서버는 모든 state를 가지고있기때문
+	DOREPLIFETIME_CONDITION(APE_PlayerState, InventoryData, COND_OwnerOnly);
 }
 
 // 인벤토리 데이터가 변경될경우 자동으로 호출
 void APE_PlayerState::OnRep_InventoryData()
 {
-	MyInventoryComponent->SetInventoryUI(InventoryData);
+	OnInventoryChanged.Broadcast(InventoryData);
+	Cast<APE_PlayerController>(GetPlayerController())->InventoryDataUpdate(InventoryData);
 }
 
 bool APE_PlayerState::IsEmptySlot(const int32 SlotNumber)
@@ -49,10 +52,14 @@ bool APE_PlayerState::IsEmptySlot(const int32 SlotNumber)
 	return false;
 }
 
+void APE_PlayerState::AddItem(const FName ItemID, const int32 ItemQuantity)
+{
+	AddItem_Server(ItemID, ItemQuantity);
+}
+
 // 여기서 아이템 이미 있으면 추가, 없으면 가장 가까운 빈 슬롯에 추가
 void APE_PlayerState::AddItem_Server_Implementation(const FName ItemID, const int32 ItemQuantity)
 {
-	if (!HasAuthority()) return;	//서버 전용
 	int32 EmptySlotNum = -1;
 
 	for (int32 i = 0; i < InventoryData.Num(); i++)
@@ -63,6 +70,8 @@ void APE_PlayerState::AddItem_Server_Implementation(const FName ItemID, const in
 			InventoryData[i].Quantity += ItemQuantity;
 			PRINT_LOG(TEXT("InventoryData[%d].ItemID : %s"), i, *InventoryData[i].ItemID.ToString());
 			PRINT_LOG(TEXT("InventoryData[%d].Quantity : %d"), i, InventoryData[i].Quantity);
+			OnInventoryChanged.Broadcast(InventoryData);
+			OnRep_InventoryData();
 			return;
 		}
 
@@ -81,6 +90,8 @@ void APE_PlayerState::AddItem_Server_Implementation(const FName ItemID, const in
 		PRINT_LOG(TEXT("InventoryData[%d].ItemID : %s"), EmptySlotNum, *InventoryData[EmptySlotNum].ItemID.ToString());
 		PRINT_LOG(TEXT("InventoryData[%d].Quantity : %d"), EmptySlotNum, InventoryData[EmptySlotNum].Quantity);
 	}
+	OnInventoryChanged.Broadcast(InventoryData);
+	OnRep_InventoryData();
 }
 
 void APE_PlayerState::UseItem(const int32 SlotNumber)
