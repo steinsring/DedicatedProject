@@ -5,6 +5,7 @@
 #include "Enemy/PE_AIController.h"
 #include "Player/ProjectPlayer.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UBTTask_TurnToTarget::UBTTask_TurnToTarget()
 {
@@ -42,11 +43,22 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
     FRotator CurrentRot = Pawn->GetActorRotation();
 
     FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetRot, DeltaSeconds, RotationSpeed);
+	AIController->SetControlRotation(NewRot);
     Pawn->SetActorRotation(NewRot);
 
     float AngleDiff = FMath::Abs(FRotator::NormalizeAxis((TargetRot - NewRot).Yaw));
     if (AngleDiff < AcceptableAngle)
     {
+		ACharacter* Character = Cast<ACharacter>(Pawn);
+        if (Character)
+        {
+            Character->bUseControllerRotationYaw = false;
+			if (UCharacterMovementComponent* MoveComp = Character->GetCharacterMovement())
+			{
+				MoveComp->bOrientRotationToMovement = true;
+			}
+        }
+
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
     }
 }

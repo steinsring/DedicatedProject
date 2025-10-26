@@ -95,21 +95,21 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	FVector BoxExtent(300.0f, 300.0f, 100.0f);
 	FQuat Rotation = ControllingPawn->GetActorQuat();
 
-	TArray<FOverlapResult> OverlapResults;
-	FCollisionQueryParams CollisionQueryParam(NAME_None, false, ControllingPawn);
+	TArray<FOverlapResult> BoxOverlapResults;
+	FCollisionQueryParams BoxCollisionQueryParam(NAME_None, false, ControllingPawn);
 
-	bool bResult = World->OverlapMultiByChannel(
-		OverlapResults,
+	bool bBoxResult = World->OverlapMultiByChannel(
+		BoxOverlapResults,
 		Center + Forward * BoxExtent.X,
 		Rotation,
 		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeBox(BoxExtent),
-		CollisionQueryParam
+		BoxCollisionQueryParam
 	);
 
-	if (bResult)
+	if (bBoxResult)
 	{
-		for (auto const& OverlapResult : OverlapResults)
+		for (auto const& OverlapResult : BoxOverlapResults)
 		{
 			AProjectPlayer* DetectedPlayer = Cast<AProjectPlayer>(OverlapResult.GetActor());
 			if (DetectedPlayer && DetectedPlayer->GetController()->IsPlayerController())
@@ -119,9 +119,38 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 				DrawDebugPoint(World, DetectedPlayer->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
 				DrawDebugLine(World, ControllingPawn->GetActorLocation(), DetectedPlayer->GetActorLocation(), FColor::Blue, false, 0.2f);
 				return;
+				//break;
 			}
 		}
 	}
+
+	//FCollisionQueryParams SphereCollisionQueryParam(NAME_None, false, ControllingPawn);
+	//float SphereRadius = 800.0f;
+	//TArray<FOverlapResult> SphereOverlapResults;
+	//bool bSphereResult = World->OverlapMultiByChannel(
+	//	SphereOverlapResults,
+	//	Center,
+	//	FQuat::Identity,
+	//	ECollisionChannel::ECC_GameTraceChannel2,
+	//	FCollisionShape::MakeSphere(SphereRadius),
+	//	SphereCollisionQueryParam
+	//);
+
+	//if (bSphereResult)
+	//{
+	//	for (auto const& OverlapResult : SphereOverlapResults)
+	//	{
+	//		AProjectPlayer* DetectedPlayer = Cast<AProjectPlayer>(OverlapResult.GetActor());
+	//		if (DetectedPlayer && DetectedPlayer->GetController()->IsPlayerController())
+	//		{
+	//			OwnerComp.GetBlackboardComponent()->SetValueAsObject(APE_AIController::StaringTargetKey, DetectedPlayer);
+	//			// 디버그 포인트와 라인 그리기
+	//			DrawDebugPoint(World, DetectedPlayer->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
+	//			DrawDebugLine(World, ControllingPawn->GetActorLocation(), DetectedPlayer->GetActorLocation(), FColor::Blue, false, 0.2f);
+	//			return;
+	//		}
+	//	}
+	//}
 
 	// 디버그 박스 표시
 	DrawDebugBox(
@@ -129,12 +158,23 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		Center + Forward * BoxExtent.X,
 		BoxExtent,
 		Rotation,
-		bResult ? FColor::Green : FColor::Red,
+		bBoxResult ? FColor::Green : FColor::Red,
 		false,
 		0.2f
 	);
+	// 디버그 구 표시
+	//DrawDebugSphere(
+	//	World,
+	//	Center,
+	//	SphereRadius,
+	//	16,
+	//	bSphereResult ? FColor::Green : FColor::Red,
+	//	false,
+	//	0.2f
+	//);
 
 	BB->ClearValue(APE_AIController::TargetKey);
+	//BB->ClearValue(APE_AIController::StaringTargetKey);
 	// 감지되는 것이 없을 경우엔 빨간색
 	//DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
 	//DrawDebugCone(

@@ -17,6 +17,7 @@
 const FName APE_AIController::HomePosKey(TEXT("HomePos"));
 const FName APE_AIController::PatrolPosKey(TEXT("PatrolPos"));
 const FName APE_AIController::TargetKey(TEXT("Target"));
+const FName APE_AIController::StaringTargetKey(TEXT("StaringTarget"));
 
 APE_AIController::APE_AIController()
 {

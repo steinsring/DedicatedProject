@@ -17,5 +17,28 @@ class DEDICATEDPROJECT_API UBTTask_WanderAroundTarget : public UBTTaskNode
 public:
 	UBTTask_WanderAroundTarget();
 
+protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wander")
+	float OrbitAngleDegree = 75.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wander")
+	float OrbitRadius = 300.0f;
+
+private:
+	bool bIsWandering = false;
+
+	AAIController* AIController = nullptr;
+
+	APawn* AIPawn = nullptr;
+
+	AActor* Target = nullptr;
+
+	FVector TargetPos;
+
+	float OriginalSpeed = 0.0f;
 };
