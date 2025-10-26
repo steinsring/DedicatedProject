@@ -35,4 +35,6 @@ public:
 	void InitInventoryUI();				// Inventory UI 생성
 
 	void ItemSlotSelect(int32 i);
+
+	void InventoryDataUpdate(const TArray<struct FItemData>& InventoryData);
 };

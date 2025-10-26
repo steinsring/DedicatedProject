@@ -5,6 +5,7 @@
 #include "DedicatedProject.h"
 #include "UI/PE_Inventory.h"
 #include "Inventory/PE_InventoryComponent.h"
+#include "Inventory/FItemData.h"
 APE_PlayerController::APE_PlayerController()
 {
 	// Inventory UI 로드 ----------------------------------------------------------------------
@@ -46,5 +47,10 @@ void APE_PlayerController::BeginPlay()
 void APE_PlayerController::ItemSlotSelect(int32 i)
 { // 선택 위젯 슬롯 변경
 	InventoryWidget->ItemSlotSelect(i);
+}
+
+void APE_PlayerController::InventoryDataUpdate(const TArray<FItemData>& InventoryData)
+{
+	InventoryWidget->SetInventoryData(InventoryData);
 }
 

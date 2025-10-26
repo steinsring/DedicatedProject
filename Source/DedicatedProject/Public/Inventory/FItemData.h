@@ -11,6 +11,9 @@ struct FItemData
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY()
 	FName ItemID = NAME_None;
+
+	UPROPERTY()
 	int32 Quantity = 0;
 };
