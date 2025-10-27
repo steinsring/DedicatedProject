@@ -64,7 +64,9 @@ public:
 	UFUNCTION()
 	bool RemoveItem(UPE_InventoryItemBase* Item);								// 인벤토리에서 아이템을 제거
 
-	void UseItem(APE_PlayerController* PlayerController);																// 인벤토리에서 아이템을 사용
+	void UseItem(AProjectPlayer* Interactor);									// 인벤토리에서 아이템을 사용
+
+	void SpawnItem();
 
 	void SetInventoryUI(const TArray<struct FItemData> ServerInventoryData);	// 서버에서 인벤토리 UI 세팅
 

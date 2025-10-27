@@ -118,7 +118,13 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Interact;
-	void Interact();																							// 플레이어가 E키를 클릭했을 때
+	void Interact();													// 플레이어가 E키를 클릭했을 때
+	
+	// 아이템 사용 ------------------------------------------------------
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_ItemUse;
+
+	void ItemUse(const FInputActionValue& inputValue);
 	
 	// --------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -161,6 +167,8 @@ private:
 public:
 	// Sets default values for this character's properties
 	AProjectPlayer();
+	void AddItemToInventory(FName ID, int32 Quantity);
+	UPE_InventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 
 	UCameraComponent* GetPlayerCamComp() const { return tpsCamComp; }
 
@@ -175,8 +183,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	USkillManagerComponent* GetSkillManager() const { return SkillManager; }
-
-	void AddItemToInventory(FName ID, int32 Quantity);
 
 	FORCEINLINE UPE_ItemThrowableComponent* GetItemThrowable() const { return ItemThrowable; }
 

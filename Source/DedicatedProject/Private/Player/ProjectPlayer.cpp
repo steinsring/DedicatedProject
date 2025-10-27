@@ -167,6 +167,8 @@ AProjectPlayer::AProjectPlayer()
 	if (IASkillAugment.Succeeded())	ia_Skill_Augment = IASkillAugment.Object;
 	static ConstructorHelpers::FObjectFinder<UInputAction> IASkillOverride(TEXT("/Game/Inputs/IA_Skill_Override.IA_Skill_Override"));
 	if (IASkillOverride.Succeeded())	ia_Skill_Override = IASkillOverride.Object;
+	static ConstructorHelpers::FObjectFinder<UInputAction> IAItemUse(TEXT("/Game/Inputs/IA_ItemUse.IA_ItemUse"));
+	if (IAItemUse.Succeeded())	IA_ItemUse = IAItemUse.Object;
 }
 
 // Called when the game starts or when spawned
@@ -289,6 +291,7 @@ void AProjectPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		PlayerInput->BindAction(ia_Skill_Augment, ETriggerEvent::Started, this, &AProjectPlayer::InputAugmentSkill);
 		PlayerInput->BindAction(ia_Skill_Override, ETriggerEvent::Triggered, this, &AProjectPlayer::WhileHoldingOverrideSkill);
 		PlayerInput->BindAction(ia_Skill_Override, ETriggerEvent::Completed, this, &AProjectPlayer::OnReleaseOverrideSkill);
+		PlayerInput->BindAction(IA_ItemUse, ETriggerEvent::Started, this, &AProjectPlayer::ItemUse);
 	}
 
 	InventoryComponent->InitInputAction(MyPlayerController);
@@ -329,16 +332,6 @@ void AProjectPlayer::InputJump(const struct FInputActionValue& inputValue)
 
 void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)  
 {  
-	if (true)
-	{
-		APE_PlayerController* MyPlayerController = this->GetController<APE_PlayerController>();
-		InventoryComponent->UseItem(MyPlayerController);
-		PRINT_LOG(TEXT("UseItem"));
-	}
-	else
-	{
-
-	}
    PRINT_LOG(TEXT("InputAttack Called"));  
    if (!PlayerAnim)  
    {  
@@ -363,6 +356,12 @@ void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
    {  
        PRINT_ERROR_LOG(TEXT("BasicAttack is NULL"));  
    }
+}
+
+void AProjectPlayer::ItemUse(const FInputActionValue& inputValue)
+{
+	InventoryComponent->UseItem(this);
+	PRINT_LOG(TEXT("UseItem"));
 }
  
 void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {
