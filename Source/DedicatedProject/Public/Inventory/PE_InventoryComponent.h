@@ -40,10 +40,7 @@ private:
 
 	// 연결된 플레이어 클래스------------------------------------------------------
 	UPROPERTY(Transient)
-	TWeakObjectPtr<APE_PlayerController> CachedPC; // 로컬 컨트롤러만 가리키도록
-
-	UFUNCTION(Server, Reliable)
-	void UseItem_Server(APE_PlayerController* PlayerController);
+	TWeakObjectPtr<class APE_PlayerController> CachedPC; // 로컬 컨트롤러만 가리키도록
 
 public:	
 	// Sets default values for this component's properties
