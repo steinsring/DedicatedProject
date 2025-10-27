@@ -40,17 +40,19 @@ EBTNodeResult::Type UBTTask_WanderAroundTarget::ExecuteTask(UBehaviorTreeCompone
 		MoveComp->MaxWalkSpeed = OriginalSpeed * 0.1f;
 	}
 
+	AnimInstance = Cast<UCommon_AnimInstance>(AIChar->GetMesh()->GetAnimInstance());
+	if (AnimInstance) AnimInstance->IsWandering = true;
+
 	FVector Center = Target->GetActorLocation();
 	FVector ToAI = AIPawn->GetActorLocation() - Center;
 	ToAI.Z = 0.0f;
 	ToAI.Normalize();
 
-	FVector TangentDir = FMath::RandBool() ? FVector(-ToAI.Y, ToAI.X, 0.0f) : FVector(ToAI.Y, -ToAI.X, 0.0f);
-
+	AnimInstance->IsGoingLeft = FMath::RandBool();
+	FVector TangentDir = AnimInstance->IsGoingLeft ? FVector(-ToAI.Y, ToAI.X, 0.0f) : FVector(ToAI.Y, -ToAI.X, 0.0f);
 	float MoveDistance = OrbitRadius * FMath::DegreesToRadians(OrbitAngleDegree);
 
 	TargetPos = AIPawn->GetActorLocation() + TangentDir * MoveDistance;
-
 	FVector AIPos = AIPawn->GetActorLocation();
 
 	UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(AIPawn);
@@ -90,6 +92,7 @@ void UBTTask_WanderAroundTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uin
 
 		UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
 		BB->SetValueAsBool(TEXT("bShouldWander"), false);
+		if (AnimInstance) AnimInstance->IsWandering = false;
 
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

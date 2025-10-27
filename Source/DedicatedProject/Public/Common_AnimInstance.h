@@ -24,6 +24,12 @@ public:
 
 	EMontageType GetMontageType(UAnimMontage* Montage) const;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn", meta = (AllowPrivateAccess = true))
+	bool IsWandering;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn", meta = (AllowPrivateAccess = true))
+	bool IsGoingLeft;
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Stun", meta = (AllowPrivateAccess = true))
 	UAnimMontage* StunMontage = nullptr;	// 애니메이션 몽타주는 부모에서 선언하고 자식에서 각각 할당함.
