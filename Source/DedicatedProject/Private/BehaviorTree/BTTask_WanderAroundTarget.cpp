@@ -41,15 +41,20 @@ EBTNodeResult::Type UBTTask_WanderAroundTarget::ExecuteTask(UBehaviorTreeCompone
 	}
 
 	AnimInstance = Cast<UCommon_AnimInstance>(AIChar->GetMesh()->GetAnimInstance());
-	if (AnimInstance) AnimInstance->IsWandering = true;
+	if (AnimInstance)
+	{
+		AnimInstance->SetWandering(true);
+		PRINT_LOG(TEXT("Wandering true"));
+	}
+	if (!AnimInstance) PRINT_LOG(TEXT("No AnimInstance"));
 
 	FVector Center = Target->GetActorLocation();
 	FVector ToAI = AIPawn->GetActorLocation() - Center;
 	ToAI.Z = 0.0f;
 	ToAI.Normalize();
 
-	AnimInstance->IsGoingLeft = FMath::RandBool();
-	FVector TangentDir = AnimInstance->IsGoingLeft ? FVector(-ToAI.Y, ToAI.X, 0.0f) : FVector(ToAI.Y, -ToAI.X, 0.0f);
+	if (AnimInstance) AnimInstance->SetGoingLeft(FMath::RandBool());
+	FVector TangentDir = AnimInstance->GetGoingLeft() ? FVector(-ToAI.Y, ToAI.X, 0.0f) : FVector(ToAI.Y, -ToAI.X, 0.0f);
 	float MoveDistance = OrbitRadius * FMath::DegreesToRadians(OrbitAngleDegree);
 
 	TargetPos = AIPawn->GetActorLocation() + TangentDir * MoveDistance;
@@ -92,7 +97,11 @@ void UBTTask_WanderAroundTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uin
 
 		UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
 		BB->SetValueAsBool(TEXT("bShouldWander"), false);
-		if (AnimInstance) AnimInstance->IsWandering = false;
+		if (AnimInstance) AnimInstance->SetWandering(false);
+		PRINT_LOG(TEXT("Wandering false"));
+
+		ACharacter* AIChar = Cast<ACharacter>(AIPawn);
+		PRINT_LOG(TEXT("AnimInstance %s"), *AIChar->GetMesh()->GetAnimInstance()->GetClass()->GetName());
 
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

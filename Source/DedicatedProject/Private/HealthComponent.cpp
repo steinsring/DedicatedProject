@@ -3,6 +3,8 @@
 
 #include "HealthComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "CharacterCommon.h"
+#include "Common_AnimInstance.h"
 
 
 // Sets default values for this component's properties
@@ -40,7 +42,7 @@ void UHealthComponent::OnRep_CurrentHealth()
 	if (CurrentHealth <= 0.0f)
 	{
 		CurrentHealth = 0.0f; // HP가 0 이하로 떨어지면 0으로 설정
-		OnHPIsZero.Broadcast(); // HP가 0이 되었음을 알리는 델리게이트 호출
+		
 	}
 }
 
@@ -62,7 +64,14 @@ void UHealthComponent::SetHP(float NewHP)
 		if (CurrentHealth <= 0.0f)
 		{
 			CurrentHealth = 0.0f; // HP가 0 이하로 떨어지면 0으로 설정
-			OnHPIsZero.Broadcast(); // HP가 0이 되었음을 알리는 델리게이트 호출
+			
+			ACharacterCommon* OwnerCharacter = Cast<ACharacterCommon>(GetOwner());
+			if (!OwnerCharacter) return;
+
+			UCommon_AnimInstance* CommonAnim = Cast<UCommon_AnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+			if (!CommonAnim) return;
+
+			CommonAnim->SetIsDead(true);
 		}
 	}
 }

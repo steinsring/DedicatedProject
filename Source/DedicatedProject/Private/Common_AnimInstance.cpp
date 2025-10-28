@@ -13,6 +13,7 @@ UCommon_AnimInstance::UCommon_AnimInstance()
 	CurrentPawnSpeed = 0.0f;
 	IsInAir = false;
 	IsWandering = false;
+	IsDead = false;
 }
 
 void UCommon_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
