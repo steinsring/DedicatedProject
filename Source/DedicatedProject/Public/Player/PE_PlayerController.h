@@ -15,26 +15,30 @@ class DEDICATEDPROJECT_API APE_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	APE_PlayerController();
+
 private:
+	// 인벤토리 ----------------------------------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	TSubclassOf<class UPE_Inventory> InventoryWidgetBPClass;
 
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	TObjectPtr<class UPE_Inventory> InventoryWidget;				// 실제 생성된 인벤토리 위젯 인스턴스
 
-	UPROPERTY(VisibleAnywhere, Category = "Inventory")
-	TObjectPtr<class UPE_InventoryComponent> InventoryComponent;	// 인벤토리 컴포넌트
-protected:
-	virtual void BeginPlay() override;
-	
 public:
-	APE_PlayerController();
-
-	void InitializeDefaultData();		// Gamemode의 PostLogin에서 호출
-
-	void InitInventoryUI();				// Inventory UI 생성
-
 	void ItemSlotSelect(int32 i);
 
 	void InventoryDataUpdate(const TArray<struct FItemData>& InventoryData);
+
+private:
+	// 체력 ------------------------------------------------------------------------------------
+	UPROPERTY(VisibleAnywhere, Category = "UI")
+	TSubclassOf<class UPE_HPBarWidget> HPBarWidgetClass; // 플레이어 UI 위젯 컴포넌트
+
+	UPROPERTY()
+	TObjectPtr<UPE_HPBarWidget> HPBarWidget; // 플레이어 UI 위젯 인스턴스
 };

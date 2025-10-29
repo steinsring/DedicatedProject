@@ -3,6 +3,7 @@
 
 #include "HealthComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/PE_PlayerController.h"
 #include "CharacterCommon.h"
 #include "Common_AnimInstance.h"
 

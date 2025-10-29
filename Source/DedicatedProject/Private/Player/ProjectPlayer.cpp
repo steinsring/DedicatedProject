@@ -16,8 +16,6 @@
 #include "Player/PE_CharacterStats.h"
 #include "Player/PE_AnimInstance.h"
 #include "UI/PE_Inventory.h"
-#include "UI/PE_HPBarWidget.h"
-
 #include <Camera/CameraComponent.h> // 카메라
 #include <GameFramework/SpringArmComponent.h> //3인칭 카메라암
 #include "Blueprint/UserWidget.h"
@@ -122,17 +120,6 @@ AProjectPlayer::AProjectPlayer()
 		PRINT_ERROR_LOG(TEXT("Player Skeletal Mesh is NULL"));
 	}
 
-	// 체력 --------------------------------------------------------------------------
-	static ConstructorHelpers::FClassFinder<UUserWidget> HPBarWidgetAsset(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_HPBar.WB_HPBar_C'"));
-	if (HPBarWidgetAsset.Succeeded())
-	{
-		HPBarWidgetClass = HPBarWidgetAsset.Class; //블루프린트에서 위젯 클래스를 불러온다.
-	}
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("HPBarWidgetAsset is NULL"));
-	}
-
 	// 스킬 --------------------------------------------------------------------------
 	CharacterDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_CharacterStats.DT_CharacterStats"));
 	SkillManager = CreateDefaultSubobject<USkillManagerComponent>(TEXT("SkillManager"));
@@ -167,6 +154,8 @@ AProjectPlayer::AProjectPlayer()
 	if (IASkillAugment.Succeeded())	ia_Skill_Augment = IASkillAugment.Object;
 	static ConstructorHelpers::FObjectFinder<UInputAction> IASkillOverride(TEXT("/Game/Inputs/IA_Skill_Override.IA_Skill_Override"));
 	if (IASkillOverride.Succeeded())	ia_Skill_Override = IASkillOverride.Object;
+	static ConstructorHelpers::FObjectFinder<UInputAction> IAItemUse(TEXT("/Game/Inputs/IA_ItemUse.IA_ItemUse"));
+	if (IAItemUse.Succeeded())	IA_ItemUse = IAItemUse.Object;
 }
 
 // Called when the game starts or when spawned
@@ -203,35 +192,6 @@ void AProjectPlayer::PossessedBy(AController* NewController)
 void AProjectPlayer::OnRep_Controller()
 {
 	Super::OnRep_Controller();
-	InitForHPBar(Cast<APE_PlayerController>(Controller));			//위젯은 클라이언트에서만 접근
-}
-
-void AProjectPlayer::InitForHPBar(class APE_PlayerController* PlayerController)
-{
-	if (PlayerController)
-	{
-		if (HPBarWidgetClass)
-		{
-			HPBarWidget = CreateWidget<UPE_HPBarWidget>(PlayerController, HPBarWidgetClass);
-			if (HPBarWidget)
-			{
-				HPBarWidget->AddToViewport();
-				HPBarWidget->BindToHealthComponent(HealthComp); //HealthComponent를 위젯에 설정
-			}
-			else
-			{
-				PRINT_ERROR_LOG(TEXT("HPBarWidget is Not Created"));
-			}
-		}
-		else
-		{
-			PRINT_ERROR_LOG(TEXT("HPBarWidgetClass is NULL"));
-		}
-	}
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
-	}
 }
 
 // Called every frame
@@ -289,6 +249,7 @@ void AProjectPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		PlayerInput->BindAction(ia_Skill_Augment, ETriggerEvent::Started, this, &AProjectPlayer::InputAugmentSkill);
 		PlayerInput->BindAction(ia_Skill_Override, ETriggerEvent::Triggered, this, &AProjectPlayer::WhileHoldingOverrideSkill);
 		PlayerInput->BindAction(ia_Skill_Override, ETriggerEvent::Completed, this, &AProjectPlayer::OnReleaseOverrideSkill);
+		PlayerInput->BindAction(IA_ItemUse, ETriggerEvent::Started, this, &AProjectPlayer::ItemUse);
 	}
 
 	InventoryComponent->InitInputAction(MyPlayerController);
@@ -329,16 +290,6 @@ void AProjectPlayer::InputJump(const struct FInputActionValue& inputValue)
 
 void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)  
 {  
-	if (true)
-	{
-		APE_PlayerController* MyPlayerController = this->GetController<APE_PlayerController>();
-		InventoryComponent->UseItem(MyPlayerController);
-		PRINT_LOG(TEXT("UseItem"));
-	}
-	else
-	{
-
-	}
    PRINT_LOG(TEXT("InputAttack Called"));  
    if (!PlayerAnim)  
    {  
@@ -363,6 +314,12 @@ void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
    {  
        PRINT_ERROR_LOG(TEXT("BasicAttack is NULL"));  
    }
+}
+
+void AProjectPlayer::ItemUse(const FInputActionValue& inputValue)
+{
+	InventoryComponent->UseItem(this);
+	PRINT_LOG(TEXT("UseItem"));
 }
  
 void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {

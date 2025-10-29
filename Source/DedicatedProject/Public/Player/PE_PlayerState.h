@@ -18,8 +18,6 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	int32 MaxInventorySlotNumber = 6;										// 최대 인벤토리 슬롯 개수
 
-	int32 SelectedSlotNumber = 0;											// 현재 선택된 슬롯 번호
-
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -43,7 +41,10 @@ public:
 	UFUNCTION(Server,Reliable)
 	void AddItem_Server(const FName ItemID, const int32 ItemQuantity);		// 아이템 획득 RPC
 
-	void UseItem(const int32 SlotNumber);									// 아이템 사용 RPC
+	void UseItem(const int32 SlotNumber);
+
+	UFUNCTION(Server, Reliable)
+	void UseItem_Server(const int32 SlotNumber);							// 아이템 사용 RPC
 
 	UPROPERTY(VisibleAnywhere, Category = "Events")
 	FOnInventoryChanged OnInventoryChanged;									// 나중에 함수들을 바인딩해서 실제로 사용

@@ -9,9 +9,6 @@
 #include <Components/BoxComponent.h>
 #include "ProjectPlayer.generated.h"
 
-
-
-class UPE_HPBarWidget;
 class UPE_Inventory;
 class UPE_InventoryComponent;
 
@@ -36,10 +33,6 @@ private:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
-
-	// Init
-	void InitForHPBar(class APE_PlayerController* PlayerController);		// HP 위젯 초기화
-	
 
 	//카메라 컴포넌트 --------------------------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -118,7 +111,13 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_Interact;
-	void Interact();																							// 플레이어가 E키를 클릭했을 때
+	void Interact();													// 플레이어가 E키를 클릭했을 때
+	
+	// 아이템 사용 ------------------------------------------------------
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_ItemUse;
+
+	void ItemUse(const FInputActionValue& inputValue);
 	
 	// --------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -141,12 +140,6 @@ private:
 
 	class UInputAction* ia_SkillChoice;
 
-	UPROPERTY(VisibleAnywhere, Category = "UI")
-	TSubclassOf<UPE_HPBarWidget> HPBarWidgetClass; // 플레이어 UI 위젯 컴포넌트
-
-	UPROPERTY()
-	TObjectPtr<UPE_HPBarWidget> HPBarWidget; // 플레이어 UI 위젯 인스턴스
-
 	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
 	TObjectPtr<class UPE_ItemThrowableComponent> ItemThrowable;	// 던지는 아이템
 
@@ -161,6 +154,8 @@ private:
 public:
 	// Sets default values for this character's properties
 	AProjectPlayer();
+	void AddItemToInventory(FName ID, int32 Quantity);
+	UPE_InventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 
 	UCameraComponent* GetPlayerCamComp() const { return tpsCamComp; }
 
@@ -175,8 +170,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	USkillManagerComponent* GetSkillManager() const { return SkillManager; }
-
-	void AddItemToInventory(FName ID, int32 Quantity);
 
 	FORCEINLINE UPE_ItemThrowableComponent* GetItemThrowable() const { return ItemThrowable; }
 

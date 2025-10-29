@@ -13,21 +13,16 @@ void UPE_Inventory::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// 데이터 데이블 초기화 --------------------------------------------------------------------------------
-	ItemDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ItemDataTable.DT_ItemDataTable"));
-
-	if (ItemDataTable)									//데이터 테이블이 참조되었는지 확인
-	{
-		ItemDataTable->GetAllRows<FPE_ItemDataTable>(TEXT("PE_Inventory"), ItemDataRows); //테이블의 모든 행을 지역배열로 가져온다.
-	}
-	else
-	{
-		PRINT_LOG(TEXT("ItemDataTable is NULL"));
-	}
-
 	// 인벤토리 위젯 초기화 ---------------------------------------------------------------------------------
-	ItemSlots.Empty();
-
+	ItemSlots.Reset();
+	ItemSlots.SetNum(MaxInventorySlotNumber);
+	ItemSlots[0] = InventorySlot_0;
+	ItemSlots[1] = InventorySlot_1;
+	ItemSlots[2] = InventorySlot_2;
+	ItemSlots[3] = InventorySlot_3;
+	ItemSlots[4] = InventorySlot_4;
+	ItemSlots[5] = InventorySlot_5;
+	/*
 	int32 Count = ItemGridPanel->GetChildrenCount();
 	for (int32 i = 0; i < Count; ++i)
 	{
@@ -43,35 +38,28 @@ void UPE_Inventory::NativeConstruct()
 			}
 		}
 	}
-
-	// 이거 어따 쓰는거지..
-	UClass* LoadedWidgetClass = LoadClass<UUserWidget>(nullptr, TEXT("/Game/BluePrints/UI/WB_InventorySlot.WB_InventorySlot_C"));
-	if (LoadedWidgetClass)
-	{
-		InventoryWidget = LoadedWidgetClass;
-	}
-	else
-	{
-		PRINT_LOG(TEXT("InventoryWidget is NULL"));
-	}
+	*/
 }
 
-FPE_ItemDataTable* UPE_Inventory::FindItemData(FName ItemID)
+void UPE_Inventory::SetInventoryData(const TArray<FItemData>& ServerInventoryData)
 {
-	SearchedItemData = nullptr;						// 이전결과 초기화
-
-	for (FPE_ItemDataTable* Row : ItemDataRows)		// ItemDataTable에서 아이템 정보 검색
+	if (ServerInventoryData.IsEmpty()) 
 	{
-		if (Row->ItemID == ItemID)
+		PRINT_ERROR_LOG(TEXT("ServerInventoryData Is Empty"));
+		return;
+	}
+	if (ItemSlots.IsEmpty())
+	{
+		PRINT_LOG(TEXT("ItemSlots is empty!"));
+	}
+
+	for (int32 i = 0; i < ItemSlots.Num(); ++i)
+	{
+		if (!IsValid(ItemSlots[i]))
 		{
-			return Row;
+			PRINT_ERROR_LOG(TEXT("ItemSlots[%d] is null or invalid!"), i);
 		}
 	}
-	return nullptr;
-}
-
-void UPE_Inventory::SetInventoryData(const TArray<FItemData> ServerInventoryData)
-{
 	for (int32 i = 0; i < ItemSlots.Num(); i++)
 	{
 		ItemSlots[i]->SetItem(ServerInventoryData[i].ItemID, ServerInventoryData[i].Quantity);

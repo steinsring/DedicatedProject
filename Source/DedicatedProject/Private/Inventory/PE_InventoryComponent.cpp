@@ -137,21 +137,14 @@ void UPE_InventoryComponent::SetInventoryUI(const TArray<FItemData> ServerInvent
 	//InventoryWidget->SetInventoryData(ServerInventoryData);
 }
 
-void UPE_InventoryComponent::UseItem(APE_PlayerController* PlayerController)
+void UPE_InventoryComponent::UseItem(AProjectPlayer* Interactor)
 {
-	UseItem_Server(PlayerController);
+	APE_PlayerState* ClientPlayerState = Interactor->GetPlayerState<APE_PlayerState>();
+	ClientPlayerState->UseItem(SelectedSlotNumber);
 }
 
-void UPE_InventoryComponent::UseItem_Server_Implementation(APE_PlayerController* PlayerController)
+void UPE_InventoryComponent::SpawnItem()
 {
-	if (!PlayerController)
-	{
-		PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
-		return;
-	}
-	APE_PlayerState* ClientPlayerState = PlayerController->GetPlayerState<APE_PlayerState>();
-	ClientPlayerState->UseItem(SelectedSlotNumber);
-
 	// itemthrowcomponent에 접근해서 throw()를 실행
 	if (ItemThrowableComponent)
 	{
