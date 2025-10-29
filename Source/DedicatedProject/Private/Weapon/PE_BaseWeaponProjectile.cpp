@@ -1,0 +1,84 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Weapon/PE_BaseWeaponProjectile.h"
+#include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Player/ProjectPlayer.h"
+#include "Engine/DamageEvents.h"
+
+
+// Sets default values
+APE_BaseWeaponProjectile::APE_BaseWeaponProjectile()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	// SphereCollision 생성 및 초기화
+	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
+	//SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);   // 트리거 전용
+	SphereCollision->SetGenerateOverlapEvents(true);						// 오버랩시 이벤트
+	SphereCollision->InitSphereRadius(10.f);
+	//SphereCollision->SetNotifyRigidBodyCollision(false);					// Hit 이벤트
+	SphereCollision->BodyInstance.SetCollisionProfileName("BlockAll");
+	SphereCollision->OnComponentHit.AddDynamic(this, &APE_BaseWeaponProjectile::OnHit);
+	SetRootComponent(SphereCollision);
+	
+	// 오브젝트 메시 생성 및 초기화
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
+	Mesh->SetupAttachment(RootComponent);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);		//물리 시뮬레이션에서만 충돌을 사용하고, 쿼리(Overlap / Hit 테스트)는 비활성화
+	Mesh->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+	Mesh->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMesh(TEXT("/Game/ParagonWraith/FX/Meshes/Heroes/Wraith/SM_Wraith_Drone.SM_Wraith_Drone"));
+	if (StaticMesh.Succeeded())
+	{
+		GetMesh()->SetStaticMesh(StaticMesh.Object);
+	}
+	//Mesh->SetSimulatePhysics(true);									// 물리 적용
+	
+	// ProjectileMovement 생성 및 초기화
+	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
+	ProjectileMovement->UpdatedComponent = SphereCollision;
+	ProjectileMovement->ProjectileGravityScale = 0;						// 중력 설정
+	ProjectileMovement->bRotationFollowsVelocity = true;				// 무기에서 나가도록
+	ProjectileMovement->InitialSpeed = 3000;
+	ProjectileMovement->MaxSpeed = 3000;
+	//ProjectileMovement->Bounciness = 0.6f;								// 탄성(0~1)
+	//ProjectileMovement->Friction = 0.2f;								// 마찰
+	ProjectileMovement->bShouldBounce = false;							// 바운스 설정
+	//ProjectileMovement->BounceVelocityStopSimulatingThreshold = 150.f;	// 너무 느리면 정지
+
+	bReplicates = true;
+}
+
+// Called when the game starts or when spawned
+void APE_BaseWeaponProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+// Called every frame
+void APE_BaseWeaponProjectile::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+void APE_BaseWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	auto ComputedDamage = Damage;
+	if (const auto Character = Cast<AProjectPlayer>(GetInstigator()))
+	{
+		//ComputedDamage *= Character->
+	}
+
+	if (OtherActor && OtherActor != this)
+	{
+		const FDamageEvent Event(UDamageType::StaticClass());
+		OtherActor->TakeDamage(ComputedDamage, Event, GetInstigatorController(), this);
+	}
+
+	Destroy();
+}

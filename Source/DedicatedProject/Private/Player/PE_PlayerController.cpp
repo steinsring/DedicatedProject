@@ -6,6 +6,9 @@
 #include "UI/PE_Inventory.h"
 #include "Inventory/PE_InventoryComponent.h"
 #include "Inventory/FItemData.h"
+#include "UI/PE_HPBarWidget.h"
+#include "HealthComponent.h"
+
 APE_PlayerController::APE_PlayerController()
 {
 	// Inventory UI 로드 ----------------------------------------------------------------------
@@ -17,16 +20,24 @@ APE_PlayerController::APE_PlayerController()
 	}
 
 	InventoryWidgetBPClass = WidgetBPClass.Class;
+
+	// HealthComp UI 로드 ----------------------------------------------------------------------
+	static ConstructorHelpers::FClassFinder<UUserWidget> HPBarWidgetAsset(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_HPBar.WB_HPBar_C'"));
+	if (HPBarWidgetAsset.Succeeded())
+	{
+		HPBarWidgetClass = HPBarWidgetAsset.Class; //블루프린트에서 위젯 클래스를 불러온다.
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("HPBarWidgetAsset is NULL"));
+	}
+
 }
 
-void APE_PlayerController::InitializeDefaultData()
-{
-
-}
-
-void APE_PlayerController::InitInventoryUI()
+void APE_PlayerController::BeginPlay()
 {
 	if (!IsLocalController()) return;
+
 	// Inventory UI 생성 ----------------------------------------------------------------------
 	InventoryWidget = CreateWidget<UPE_Inventory>(this, InventoryWidgetBPClass);
 	if (InventoryWidget)
@@ -37,11 +48,25 @@ void APE_PlayerController::InitInventoryUI()
 	{
 		PRINT_ERROR_LOG(TEXT("InventoryWidget Create Fail"));
 	}
-}
 
-void APE_PlayerController::BeginPlay()
-{
-	InitInventoryUI();
+	// 체력 --------------------------------------------------------------------------
+	if (HPBarWidgetClass)
+	{
+		HPBarWidget = CreateWidget<UPE_HPBarWidget>(this, HPBarWidgetClass);
+		if (HPBarWidget)
+		{
+			HPBarWidget->AddToViewport();
+			HPBarWidget->BindToHealthComponent(GetPawn()->FindComponentByClass<UHealthComponent>());
+		}
+		else
+		{
+			PRINT_ERROR_LOG(TEXT("HPBarWidget is Not Created"));
+		}
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("HPBarWidgetClass is NULL"));
+	}
 }
 
 void APE_PlayerController::ItemSlotSelect(int32 i)

@@ -17,6 +17,7 @@ UPE_AnimInstance::UPE_AnimInstance()
 	{
 		PRINT_LOG(TEXT("BasicAttackPattern is loaded successfully"));
 		BasicAttack = BasicAttackPattern.Object;
+		AttackMontages.Add(BasicAttack);
 	}
 	else
 	{

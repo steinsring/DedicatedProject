@@ -16,8 +16,6 @@
 #include "Player/PE_CharacterStats.h"
 #include "Player/PE_AnimInstance.h"
 #include "UI/PE_Inventory.h"
-#include "UI/PE_HPBarWidget.h"
-
 #include <Camera/CameraComponent.h> // 카메라
 #include <GameFramework/SpringArmComponent.h> //3인칭 카메라암
 #include "Blueprint/UserWidget.h"
@@ -122,17 +120,6 @@ AProjectPlayer::AProjectPlayer()
 		PRINT_ERROR_LOG(TEXT("Player Skeletal Mesh is NULL"));
 	}
 
-	// 체력 --------------------------------------------------------------------------
-	static ConstructorHelpers::FClassFinder<UUserWidget> HPBarWidgetAsset(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_HPBar.WB_HPBar_C'"));
-	if (HPBarWidgetAsset.Succeeded())
-	{
-		HPBarWidgetClass = HPBarWidgetAsset.Class; //블루프린트에서 위젯 클래스를 불러온다.
-	}
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("HPBarWidgetAsset is NULL"));
-	}
-
 	// 스킬 --------------------------------------------------------------------------
 	CharacterDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_CharacterStats.DT_CharacterStats"));
 	SkillManager = CreateDefaultSubobject<USkillManagerComponent>(TEXT("SkillManager"));
@@ -205,35 +192,6 @@ void AProjectPlayer::PossessedBy(AController* NewController)
 void AProjectPlayer::OnRep_Controller()
 {
 	Super::OnRep_Controller();
-	InitForHPBar(Cast<APE_PlayerController>(Controller));			//위젯은 클라이언트에서만 접근
-}
-
-void AProjectPlayer::InitForHPBar(class APE_PlayerController* PlayerController)
-{
-	if (PlayerController)
-	{
-		if (HPBarWidgetClass)
-		{
-			HPBarWidget = CreateWidget<UPE_HPBarWidget>(PlayerController, HPBarWidgetClass);
-			if (HPBarWidget)
-			{
-				HPBarWidget->AddToViewport();
-				HPBarWidget->BindToHealthComponent(HealthComp); //HealthComponent를 위젯에 설정
-			}
-			else
-			{
-				PRINT_ERROR_LOG(TEXT("HPBarWidget is Not Created"));
-			}
-		}
-		else
-		{
-			PRINT_ERROR_LOG(TEXT("HPBarWidgetClass is NULL"));
-		}
-	}
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("PlayerController is NULL"));
-	}
 }
 
 // Called every frame

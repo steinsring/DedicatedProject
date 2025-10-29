@@ -52,7 +52,7 @@ void ACharacterCommon::PostInitializeComponents()
 void ACharacterCommon::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
 	EMontageType Type =	BaseAnimInstance->GetMontageType(Montage);
-	
+
 	switch (Type)
 	{
 	case EMontageType::Attack:
@@ -69,7 +69,6 @@ void ACharacterCommon::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 void ACharacterCommon::Attack(UAnimMontage* AnimMontage)
 {
 	if (IsAttacking) return;
-
 	HitActors.Empty();
 	if (HasAuthority())
 	{

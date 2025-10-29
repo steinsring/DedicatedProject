@@ -9,9 +9,6 @@
 #include <Components/BoxComponent.h>
 #include "ProjectPlayer.generated.h"
 
-
-
-class UPE_HPBarWidget;
 class UPE_Inventory;
 class UPE_InventoryComponent;
 
@@ -36,10 +33,6 @@ private:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
-
-	// Init
-	void InitForHPBar(class APE_PlayerController* PlayerController);		// HP 위젯 초기화
-	
 
 	//카메라 컴포넌트 --------------------------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -146,12 +139,6 @@ private:
 	class UInputAction* ia_SkillTree;
 
 	class UInputAction* ia_SkillChoice;
-
-	UPROPERTY(VisibleAnywhere, Category = "UI")
-	TSubclassOf<UPE_HPBarWidget> HPBarWidgetClass; // 플레이어 UI 위젯 컴포넌트
-
-	UPROPERTY()
-	TObjectPtr<UPE_HPBarWidget> HPBarWidget; // 플레이어 UI 위젯 인스턴스
 
 	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
 	TObjectPtr<class UPE_ItemThrowableComponent> ItemThrowable;	// 던지는 아이템
