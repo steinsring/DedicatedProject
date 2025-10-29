@@ -4,6 +4,7 @@
 #include "Common_AnimInstance.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Enemy/Enemy.h"
 
 #include "DedicatedProject.h"
 
@@ -11,6 +12,8 @@ UCommon_AnimInstance::UCommon_AnimInstance()
 {
 	CurrentPawnSpeed = 0.0f;
 	IsInAir = false;
+	IsWandering = false;
+	IsDead = false;
 }
 
 void UCommon_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -22,13 +25,24 @@ void UCommon_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (::IsValid(Pawn))
 	{
 		CurrentPawnSpeed = Pawn->GetVelocity().Size();
-		//UE_LOG(LogTemp, Log, TEXT("Speed : %f"), CurrentPawnSpeed);
+		//if(Cast<AEnemy>(Pawn)) PRINT_LOG(TEXT("Speed : %f"), CurrentPawnSpeed);
 		auto Character = Cast<ACharacter>(Pawn);
 		if (Character)
 		{
 			IsInAir = Character->GetMovementComponent()->IsFalling();
 		}
 	}
+
+	//if (::IsValid(Pawn))
+	//{
+	//	FVector Velocity = Pawn->GetVelocity();
+	//	if (Cast<AEnemy>(Pawn))
+	//		PRINT_LOG(TEXT("%s | Role:%d | Vel:(%.1f, %.1f, %.1f) | Speed:%.1f"),
+	//			*Pawn->GetName(),
+	//			(int32)Pawn->GetLocalRole(),
+	//			Velocity.X, Velocity.Y, Velocity.Z,
+	//			Velocity.Size());
+	//}
 }
 
 void UCommon_AnimInstance::PlayAttackMontage(UAnimMontage* AnimMontage)

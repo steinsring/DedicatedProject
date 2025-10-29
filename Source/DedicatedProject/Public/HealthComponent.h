@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnHPIsZeroDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnHPChangedDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -42,7 +41,6 @@ public:
 
 	float GetMaxHealth() const { return MaxHealth; }
 
-	FOnHPIsZeroDelegate OnHPIsZero; // HP가 0이 되었을 때 호출되는 델리게이트
 	FOnHPChangedDelegate OnHPChanged;
 
 private:

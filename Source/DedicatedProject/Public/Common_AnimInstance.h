@@ -6,7 +6,7 @@
 #include "Animation/AnimInstance.h"
 #include "Common_AnimInstance.generated.h"
 
-enum class EMontageType { Attack, Stun, None };
+enum class EMontageType { Attack, Stun, Dead, None };
 
 UCLASS()
 class DEDICATEDPROJECT_API UCommon_AnimInstance : public UAnimInstance
@@ -23,6 +23,16 @@ public:
 	virtual void EndStunMontage();
 
 	EMontageType GetMontageType(UAnimMontage* Montage) const;
+
+	void SetIsDead(bool bDead) { IsDead = bDead; }
+
+	bool GetIsDead() const { return IsDead; }
+
+	void SetWandering(bool bWandering) { IsWandering = bWandering; }
+
+	void SetGoingLeft(bool bLeft) { IsGoingLeft = bLeft; }
+
+	bool GetGoingLeft() const { return IsGoingLeft; }
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Stun", meta = (AllowPrivateAccess = true))
@@ -47,4 +57,13 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn", meta = (AllowPrivateAccess = true))
 	bool IsInAir;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn", meta = (AllowPrivateAccess = true))
+	bool IsWandering;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn", meta = (AllowPrivateAccess = true))
+	bool IsGoingLeft = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn", meta = (AllowPrivateAccess = true))
+	bool IsDead;
 };

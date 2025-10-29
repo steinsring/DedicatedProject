@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
+#include "Common_AnimInstance.h"
 #include "BTTask_WanderAroundTarget.generated.h"
 
 /**
@@ -41,4 +42,6 @@ private:
 	FVector TargetPos;
 
 	float OriginalSpeed = 0.0f;
+
+	UCommon_AnimInstance* AnimInstance = nullptr;
 };

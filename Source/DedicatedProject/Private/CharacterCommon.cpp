@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Enemy/PE_AIController.h"
+#include "HealthComponent.h"
 #include "BrainComponent.h"
 #include "DedicatedProject.h"
 
@@ -46,6 +47,11 @@ void ACharacterCommon::PostInitializeComponents()
 		return;
 	}
 	BaseAnimInstance->OnMontageEnded.AddDynamic(this, &ACharacterCommon::OnMontageEnded);
+
+	if (HealthComp)
+	{
+		//HealthComp->OnHPIsZero.AddDynamic(this, &ACharacterCommon::Dead);
+	}
 }
 
 // Montage 종료시 Type을 구분해 이후 함수 호출
@@ -90,6 +96,7 @@ void ACharacterCommon::PlayAttackMontage_Multicast_Implementation(UAnimMontage* 
 {
 	BaseAnimInstance->PlayAttackMontage(AnimMontage);
 }
+
 
 void ACharacterCommon::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
@@ -202,3 +209,28 @@ void ACharacterCommon::EndStun()
 	}
 }
 
+//void ACharacterCommon::PlayDeadMontage_Server_Implementation()
+//{
+//	PlayDeadMontage_Multicast();
+//}
+//
+//void ACharacterCommon::PlayDeadMontage_Multicast_Implementation()
+//{
+//	BaseAnimInstance->PlayDeadMontage();
+//}
+//
+//void ACharacterCommon::Dead()
+//{
+//	if (BaseAnimInstance->GetIsDead()) return;
+//
+//	if (HasAuthority())
+//	{
+//		PlayDeadMontage_Multicast();
+//	}
+//	else
+//	{
+//		PlayDeadMontage_Server();
+//	}
+//
+//	BaseAnimInstance->SetIsDead(true);
+//}

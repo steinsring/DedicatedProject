@@ -45,6 +45,9 @@ public:
 	void Attack(UAnimMontage* AnimMontage);
 	FOnAttackEndDelegate OnAttackEnd;
 
+	//UFUNCTION()
+	//void Dead();
+
 	UFUNCTION()
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
