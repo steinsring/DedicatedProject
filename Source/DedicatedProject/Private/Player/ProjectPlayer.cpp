@@ -26,6 +26,7 @@
 #include "PE_Interactable.h"
 #include "Player/PE_PlayerController.h"
 #include "Player/PE_PlayerState.h"
+#include "Weapon/PE_WeaponProjectileComponent.h"
 
 
 // Sets default values
@@ -114,6 +115,12 @@ AProjectPlayer::AProjectPlayer()
 		SpotLightComp->SetupAttachment(GetMesh(), TEXT("HealthBar"));
 		SpotLightComp->SetRelativeLocation(FVector(0.f, 70.f, 0.f));
 		SpotLightComp->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+
+		// WeponProjectile ----------------------------------------------------------------------------
+		WeaponProjectileComponent = CreateDefaultSubobject<UPE_WeaponProjectileComponent>(TEXT("WeponProjectile"));
+		WeaponProjectileComponent->SetupAttachment(GetMesh(), TEXT("Muzzle_01"));
+		WeaponProjectileComponent->SetRelativeLocation(FVector(10.f, 0.f, 0.f));
+		WeaponProjectileComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 	}
 	else
 	{
@@ -297,6 +304,13 @@ void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
        return;  
    }  
 
+   if (!WeaponProjectileComponent)
+   {
+	   PRINT_ERROR_LOG(TEXT("WeaponProjectileComponent is NULL"));
+	   return;
+   }
+
+   WeaponProjectileComponent->Fire();
    
    if (PlayerAnim->BasicAttack)  
    {  
