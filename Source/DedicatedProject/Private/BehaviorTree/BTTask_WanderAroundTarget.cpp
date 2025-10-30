@@ -20,6 +20,8 @@ UBTTask_WanderAroundTarget::UBTTask_WanderAroundTarget()
 
 EBTNodeResult::Type UBTTask_WanderAroundTarget::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	ElapsedWanderTime = 0.0f;
+
 	AIController = OwnerComp.GetAIOwner();
 	if (!AIController) return EBTNodeResult::Failed;
 
@@ -37,16 +39,10 @@ EBTNodeResult::Type UBTTask_WanderAroundTarget::ExecuteTask(UBehaviorTreeCompone
 	if (MoveComp)
 	{
 		OriginalSpeed = MoveComp->MaxWalkSpeed;
-		MoveComp->MaxWalkSpeed = OriginalSpeed * 0.1f;
+		//MoveComp->MaxWalkSpeed = OriginalSpeed * 0.1f;
 	}
 
-	AnimInstance = Cast<UCommon_AnimInstance>(AIChar->GetMesh()->GetAnimInstance());
-	if (AnimInstance)
-	{
-		AnimInstance->SetWandering(true);
-		PRINT_LOG(TEXT("Wandering true"));
-	}
-	if (!AnimInstance) PRINT_LOG(TEXT("No AnimInstance"));
+	AnimInstance = Cast<UEnemy_AnimInstance>(AIChar->GetMesh()->GetAnimInstance());
 
 	FVector Center = Target->GetActorLocation();
 	FVector ToAI = AIPawn->GetActorLocation() - Center;
@@ -88,6 +84,13 @@ void UBTTask_WanderAroundTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uin
 	FRotator LookRot = FRotationMatrix::MakeFromX(ToTarget).Rotator();
 	AIPawn->SetActorRotation(LookRot);
 
+	ElapsedWanderTime += DeltaSeconds;
+
+	if (ElapsedWanderTime < MinWanderTime)
+	{
+		return;
+	}
+
 	if (AIController->GetMoveStatus() == EPathFollowingStatus::Idle)
 	{
 		if (UCharacterMovementComponent* MoveComp = Cast<ACharacter>(AIPawn)->GetCharacterMovement())
@@ -97,11 +100,6 @@ void UBTTask_WanderAroundTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uin
 
 		UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
 		BB->SetValueAsBool(TEXT("bShouldWander"), false);
-		if (AnimInstance) AnimInstance->SetWandering(false);
-		PRINT_LOG(TEXT("Wandering false"));
-
-		ACharacter* AIChar = Cast<ACharacter>(AIPawn);
-		PRINT_LOG(TEXT("AnimInstance %s"), *AIChar->GetMesh()->GetAnimInstance()->GetClass()->GetName());
 
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

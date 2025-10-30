@@ -33,6 +33,27 @@ void UEnemy_AnimInstance::AnimNotify_AttackRangeCheck()
 	}
 }
 
+void UEnemy_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+{
+	Super::NativeUpdateAnimation(DeltaSeconds);
+
+	APawn* Pawn = TryGetPawnOwner();
+	if (::IsValid(Pawn))
+	{
+		AAIController* AIController = Cast<AAIController>(Pawn->GetController());
+		if (AIController)
+		{
+			UBlackboardComponent* BlackBoard = AIController->GetBlackboardComponent();
+			if (BlackBoard)
+			{
+				bool bWandering = BlackBoard->GetValueAsBool(TEXT("bShouldWander"));
+				SetWandering(bWandering);
+				//PRINT_LOG(TEXT("IsWandering: %s"), bWandering ? TEXT("True") : TEXT("False"));
+			}
+		}
+	}
+}
+
 UAnimMontage* UEnemy_AnimInstance::GetRandomAttackMontage()
 {
 	if (AttackMontages.Num() == 0)

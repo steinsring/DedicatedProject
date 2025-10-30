@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "Enemy/Enemy.h"
+#include "Enemy/ToiletMechTest.h"
 
 #include "DedicatedProject.h"
 
@@ -12,7 +13,6 @@ UCommon_AnimInstance::UCommon_AnimInstance()
 {
 	CurrentPawnSpeed = 0.0f;
 	IsInAir = false;
-	IsWandering = false;
 	IsDead = false;
 }
 
@@ -25,7 +25,7 @@ void UCommon_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (::IsValid(Pawn))
 	{
 		CurrentPawnSpeed = Pawn->GetVelocity().Size();
-		//if(Cast<AEnemy>(Pawn)) PRINT_LOG(TEXT("Speed : %f"), CurrentPawnSpeed);
+		//if(Cast<AToiletMechTest>(Pawn)) PRINT_LOG(TEXT("Speed : %f"), CurrentPawnSpeed);
 		auto Character = Cast<ACharacter>(Pawn);
 		if (Character)
 		{

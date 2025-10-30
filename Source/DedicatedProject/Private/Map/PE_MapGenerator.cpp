@@ -7,6 +7,7 @@
 #include <Kismet/GameplayStatics.h>
 #include <Enemy/SpawnPoint.h>
 #include <Enemy/ToiletMechTest.h>
+#include "Enemy/Crunch.h"
 #include "Enemy/PE_AIController.h"
 
 // Sets default values
@@ -499,6 +500,9 @@ void APE_MapGenerator::SpawnEnemies()
 				{
 				case E_EnemyType::ToiletMech:
 					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
+					break;
+				case E_EnemyType::Crunch:
+					Enemy = GetWorld()->SpawnActor<ACrunch>(Location, Rotation, SpawnParams);
 					break;
 				case E_EnemyType::Boss:
 					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);

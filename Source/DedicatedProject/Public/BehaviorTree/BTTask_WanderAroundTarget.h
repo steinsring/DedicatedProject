@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "Common_AnimInstance.h"
+#include "Enemy/Enemy_AnimInstance.h"
 #include "BTTask_WanderAroundTarget.generated.h"
 
 /**
@@ -43,5 +43,8 @@ private:
 
 	float OriginalSpeed = 0.0f;
 
-	UCommon_AnimInstance* AnimInstance = nullptr;
+	UEnemy_AnimInstance* AnimInstance = nullptr;
+
+	float MinWanderTime = 2.0f;
+	float ElapsedWanderTime = 0.0f;
 };

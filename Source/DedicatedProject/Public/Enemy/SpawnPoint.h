@@ -10,6 +10,7 @@ UENUM(BlueprintType)
 enum class E_EnemyType : uint8
 {
 	ToiletMech		UMETA(DisplayName = "ToiletMech"),
+	Crunch		    UMETA(DisplayName = "Crunch"),
 	Boss		    UMETA(DisplayName = "Boss"),
 	Minion		    UMETA(DisplayName = "Minion")
 };

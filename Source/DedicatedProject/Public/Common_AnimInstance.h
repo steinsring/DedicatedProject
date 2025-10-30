@@ -28,12 +28,6 @@ public:
 
 	bool GetIsDead() const { return IsDead; }
 
-	void SetWandering(bool bWandering) { IsWandering = bWandering; }
-
-	void SetGoingLeft(bool bLeft) { IsGoingLeft = bLeft; }
-
-	bool GetGoingLeft() const { return IsGoingLeft; }
-
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Stun", meta = (AllowPrivateAccess = true))
 	UAnimMontage* StunMontage = nullptr;	// 애니메이션 몽타주는 부모에서 선언하고 자식에서 각각 할당함.
@@ -57,12 +51,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn", meta = (AllowPrivateAccess = true))
 	bool IsInAir;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn", meta = (AllowPrivateAccess = true))
-	bool IsWandering;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn", meta = (AllowPrivateAccess = true))
-	bool IsGoingLeft = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn", meta = (AllowPrivateAccess = true))
 	bool IsDead;

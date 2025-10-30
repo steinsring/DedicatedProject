@@ -26,16 +26,16 @@ void APE_GameMode::BeginPlay()
 {
 	Super::BeginPlay();
     
-	//if (HasAuthority()) {
-	//	UE_LOG(LogTemp, Warning, TEXT("서버에서 던전 생성 시작"));
+	if (HasAuthority()) {
+		UE_LOG(LogTemp, Warning, TEXT("서버에서 던전 생성 시작"));
 
-	//	FActorSpawnParameters SpawnParams;
-	//	GetWorld()->SpawnActor<APE_MapGenerator>(
-	//		FVector::ZeroVector,             // 위치
-	//		FRotator::ZeroRotator,          // 회전
-	//		SpawnParams
-	//	);
-	//}
+		FActorSpawnParameters SpawnParams;
+		GetWorld()->SpawnActor<APE_MapGenerator>(
+			FVector::ZeroVector,             // 위치
+			FRotator::ZeroRotator,          // 회전
+			SpawnParams
+		);
+	}
 
     FVector LevelTravelLocation(-300.f, 1082.f, -218.f);
 

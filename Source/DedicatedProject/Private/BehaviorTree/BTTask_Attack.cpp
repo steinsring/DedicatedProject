@@ -49,6 +49,29 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	{
 		UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
 		BB->SetValueAsBool(TEXT("bShouldWander"), true);
+
+		//auto Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
+		//if (nullptr == Enemy) return;
+
+		//auto EnemyAnimInstance = Cast<UEnemy_AnimInstance>(Enemy->GetMesh()->GetAnimInstance());
+		//if (nullptr == EnemyAnimInstance)
+		//{
+		//	PRINT_LOG(TEXT("EnemyAnimInstance is NULL"));
+		//	return;
+		//}
+		//if (EnemyAnimInstance)
+		//{
+		//	EnemyAnimInstance->SetWandering(true);
+		//	if (EnemyAnimInstance->GetWandering())
+		//	{
+		//		PRINT_LOG(TEXT("Wandering true"));
+		//	}
+		//	else
+		//	{
+		//		PRINT_LOG(TEXT("Wandering false"));
+		//	}
+		//}
+
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }
