@@ -6,6 +6,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Player/ProjectPlayer.h"
 #include "Engine/DamageEvents.h"
+#include "DedicatedProject.h"
 
 
 // Sets default values
@@ -22,7 +23,6 @@ APE_BaseWeaponProjectile::APE_BaseWeaponProjectile()
 	//SphereCollision->SetNotifyRigidBodyCollision(false);					// Hit 이벤트
 	//SphereCollision->BodyInstance.SetCollisionProfileName("BlockAll");
 	SphereCollision->OnComponentHit.AddDynamic(this, &APE_BaseWeaponProjectile::OnHit);
-	SphereCollision->IgnoreActorWhenMoving(GetOwner(), true);
 	//RootComponent = SphereCollision;
 	
 	
@@ -73,16 +73,13 @@ void APE_BaseWeaponProjectile::Tick(float DeltaTime)
 
 void APE_BaseWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	auto ComputedDamage = Damage;
-	if (const auto Character = Cast<AProjectPlayer>(GetInstigator()))
-	{
-		//ComputedDamage *= Character->
-	}
-
+	if (OtherActor == GetOwner()) return;
+	
 	if (OtherActor && OtherActor != this)
 	{
 		const FDamageEvent Event(UDamageType::StaticClass());
-		OtherActor->TakeDamage(ComputedDamage, Event, GetInstigatorController(), this);
+		OtherActor->TakeDamage(Damage, Event, GetInstigatorController(), this);
+		PRINT_LOG(TEXT("Hit"));
 	}
 
 	Destroy();
