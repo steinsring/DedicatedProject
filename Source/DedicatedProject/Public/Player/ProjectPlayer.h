@@ -34,12 +34,17 @@ private:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
 
+private:
 	//카메라 컴포넌트 --------------------------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* springArmComp; //카메라 암 위치
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* tpsCamComp; //카메라
 
+public:
+	FORCEINLINE UCameraComponent* GetPlayerCamComp() const { return tpsCamComp; }
+
+private:
 	// 플레이어 화면 조작--------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputMappingContext* imc_ProjectPlayer; //만들어둔 IMC_ProjectPlayer
@@ -53,6 +58,7 @@ private:
 	//상하 회전 입력 처리
 	void LookUp(const struct FInputActionValue& inputValue);
 
+private:
 	// 플레이어 이동 --------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_Move;
@@ -69,8 +75,14 @@ private:
 	// 공격 --------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* ia_Attack; // 공격 입력 액션
+
 	void InputAttack(const struct FInputActionValue& inputValue);
-	//void Attack();
+
+	UPROPERTY(VisibleAnywhere, Category = "WeaponProjectile")
+	TObjectPtr<class UPE_WeaponProjectileComponent> WeaponProjectileComponent;
+
+public:
+	FORCEINLINE UPE_WeaponProjectileComponent* GetWeaponProjectileComponent() const { return WeaponProjectileComponent; }
 
 protected:
 	//캐릭터 스탯 관련 --------------------------------------------------------------------------
@@ -80,6 +92,7 @@ protected:
 	void UpdateCharacterStats(int32 CharacterLevel);
 	FORCEINLINE FPE_CharacterStats* GetCharacterStats() const { return CharacterStats; } //스탯 구조체를 위한 Getter함수
 
+protected:
 	//달리기 관련 --------------------------------------------------------------------------
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	class UInputAction* ia_Sprint;
@@ -96,6 +109,7 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void SprintEnd_Client();
 
+private:
 	// 상호작용 --------------------------------------------------------------------------
 	UPROPERTY(VisibleAnywhere, Category = "Interact")
 	UBoxComponent* InteractionZone;																				// 아이템 감지 범위 오브젝트
@@ -113,6 +127,7 @@ private:
 	class UInputAction* IA_Interact;
 	void Interact();													// 플레이어가 E키를 클릭했을 때
 	
+private:
 	// 아이템 사용 ------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* IA_ItemUse;
@@ -133,17 +148,28 @@ private:
 	float DamageMultiplier = 1.0f;
 	float SpeedMultiplier = 1.0f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UPE_InventoryComponent> InventoryComponent;
-
 	class UInputAction* ia_SkillTree;
 
 	class UInputAction* ia_SkillChoice;
+	 
+	// Inventory  -------------------------------------------------------------------------
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UPE_InventoryComponent> InventoryComponent;
 
+public:
+	void AddItemToInventory(FName ID, int32 Quantity);
+	FORCEINLINE UPE_InventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+	
+	// Throwable -------------------------------------------------------------------------
+private:
 	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
-	TObjectPtr<class UPE_ItemThrowableComponent> ItemThrowable;	// 던지는 아이템
+	TObjectPtr<class UPE_ItemThrowableComponent> ItemThrowable;	
+
+public:
+	FORCEINLINE UPE_ItemThrowableComponent* GetItemThrowable() const { return ItemThrowable; }
 
 	// Fuel -------------------------------------------------------------------------
+private:
 	UPROPERTY(VisibleAnywhere, Category = "Fuel")
 	TObjectPtr<class UPE_FuelComponent> FuelComponent;	// FuelComponent
 
@@ -154,11 +180,8 @@ private:
 public:
 	// Sets default values for this character's properties
 	AProjectPlayer();
-	void AddItemToInventory(FName ID, int32 Quantity);
-	UPE_InventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 
-	UCameraComponent* GetPlayerCamComp() const { return tpsCamComp; }
-
+	// 스킬 관련 -------------------------------------------------------------------------
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 		AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -170,8 +193,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	USkillManagerComponent* GetSkillManager() const { return SkillManager; }
-
-	FORCEINLINE UPE_ItemThrowableComponent* GetItemThrowable() const { return ItemThrowable; }
 
 	// Augment Skill 관련 ---------------------------------------------------------------
 	float GetAttackPower() const { return AttackPower; }

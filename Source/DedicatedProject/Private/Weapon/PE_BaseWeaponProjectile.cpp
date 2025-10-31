@@ -6,6 +6,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Player/ProjectPlayer.h"
 #include "Engine/DamageEvents.h"
+#include "DedicatedProject.h"
 
 
 // Sets default values
@@ -16,17 +17,20 @@ APE_BaseWeaponProjectile::APE_BaseWeaponProjectile()
 
 	// SphereCollision 생성 및 초기화
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
-	//SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);   // 트리거 전용
+	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);   // 트리거 전용
 	SphereCollision->SetGenerateOverlapEvents(true);						// 오버랩시 이벤트
-	SphereCollision->InitSphereRadius(10.f);
+	SphereCollision->InitSphereRadius(100.f);
 	//SphereCollision->SetNotifyRigidBodyCollision(false);					// Hit 이벤트
-	SphereCollision->BodyInstance.SetCollisionProfileName("BlockAll");
+	//SphereCollision->BodyInstance.SetCollisionProfileName("BlockAll");
 	SphereCollision->OnComponentHit.AddDynamic(this, &APE_BaseWeaponProjectile::OnHit);
-	SetRootComponent(SphereCollision);
+	//RootComponent = SphereCollision;
+	
+	
 	
 	// 오브젝트 메시 생성 및 초기화
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	Mesh->SetupAttachment(RootComponent);
+	RootComponent = Mesh;
+	//Mesh->SetupAttachment(RootComponent);
 	Mesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);		//물리 시뮬레이션에서만 충돌을 사용하고, 쿼리(Overlap / Hit 테스트)는 비활성화
 	Mesh->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
 	Mesh->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
@@ -36,10 +40,12 @@ APE_BaseWeaponProjectile::APE_BaseWeaponProjectile()
 		GetMesh()->SetStaticMesh(StaticMesh.Object);
 	}
 	//Mesh->SetSimulatePhysics(true);									// 물리 적용
-	
+	SphereCollision->SetupAttachment(RootComponent);
+	Mesh->IgnoreActorWhenMoving(GetOwner(), true);
+
 	// ProjectileMovement 생성 및 초기화
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
-	ProjectileMovement->UpdatedComponent = SphereCollision;
+	ProjectileMovement->UpdatedComponent = Mesh;
 	ProjectileMovement->ProjectileGravityScale = 0;						// 중력 설정
 	ProjectileMovement->bRotationFollowsVelocity = true;				// 무기에서 나가도록
 	ProjectileMovement->InitialSpeed = 3000;
@@ -48,7 +54,7 @@ APE_BaseWeaponProjectile::APE_BaseWeaponProjectile()
 	//ProjectileMovement->Friction = 0.2f;								// 마찰
 	ProjectileMovement->bShouldBounce = false;							// 바운스 설정
 	//ProjectileMovement->BounceVelocityStopSimulatingThreshold = 150.f;	// 너무 느리면 정지
-
+	Mesh->SetRelativeScale3D(FVector(10.0f));
 	bReplicates = true;
 }
 
@@ -56,7 +62,6 @@ APE_BaseWeaponProjectile::APE_BaseWeaponProjectile()
 void APE_BaseWeaponProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -68,16 +73,13 @@ void APE_BaseWeaponProjectile::Tick(float DeltaTime)
 
 void APE_BaseWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	auto ComputedDamage = Damage;
-	if (const auto Character = Cast<AProjectPlayer>(GetInstigator()))
-	{
-		//ComputedDamage *= Character->
-	}
-
+	if (OtherActor == GetOwner()) return;
+	
 	if (OtherActor && OtherActor != this)
 	{
 		const FDamageEvent Event(UDamageType::StaticClass());
-		OtherActor->TakeDamage(ComputedDamage, Event, GetInstigatorController(), this);
+		OtherActor->TakeDamage(Damage, Event, GetInstigatorController(), this);
+		PRINT_LOG(TEXT("Hit"));
 	}
 
 	Destroy();
