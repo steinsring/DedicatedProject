@@ -9,7 +9,7 @@ UToiletMech_AnimInstance::UToiletMech_AnimInstance()
 {
 	// 공격 몽타주를 불러오기
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> AttackMontage1
-		(TEXT("/Script/Engine.AnimMontage'/Game/Fab/SciFi_ToiletMech/Animation/SKEL_SciFi_ToiletMech_Skeleton_Montage.SKEL_SciFi_ToiletMech_Skeleton_Montage'"));
+		(TEXT("/Game/Fab/SciFi_ToiletMech/Animation/SKEL_SciFi_ToiletMech_Skeleton_Montage.SKEL_SciFi_ToiletMech_Skeleton_Montage"));
 	if (AttackMontage1.Succeeded())
 	{
 		AttackPattern1 = AttackMontage1.Object;
@@ -22,6 +22,7 @@ UToiletMech_AnimInstance::UToiletMech_AnimInstance()
 	//}
 
 	AttackMontages.Add(AttackPattern1);
+	PRINT_LOG(TEXT("ToiletMech AttackMontage Count: %d"), AttackMontages.Num());
 
 	// 스턴 몽타주 할당
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> TempMontage
