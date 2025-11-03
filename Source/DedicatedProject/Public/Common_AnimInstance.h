@@ -17,7 +17,7 @@ public:
 	UCommon_AnimInstance();
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
-	void PlayAttackMontage(UAnimMontage* AnimMontage);
+	void PlayMontage(UAnimMontage* AnimMontage);
 
 	virtual void PlayStunMontage(float Duration = 0.0);
 	virtual void EndStunMontage();

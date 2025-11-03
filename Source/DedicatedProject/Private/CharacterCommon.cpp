@@ -16,6 +16,7 @@ ACharacterCommon::ACharacterCommon()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthStat"));
 
@@ -79,11 +80,11 @@ void ACharacterCommon::Attack(UAnimMontage* AnimMontage)
 	HitActors.Empty();
 	if (HasAuthority())
 	{
-		PlayAttackMontage_Multicast(AnimMontage);
+		PlayMontage_Multicast(AnimMontage);
 	}
 	else
 	{
-		PlayAttackMontage_Server(AnimMontage);
+		PlayMontage_Server(AnimMontage);
 	}
 	IsAttacking = true;
 }
@@ -119,14 +120,14 @@ void ACharacterCommon::StopMontage()
 	}
 }
 
-void ACharacterCommon::PlayAttackMontage_Server_Implementation(UAnimMontage* AnimMontage)
+void ACharacterCommon::PlayMontage_Server_Implementation(UAnimMontage* AnimMontage)
 {
-	PlayAttackMontage_Multicast(AnimMontage);
+	PlayMontage_Multicast(AnimMontage);
 }
 
-void ACharacterCommon::PlayAttackMontage_Multicast_Implementation(UAnimMontage* AnimMontage)
+void ACharacterCommon::PlayMontage_Multicast_Implementation(UAnimMontage* AnimMontage)
 {
-	BaseAnimInstance->PlayAttackMontage(AnimMontage);
+	BaseAnimInstance->PlayMontage(AnimMontage);
 }
 
 

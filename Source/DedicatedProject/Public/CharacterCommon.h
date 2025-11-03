@@ -32,10 +32,10 @@ protected:
 	UHealthComponent* HealthComp;
 
 	UFUNCTION(Server, Reliable)
-	void PlayAttackMontage_Server(UAnimMontage* AnimMontage);
+	void PlayMontage_Server(UAnimMontage* AnimMontage);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void PlayAttackMontage_Multicast(UAnimMontage* AnimMontage);
+	void PlayMontage_Multicast(UAnimMontage* AnimMontage);
 
 	UFUNCTION(Server, Reliable)
 	void StopMontage_Server();

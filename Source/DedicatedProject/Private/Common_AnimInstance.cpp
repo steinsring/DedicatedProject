@@ -45,7 +45,7 @@ void UCommon_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	//}
 }
 
-void UCommon_AnimInstance::PlayAttackMontage(UAnimMontage* AnimMontage)
+void UCommon_AnimInstance::PlayMontage(UAnimMontage* AnimMontage)
 {
 	if (!AnimMontage)
 	{
