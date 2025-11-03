@@ -7,7 +7,7 @@
 #include "CharacterCommon.h"
 #include "Enemy.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
+//DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
 
 UCLASS()
 class DEDICATEDPROJECT_API AEnemy : public ACharacterCommon

@@ -37,6 +37,12 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void PlayAttackMontage_Multicast(UAnimMontage* AnimMontage);
 
+	UFUNCTION(Server, Reliable)
+	void StopMontage_Server();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void StopMontage_Multicast();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -64,6 +70,9 @@ public:
 
 	UFUNCTION()
 	void ApplyStun(float Duration);	// 스턴이 적용되었을 때 현재 BT, Anim 종료 및 Stun 실행. 내부에서 호출하는 stun 시작점
+
+	UFUNCTION()
+	void StopMontage();
 
 private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))

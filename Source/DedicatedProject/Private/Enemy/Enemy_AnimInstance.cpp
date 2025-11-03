@@ -6,6 +6,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "CharacterCommon.h"
 
 #include "DedicatedProject.h"
 
@@ -21,14 +22,17 @@ void UEnemy_AnimInstance::AnimNotify_AttackRangeCheck()
 	auto BlackBoard = AIController->GetBlackboardComponent();
 	if (!BlackBoard) return;
 
-	const bool bIsInAttackRange = BlackBoard->GetValueAsBool("IsInAttackRange");
+	auto Target = Cast<AActor>(BlackBoard->GetValueAsObject("Target"));
+	if (!Target) return;
+
+	bool bIsInAttackRange = (OwnerCharacter->GetDistanceTo(Target) <= 200.0f);
+	PRINT_LOG(TEXT("AttackRangeCheck: %s"), bIsInAttackRange ? TEXT("In Range") : TEXT("Out of Range"));
 
 	if (!bIsInAttackRange)
 	{
-		UAnimMontage* CurrentMontage = GetCurrentActiveMontage();
-		if (CurrentMontage)
+		if (ACharacterCommon* Char = Cast<ACharacterCommon>(OwnerCharacter))
 		{
-			Montage_Stop(0.2f, CurrentMontage);
+			Char->StopMontage();
 		}
 	}
 }

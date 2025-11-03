@@ -33,45 +33,54 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		return EBTNodeResult::Failed;
 	}
 
-	Enemy->Attack(RandomMontage);
-	IsAttacking = true;
-	Enemy->OnAttackEnd.AddLambda([this]()  -> void {
-		IsAttacking = false;
-	});
-
-	return EBTNodeResult::InProgress;
+	//Enemy->OnAttackEnd.AddUObject(this, &UBTTask_Attack::OnAttackFinished, &OwnerComp);
+	
+	if (!IsAttacking)
+	{
+		Enemy->Attack(RandomMontage);
+		IsAttacking = true;
+		Enemy->OnAttackEnd.AddLambda([this]()  -> void {
+			IsAttacking = false;
+		});
+		return EBTNodeResult::InProgress;
+	}
+	else
+	{
+		return EBTNodeResult::Failed;
+	}
 }
 
 void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+	//if (IsAttacking)
+	//{
+	//	PRINT_LOG(TEXT("IsAttacking..."));
+	//}
+	//else
+	//{
+	//	PRINT_LOG(TEXT("IsNotAttacking..."));
+	//}
+
 	if (!IsAttacking)
 	{
 		UBlackboardComponent* BB = OwnerComp.GetBlackboardComponent();
 		BB->SetValueAsBool(TEXT("bShouldWander"), true);
 
-		//auto Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
-		//if (nullptr == Enemy) return;
-
-		//auto EnemyAnimInstance = Cast<UEnemy_AnimInstance>(Enemy->GetMesh()->GetAnimInstance());
-		//if (nullptr == EnemyAnimInstance)
-		//{
-		//	PRINT_LOG(TEXT("EnemyAnimInstance is NULL"));
-		//	return;
-		//}
-		//if (EnemyAnimInstance)
-		//{
-		//	EnemyAnimInstance->SetWandering(true);
-		//	if (EnemyAnimInstance->GetWandering())
-		//	{
-		//		PRINT_LOG(TEXT("Wandering true"));
-		//	}
-		//	else
-		//	{
-		//		PRINT_LOG(TEXT("Wandering false"));
-		//	}
-		//}
-
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
+}
+
+void UBTTask_Attack::OnAttackFinished(UBehaviorTreeComponent* OwnerComp)
+{
+	auto Enemy = Cast<AEnemy>(OwnerComp->GetAIOwner()->GetPawn());
+	if (Enemy)
+	{
+		Enemy->OnAttackEnd.RemoveAll(this);
+	}
+
+	UBlackboardComponent* BB = OwnerComp->GetBlackboardComponent();
+	BB->SetValueAsBool(TEXT("bShouldWander"), true);
+
+	FinishLatentTask(*OwnerComp, EBTNodeResult::Succeeded);
 }

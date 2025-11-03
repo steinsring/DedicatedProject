@@ -29,6 +29,7 @@ void ACharacterCommon::BeginPlay()
 	
 }
 
+
 // Called every frame
 void ACharacterCommon::Tick(float DeltaTime)
 {
@@ -85,6 +86,37 @@ void ACharacterCommon::Attack(UAnimMontage* AnimMontage)
 		PlayAttackMontage_Server(AnimMontage);
 	}
 	IsAttacking = true;
+}
+
+void ACharacterCommon::StopMontage_Server_Implementation()
+{
+	StopMontage_Multicast();
+}
+
+void ACharacterCommon::StopMontage_Multicast_Implementation()
+{
+	if (BaseAnimInstance)
+	{
+		BaseAnimInstance->StopAllMontages(0.1f);
+	}
+
+	if (IsAttacking)
+	{
+		IsAttacking = false;
+		OnAttackEnd.Broadcast();
+	}
+}
+
+void ACharacterCommon::StopMontage()
+{
+	if (HasAuthority())
+	{
+		StopMontage_Multicast();
+	}
+	else
+	{
+		StopMontage_Server();
+	}
 }
 
 void ACharacterCommon::PlayAttackMontage_Server_Implementation(UAnimMontage* AnimMontage)
