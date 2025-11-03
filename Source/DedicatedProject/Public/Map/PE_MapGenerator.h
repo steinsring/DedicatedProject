@@ -55,6 +55,11 @@ protected:
 	void SpawnNeighbors(TSharedPtr<FBSPNode>& Node);
 
 	void SpawnEnemies();
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Spawn Item")
+	TObjectPtr<class APE_ItemSpawner> ItemSpawner;				// 아이템 스포너
+
+	void SpawnItems();											// 스폰 위치 계산 후 스포너에게 전달
 
 public:	
 	// Called every frame
