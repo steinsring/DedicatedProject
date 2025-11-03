@@ -9,6 +9,7 @@
 #include <Enemy/ToiletMechTest.h>
 #include "Enemy/Crunch.h"
 #include "Enemy/PE_AIController.h"
+#include "Item/PE_ItemSpawner.h"
 
 // Sets default values
 APE_MapGenerator::APE_MapGenerator()
@@ -118,6 +119,9 @@ APE_MapGenerator::APE_MapGenerator()
 		if (LoadedClass)
 			GeneratableMapsExit4.Add(LoadedClass);
 	}
+
+	// 아이템 스포너 생성
+	ItemSpawner = CreateDefaultSubobject<APE_ItemSpawner>(TEXT("Item Spawner"));
 }
 
 // Called when the game starts or when spawned
@@ -530,6 +534,34 @@ void APE_MapGenerator::SpawnEnemies()
 	}
 }
 
+// 아이템 스폰
+void APE_MapGenerator::SpawnItems()
+{
+	// 모든 맵에서 맵마다 개별 생성
+	for (AActor* Map : MapList)
+	{
+		if (!Map) continue;
+
+		// Map 액터에서 ChildActorComponent를 가져옴
+		TArray<USceneComponent*> SceneComps;
+		Map->GetComponents<USceneComponent>(SceneComps); // ✅ Map 액터에서 가져오기
+
+		for (USceneComponent* Comp : SceneComps)
+		{
+			PRINT_LOG(TEXT("My Log : %s %d"), TEXT("USceneComponent Count : "), SceneComps.Num());
+
+			// 태그로 필터
+			if (!Comp->ComponentHasTag(TEXT("ItemSpawn"))) continue;
+			PRINT_LOG(TEXT("My Log : %s %s"), TEXT("Comp Name : "), *Comp->GetName());
+
+			FVector Location = Comp->GetComponentLocation();
+			FRotator Rotation = Comp->GetComponentRotation();
+
+			ItemSpawner->Spawn(Location, Rotation);
+		}
+	}
+}
+
 void APE_MapGenerator::GenerateMap() {
 	FActorSpawnParameters SpawnParams; // Actor를 생성할 때 사용할 파라미터를 담는 구조체
 	//SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding; // 스폰하려는 레벨의 다른 오브젝트가 있다면 위치를 조정. 그래도 충돌하면 스폰하지 않음.
@@ -566,6 +598,7 @@ void APE_MapGenerator::GenerateMap() {
 	}
 
 	SpawnEnemies();
+	SpawnItems();
 }
 
 // 여기부터는 쓰지 않음
