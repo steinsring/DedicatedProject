@@ -2,9 +2,7 @@
 
 
 #include "BehaviorTree/BTTask_TurnOffRotationMovement.h"
-#include "AIController.h"
-#include "GameFramework/Character.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "behaviortree/BlackboardComponent.h"
 
 #include "DedicatedProject.h"
 
@@ -16,21 +14,12 @@ UBTTask_TurnOffRotationMovement::UBTTask_TurnOffRotationMovement()
 
 EBTNodeResult::Type UBTTask_TurnOffRotationMovement::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	AAIController* AIController = OwnerComp.GetAIOwner();
-	APawn* Pawn = AIController ? AIController->GetPawn() : nullptr;
-	if (!Pawn) return EBTNodeResult::Failed;
-
-	ACharacter* Character = Cast<ACharacter>(Pawn);
-	if (Character)
+	UBlackboardComponent* BlackBoard = OwnerComp.GetBlackboardComponent();
+	if (!BlackBoard)
 	{
-		Character->bUseControllerRotationYaw = true;
-		if (UCharacterMovementComponent* MoveComp = Character->GetCharacterMovement())
-		{
-			MoveComp->bOrientRotationToMovement = false;
-			PRINT_LOG(TEXT("TurnOffRotationMovement Succeeded"));
-		}
+		return EBTNodeResult::Failed;
 	}
-	else return EBTNodeResult::Failed;
 
+	BlackBoard->SetValueAsBool(TEXT("bShouldWander"), false);
 	return EBTNodeResult::Succeeded;
 }

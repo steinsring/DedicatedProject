@@ -32,6 +32,7 @@ void UEnemy_AnimInstance::AnimNotify_AttackRangeCheck()
 	{
 		if (ACharacterCommon* Char = Cast<ACharacterCommon>(OwnerCharacter))
 		{
+			//BlackBoard->SetValueAsBool("bShouldWander", false);
 			Char->StopMontage();
 		}
 	}

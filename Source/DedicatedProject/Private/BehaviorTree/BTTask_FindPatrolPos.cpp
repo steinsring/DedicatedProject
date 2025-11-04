@@ -17,6 +17,8 @@ EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& O
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("bShouldWander"), false);
+
 	auto ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 	if (nullptr == ControllingPawn)
 		return EBTNodeResult::Failed;
