@@ -27,6 +27,9 @@ protected:
 	UDataTable* DataTable;
 
 	float AttackPower = 0.0f;
+	float MaxSpeed = 0.0f;
+	float Speed = 0.0f;
+
 	TSet<AActor*> HitActors;
 
 	UPROPERTY(VisibleAnywhere)
@@ -57,6 +60,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	virtual void PostInitializeComponents() override;
+
+	float GetAttackPower() const { return AttackPower; }
+	float GetMaxSpeed() const { return MaxSpeed; }
+	float GetSpeed() const { return Speed; }
 
 	void Attack(UAnimMontage* AnimMontage);
 	FOnAttackEndDelegate OnAttackEnd;

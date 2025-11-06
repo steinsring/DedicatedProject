@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -21,14 +21,24 @@ public:
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
+	void ReturnSpeedToOriginal();
+	void StartOrbitMovement();
+
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wander")
-	float OrbitAngleDegree = 75.0f;
+	// 조정 가능한 파라미터들
+	UPROPERTY(EditAnywhere, Category = "Wander Settings")
+	float CloseDistance = 400.0f; // 가까움 기준
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Wander")
-	float OrbitRadius = 300.0f;
+	UPROPERTY(EditAnywhere, Category = "Wander Settings")
+	float RetreatDistance = 300.0f; // 후퇴 거리
+
+	UPROPERTY(EditAnywhere, Category = "Wander Settings")
+	float OrbitAngleDegree = 120.0f; // 이동할 호의 각도
+
+	UPROPERTY(EditAnywhere, Category = "Wander Settings")
+	float MinWanderTime = 2.0f;
 
 private:
 	bool bIsWandering = false;
@@ -45,6 +55,9 @@ private:
 
 	UEnemy_AnimInstance* AnimInstance = nullptr;
 
-	float MinWanderTime = 2.0f;
 	float ElapsedWanderTime = 0.0f;
+
+	bool bHasStartedOrbit = false;
+
+	bool bHasRetreated = false;
 };

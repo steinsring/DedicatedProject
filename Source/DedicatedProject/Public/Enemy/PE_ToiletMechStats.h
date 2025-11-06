@@ -14,8 +14,8 @@ struct DEDICATEDPROJECT_API FPE_ToiletMechStats : public FTableRowBase
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Speed = 200.0f;
 
-	//UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	//float SprintSpeed = 400.0f;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float MaxSpeed = 400.0f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float DamageMultiplier = 1.0f;

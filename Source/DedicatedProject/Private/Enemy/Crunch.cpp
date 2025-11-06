@@ -97,6 +97,8 @@ void ACrunch::BeginPlay()
 		if (StatsRow)
 		{
 			AttackPower = StatsRow->AttackPower;
+			Speed = StatsRow->Speed;
+			MaxSpeed = StatsRow->MaxSpeed;
 			UE_LOG(LogTemp, Warning, TEXT("Row 'Default' found in EnemyDataTable"));
 		}
 		else

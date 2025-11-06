@@ -101,6 +101,8 @@ void AToiletMechTest::BeginPlay()
 		if (StatsRow)
 		{
 			AttackPower = StatsRow->AttackPower;
+			MaxSpeed = StatsRow->MaxSpeed;
+			Speed = StatsRow->Speed;
 			UE_LOG(LogTemp, Warning, TEXT("Row 'Default' found in EnemyDataTable"));
 		}
 		else

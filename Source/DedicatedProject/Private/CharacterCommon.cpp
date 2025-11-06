@@ -30,14 +30,20 @@ void ACharacterCommon::BeginPlay()
 	
 }
 
+// delegate가 dangling 포인터가 되는 것을 방지
 void ACharacterCommon::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	Super::EndPlay(EndPlayReason);
+	if (BaseAnimInstance && BaseAnimInstance->OnMontageEnded.IsAlreadyBound(this, &ACharacterCommon::OnMontageEnded))
+	{
+		BaseAnimInstance->OnMontageEnded.RemoveDynamic(this, &ACharacterCommon::OnMontageEnded);
+	}
 
 	if (HealthComp)
 	{
 		HealthComp->OnHPChanged.RemoveAll(this);
 	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 
@@ -89,10 +95,10 @@ void ACharacterCommon::PostInitializeComponents()
 	}
 	BaseAnimInstance->OnMontageEnded.AddDynamic(this, &ACharacterCommon::OnMontageEnded);
 
-	if (HealthComp)
-	{
-		//HealthComp->OnHPIsZero.AddDynamic(this, &ACharacterCommon::Dead);
-	}
+	//if (HealthComp)
+	//{
+	//	//HealthComp->OnHPIsZero.AddDynamic(this, &ACharacterCommon::Dead);
+	//}
 }
 
 // Montage 종료시 Type을 구분해 이후 함수 호출
@@ -316,29 +322,3 @@ void ACharacterCommon::UpdateFadeOut()
 		Destroy();
 	}
 }
-
-//void ACharacterCommon::PlayDeadMontage_Server_Implementation()
-//{
-//	PlayDeadMontage_Multicast();
-//}
-//
-//void ACharacterCommon::PlayDeadMontage_Multicast_Implementation()
-//{
-//	BaseAnimInstance->PlayDeadMontage();
-//}
-//
-//void ACharacterCommon::Dead()
-//{
-//	if (BaseAnimInstance->GetIsDead()) return;
-//
-//	if (HasAuthority())
-//	{
-//		PlayDeadMontage_Multicast();
-//	}
-//	else
-//	{
-//		PlayDeadMontage_Server();
-//	}
-//
-//	BaseAnimInstance->SetIsDead(true);
-//}
