@@ -31,6 +31,35 @@ void ACharacterCommon::BeginPlay()
 }
 
 
+void ACharacterCommon::PlayHitSound_Server_Implementation(AActor* HitActor)
+{
+	PlayHitSound_Multicast(HitActor);
+}
+
+void ACharacterCommon::PlayHitSound_Multicast_Implementation(AActor* HitActor)
+{
+	if (HitSound && HitActor)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			HitSound,
+			HitActor->GetActorLocation()
+		);
+	}
+}
+
+void ACharacterCommon::PlayHitSound(AActor* HitActor)
+{
+	if (HasAuthority())
+	{
+		PlayHitSound_Multicast(HitActor);
+	}
+	else
+	{
+		PlayHitSound_Server(HitActor);
+	}
+}
+
 // Called every frame
 void ACharacterCommon::Tick(float DeltaTime)
 {
@@ -171,7 +200,7 @@ void ACharacterCommon::SetHitbox(ECollisionEnabled::Type CollisionEnabled, UCaps
 
 float ACharacterCommon::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	HealthComp->ApplyDamage_Server(DamageAmount);
+	HealthComp->ApplyDamage(DamageAmount);
 
 	return DamageAmount;
 }
@@ -239,6 +268,42 @@ void ACharacterCommon::EndStun()
 		{
 			Brain->ResumeLogic(TEXT("Stun ended"));
 		}
+	}
+}
+
+void ACharacterCommon::HandleDeath()
+{
+	GetWorldTimerManager().SetTimer(FadeTimerHandle, this, &ACharacterCommon::StartFadeOut, 3.0f, false);
+}
+
+void ACharacterCommon::StartFadeOut()
+{
+	// 메시의 머티리얼 인스턴스 얻기
+	UMaterialInstanceDynamic* DynMat = GetMesh()->CreateAndSetMaterialInstanceDynamic(0);
+
+	if (DynMat)
+	{
+		FadeOpacity = 1.0f;
+		GetWorldTimerManager().SetTimer(FadeUpdateTimerHandle, this, &ACharacterCommon::UpdateFadeOut, 0.5f, true);
+	}
+}
+
+void ACharacterCommon::UpdateFadeOut()
+{
+	FadeOpacity -= 0.05f; // 점점 감소
+	FadeOpacity = FMath::Clamp(FadeOpacity, 0.0f, 1.0f);
+
+	if (UMaterialInstanceDynamic* DynMat = Cast<UMaterialInstanceDynamic>(GetMesh()->GetMaterial(0)))
+	{
+		DynMat->SetScalarParameterValue(TEXT("Opacity"), FadeOpacity);
+	}
+
+	if (FadeOpacity <= 0.0f)
+	{
+		GetWorldTimerManager().ClearTimer(FadeUpdateTimerHandle);
+
+		// 완전히 사라진 뒤 Destroy
+		Destroy();
 	}
 }
 

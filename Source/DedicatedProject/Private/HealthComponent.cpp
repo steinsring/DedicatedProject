@@ -6,6 +6,10 @@
 #include "Player/PE_PlayerController.h"
 #include "CharacterCommon.h"
 #include "Common_AnimInstance.h"
+#include "Enemy/Enemy.h"
+#include "AIController.h"
+
+#include "DedicatedProject.h"
 
 
 // Sets default values for this component's properties
@@ -25,10 +29,7 @@ void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetOwnerRole() == ROLE_Authority) // 서버에서만 실행
-	{
-		CurrentHealth = MaxHealth; // 게임 시작 시 최대 체력으로 초기화
-	}
+	CurrentHealth = MaxHealth; // 게임 시작 시 최대 체력으로 초기화
 }
 
 void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -58,30 +59,53 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 void UHealthComponent::SetHP(float NewHP)
 {
-	if (GetOwnerRole() == ROLE_Authority) // 서버에서만 실행
+	CurrentHealth = FMath::Clamp(NewHP, 0.0f, MaxHealth); // HP를 0과 최대 체력 사이로 제한
+	OnHPChanged.Broadcast(); // HP가 변경되었음을 알리는 델리게이트 호출
+	if (CurrentHealth <= 0.0f)
 	{
-		CurrentHealth = FMath::Clamp(NewHP, 0.0f, MaxHealth); // HP를 0과 최대 체력 사이로 제한
-		OnHPChanged.Broadcast(); // HP가 변경되었음을 알리는 델리게이트 호출
-		if (CurrentHealth <= 0.0f)
-		{
-			CurrentHealth = 0.0f; // HP가 0 이하로 떨어지면 0으로 설정
+		CurrentHealth = 0.0f; // HP가 0 이하로 떨어지면 0으로 설정
 			
-			ACharacterCommon* OwnerCharacter = Cast<ACharacterCommon>(GetOwner());
-			if (!OwnerCharacter) return;
+		ACharacterCommon* OwnerCharacter = Cast<ACharacterCommon>(GetOwner());
+		if (!OwnerCharacter) return;
 
-			UCommon_AnimInstance* CommonAnim = Cast<UCommon_AnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-			if (!CommonAnim) return;
+		UCommon_AnimInstance* CommonAnim = Cast<UCommon_AnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+		if (!CommonAnim) return;
 
-			CommonAnim->SetIsDead(true);
+		AEnemy* OwnerEnemy = Cast<AEnemy>(OwnerCharacter);
+		if (OwnerEnemy)
+		{
+			AAIController* AIController = Cast<AAIController>(OwnerEnemy->GetController());
+			if (AIController && AIController->BrainComponent)
+			{
+				AIController->UnPossess();
+			}
 		}
+		CommonAnim->SetIsDead(true);
+		OwnerCharacter->HandleDeath();
 	}
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	PRINT_LOG(TEXT("Current %s Health: %f"), *OwnerCharacter->GetName(), CurrentHealth);
 }
 
 void UHealthComponent::ApplyDamage_Server_Implementation(float DamageAmount)
 {
+	ApplyDamage_Multicast(DamageAmount); // HP 감소
+}
+
+void UHealthComponent::ApplyDamage_Multicast_Implementation(float DamageAmount)
+{
+	SetHP(CurrentHealth - DamageAmount); // HP 감소
+}
+
+void UHealthComponent::ApplyDamage(float DamageAmount)
+{
 	if (GetOwnerRole() == ROLE_Authority) // 서버에서만 실행
 	{
-		SetHP(CurrentHealth - DamageAmount); // HP 감소
+		ApplyDamage_Multicast(DamageAmount); // HP 감소
+	}
+	else
+	{
+		ApplyDamage_Server(DamageAmount); // 클라이언트에서 서버로 요청
 	}
 }
 

@@ -5,7 +5,9 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Player/ProjectPlayer.h"
+#include "CharacterCommon.h"
 #include "Engine/DamageEvents.h"
+
 #include "DedicatedProject.h"
 
 
@@ -26,7 +28,6 @@ APE_BaseWeaponProjectile::APE_BaseWeaponProjectile()
 	SphereCollision->OnComponentHit.AddDynamic(this, &APE_BaseWeaponProjectile::OnHit);
 	SphereCollision->SetMobility(EComponentMobility::Movable);
 	RootComponent = SphereCollision;
-	
 	
 	
 	// 오브젝트 메시 생성 및 초기화
@@ -95,9 +96,15 @@ void APE_BaseWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* 
 	if (OtherActor && OtherActor != this)
 	{
 		const FDamageEvent Event(UDamageType::StaticClass());
-		OtherActor->TakeDamage(Damage, Event, GetInstigatorController(), this);
+		ACharacterCommon* HitCharacter = Cast<ACharacterCommon>(OtherActor);
+		if (!HitCharacter) return;
+
+		HitCharacter->ACharacterCommon::TakeDamage(Damage, Event, GetInstigatorController(), this);
+
+		HitCharacter->PlayHitSound(OtherActor);
 		PRINT_LOG(TEXT("Hit"));
 	}
 
+	
 	Destroy();
 }

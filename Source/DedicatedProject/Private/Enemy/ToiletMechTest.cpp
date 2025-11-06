@@ -10,6 +10,8 @@
 #include "Enemy/PE_ToiletMechStats.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "DedicatedProject.h"
+
 //생성자에서 기본 애셋들 세팅해주기
 AToiletMechTest::AToiletMechTest()
 {
@@ -71,6 +73,17 @@ AToiletMechTest::AToiletMechTest()
 					("'/Game/DataTable/DT_ToiletMechStats.DT_ToiletMechStats'"));
 	if (DataTableAsset.Succeeded())
 		DataTable = DataTableAsset.Object;
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> HitSoundObject
+	(TEXT("/Game/Asset/Sci-fi_UI_Pack/Audio/FX_Sounds/Sci-fi_UI_Pack_Notificationv.Sci-fi_UI_Pack_Notificationv"));
+	if (HitSoundObject.Succeeded())
+	{
+		HitSound = HitSoundObject.Object;
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("ToiletMech HitSound is NULL"));
+	}
 }
 
 void AToiletMechTest::BeginPlay()

@@ -43,6 +43,15 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void StopMontage_Multicast();
 
+
+	UFUNCTION(Server, Reliable)
+	void PlayHitSound_Server(AActor* HitActor);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void PlayHitSound_Multicast(AActor* HitActor);
+
+	USoundBase* HitSound;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -74,6 +83,12 @@ public:
 	UFUNCTION()
 	void StopMontage();
 
+	UFUNCTION()
+	void HandleDeath();	// 사망 처리
+
+	UFUNCTION()
+	void PlayHitSound(AActor* HitActor);
+
 private:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	bool IsAttacking;
@@ -95,4 +110,14 @@ private:
 
 	UFUNCTION()
 	void EndStun();	// 스턴 종료시
+
+	UFUNCTION()
+	void StartFadeOut();
+
+	UFUNCTION()
+	void UpdateFadeOut();
+
+	float FadeOpacity;
+	FTimerHandle FadeTimerHandle;
+	FTimerHandle FadeUpdateTimerHandle;
 };

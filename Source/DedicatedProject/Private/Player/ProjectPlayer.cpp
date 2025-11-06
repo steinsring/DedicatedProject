@@ -365,7 +365,7 @@ void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {
 float AProjectPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float CalculatedDamage = DamageAmount * DamageMultiplier;
-	HealthComp->ApplyDamage_Server(CalculatedDamage);
+	HealthComp->ApplyDamage(CalculatedDamage);
 
 	return CalculatedDamage;
 }

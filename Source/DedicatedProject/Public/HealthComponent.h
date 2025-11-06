@@ -26,14 +26,19 @@ protected:
 	UFUNCTION()
 	void OnRep_CurrentHealth();
 
+	UFUNCTION(Server, Reliable)
+	void ApplyDamage_Server(float DamageAmount);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ApplyDamage_Multicast(float DamageAmount);
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	void SetHP(float NewHP);
 
-	UFUNCTION(Server, Reliable)
-	void ApplyDamage_Server(float DamageAmount);
+	void ApplyDamage(float DamageAmount);
 
 	float GetHPRatio();
 

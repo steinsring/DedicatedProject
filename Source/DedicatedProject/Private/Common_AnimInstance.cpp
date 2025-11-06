@@ -69,6 +69,11 @@ void UCommon_AnimInstance::EndStunMontage()
 
 EMontageType UCommon_AnimInstance::GetMontageType(UAnimMontage* Montage) const
 {
+	if (IsDead)
+	{
+		return EMontageType::Dead;
+	}
+
 	if (AttackMontages.Contains(Montage))
 	{
 		return EMontageType::Attack;

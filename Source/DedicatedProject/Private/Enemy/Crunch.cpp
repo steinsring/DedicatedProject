@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 
 #include "Enemy/PE_ToiletMechStats.h"
+#include "DedicatedProject.h"
 
 ACrunch::ACrunch()
 {
@@ -68,6 +69,17 @@ ACrunch::ACrunch()
 	("'/Game/DataTable/DT_ToiletMechStats.DT_ToiletMechStats'"));
 	if (DataTableAsset.Succeeded())
 		DataTable = DataTableAsset.Object;
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> HitSoundObject
+	(TEXT("Game/Asset/Sci-fi_UI_Pack/Audio/FX_Sounds/Sci-fi_UI_Pack_Clicked_2.Sci-fi_UI_Pack_Clicked_2"));
+	if (HitSoundObject.Succeeded())
+	{
+		HitSound = HitSoundObject.Object;
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("Crunch HitSound is NULL"));
+	}
 }
 
 void ACrunch::BeginPlay()
