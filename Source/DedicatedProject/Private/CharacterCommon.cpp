@@ -30,6 +30,16 @@ void ACharacterCommon::BeginPlay()
 	
 }
 
+void ACharacterCommon::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (HealthComp)
+	{
+		HealthComp->OnHPChanged.RemoveAll(this);
+	}
+}
+
 
 void ACharacterCommon::PlayHitSound_Server_Implementation(AActor* HitActor)
 {
