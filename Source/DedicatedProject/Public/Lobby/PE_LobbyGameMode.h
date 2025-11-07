@@ -18,4 +18,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "GameStart")
 	void StartGameTravel();
+
+protected:
+	virtual void PostLogin(APlayerController* NewPlayer);
 };
