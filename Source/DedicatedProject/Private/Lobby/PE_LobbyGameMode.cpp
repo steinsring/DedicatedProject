@@ -2,16 +2,16 @@
 
 
 #include "Lobby/PE_LobbyGameMode.h"
-#include "PE_GameState.h"
-#include "Player/PE_PlayerController.h"
-#include "Player/PE_PlayerState.h"
 #include "Engine/World.h"
+#include "Lobby/PE_LobbyPlayerState.h"
+#include "Lobby/PE_LobbyPlayerController.h"
+#include "OnlineSubsystem.h"
+#include "Interfaces/OnlineIdentityInterface.h"
 
 APE_LobbyGameMode::APE_LobbyGameMode()
 {
-	GameStateClass = APE_GameState::StaticClass(); // 게임 스테이트
-	PlayerStateClass = APE_PlayerState::StaticClass(); // 플레이어 스테이트
-	PlayerControllerClass = APE_PlayerController::StaticClass(); // 플레이어 컨트롤러
+    PlayerStateClass = APE_LobbyPlayerState::StaticClass(); // 플레이어 스테이트
+    PlayerControllerClass = APE_LobbyPlayerController::StaticClass(); // 플레이어 컨트롤러
 
 	// 플레이어 캐릭터 블루프린트 가져오기
 	static ConstructorHelpers::FClassFinder<APawn>PlayerPawnBPClass(TEXT("/Game/BluePrints/Lobby/BP_LobbyPawn.BP_LobbyPawn_C"));
@@ -19,6 +19,35 @@ APE_LobbyGameMode::APE_LobbyGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+}
+
+void APE_LobbyGameMode::PostLogin(APlayerController* NewPlayer)
+{
+    Super::PostLogin(NewPlayer);
+
+    if (APlayerState* PS = NewPlayer ? NewPlayer->PlayerState : nullptr)
+    {
+        // Steam 닉네임 얻기 시도
+        FString Nickname = TEXT("");
+        if (IOnlineSubsystem* OSS = IOnlineSubsystem::Get())
+        {
+            IOnlineIdentityPtr Identity = OSS->GetIdentityInterface();
+            if (Identity.IsValid() && PS->GetUniqueId().IsValid())
+            {
+                const FUniqueNetId& NetId = *PS->GetUniqueId().GetUniqueNetId();
+                Nickname = Identity->GetPlayerNickname(NetId);
+            }
+        }
+
+        // 폴백: NetId 마지막 4자리 등
+        if (Nickname.IsEmpty())
+        {
+            Nickname = FString::Printf(TEXT("Player_%d"), PS->GetPlayerId());
+        }
+
+        // 서버에서 확정 → 클라로 복제
+        PS->SetPlayerName(Nickname);
+    }
 }
 
 
