@@ -34,6 +34,8 @@ public:
 	bool GetbHasTarget()	const { return bHasTarget; }
 	void SetbHasTarget(bool bHas) { bHasTarget = bHas; }
 
+	void HandlePlayerDeath(AController* DeadController);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -17,6 +17,7 @@ class DEDICATEDPROJECT_API APE_PlayerController : public APlayerController
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 
 public:
 	APE_PlayerController();
@@ -33,6 +34,12 @@ public:
 	void ItemSlotSelect(int32 i);
 
 	void InventoryDataUpdate(const TArray<struct FItemData>& InventoryData);
+
+	UFUNCTION()
+	void OnNextSpectateTarget();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* IA_Spectator;
 
 private:
 	// 체력 ------------------------------------------------------------------------------------

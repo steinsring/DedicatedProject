@@ -26,11 +26,13 @@ protected:
 	UFUNCTION()
 	void OnRep_CurrentHealth();
 
-	UFUNCTION(Server, Reliable)
-	void ApplyDamage_Server(float DamageAmount);
+	//UFUNCTION(Server, Reliable)
+	//void ApplyDamage_Server(float DamageAmount);
 
-	UFUNCTION(NetMulticast, Reliable)
-	void ApplyDamage_Multicast(float DamageAmount);
+	//UFUNCTION(NetMulticast, Reliable)
+	//void ApplyDamage_Multicast(float DamageAmount);
+
+	void ApplyDamage_Internal(float DamageAmount);
 
 public:	
 	// Called every frame

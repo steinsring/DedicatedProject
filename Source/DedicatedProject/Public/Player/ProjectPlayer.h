@@ -207,4 +207,14 @@ public:
 	void SetAttackPowerMultiplier(float NewAttackPowerMultiplier) { AttackPowerMultiplier = NewAttackPowerMultiplier; }
 	void SetDamageMultiplier(float NewDamageMultiplier) { DamageMultiplier = NewDamageMultiplier; }
 	void SetSpeedMultiplier(float NewSpeedMultiplier) { SpeedMultiplier = NewSpeedMultiplier; }
+
+private:
+	//UFUNCTION(Server, Reliable)
+	//void Die_Server();
+
+	//UFUNCTION(NetMulticast, Reliable)
+	//void Die_Multicast();
+
+public:
+	void Die();
 };

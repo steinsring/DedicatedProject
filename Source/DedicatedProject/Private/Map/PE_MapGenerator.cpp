@@ -519,10 +519,13 @@ void APE_MapGenerator::SpawnEnemies()
 					break;
 				}
 
-				APE_AIController* AIController = Cast<APE_AIController>(Enemy->GetInstigatorController());
-				if (AIController)
+				if (Enemy)
 				{
-					AIController->WayPoints = SP->WayPoints;
+					APE_AIController* AIController = Cast<APE_AIController>(Enemy->GetInstigatorController());
+					if (AIController)
+					{
+						AIController->WayPoints = SP->WayPoints;
+					}
 				}
 			}
 

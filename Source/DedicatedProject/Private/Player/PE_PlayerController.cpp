@@ -3,6 +3,14 @@
 
 #include "Player/PE_PlayerController.h"
 #include "DedicatedProject.h"
+#include "Player/ProjectPlayer.h"
+#include "PE_GameState.h"
+
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputAction.h"
+#include "InputMappingContext.h"
+
 #include "UI/PE_Inventory.h"
 #include "Inventory/PE_InventoryComponent.h"
 #include "Inventory/FItemData.h"
@@ -69,6 +77,30 @@ void APE_PlayerController::BeginPlay()
 	}
 }
 
+void APE_PlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(InputComponent);
+	if (!EnhancedInput) return;
+
+	UInputMappingContext* IMC_Spectator = LoadObject<UInputMappingContext>
+		(nullptr, TEXT("/Game/Inputs/IMC_ProjectPlayer.IMC_ProjectPlayer"));
+	
+	if (IMC_Spectator)
+	{
+		auto SubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+		if (SubSystem) SubSystem->AddMappingContext(IMC_Spectator, 0);
+	}
+	
+	IA_Spectator = LoadObject<UInputAction>
+		(nullptr, TEXT("/Game/Inputs/IA_Spectator.IA_Spectator"));
+	if (IA_Spectator)
+	{
+		EnhancedInput->BindAction(IA_Spectator, ETriggerEvent::Started, this, &APE_PlayerController::OnNextSpectateTarget);
+	}
+}
+
 void APE_PlayerController::ItemSlotSelect(int32 i)
 { // 선택 위젯 슬롯 변경
 	InventoryWidget->ItemSlotSelect(i);
@@ -77,5 +109,43 @@ void APE_PlayerController::ItemSlotSelect(int32 i)
 void APE_PlayerController::InventoryDataUpdate(const TArray<FItemData>& InventoryData)
 {
 	InventoryWidget->SetInventoryData(InventoryData);
+}
+
+void APE_PlayerController::OnNextSpectateTarget()
+{
+	PRINT_LOG(TEXT("Spectate Next Target"));
+	if (!IsLocalController())
+	{
+		PRINT_LOG(TEXT("Not Local Controller"));
+		return;
+	}
+
+	AProjectPlayer* PlayerPawn = Cast<AProjectPlayer>(GetPawn());
+	if (PlayerPawn && !PlayerPawn->GetIsDead())
+	{
+		PRINT_LOG(TEXT("Player is Alive"));
+		return; // 살아있는 플레이어는 스펙테이트 모드로 진입 불가
+	}
+
+	APE_GameState* GS = GetWorld()->GetGameState<APE_GameState>();
+	if (!GS || GS->AlivePlayers.Num() == 0)
+	{
+		PRINT_LOG(TEXT("No Alive Players to Spectate"));
+		return;
+	}
+
+	AActor* CurrentViewTarget = GetViewTarget();
+	AProjectPlayer* CurrentPlayer = Cast<AProjectPlayer>(CurrentViewTarget);
+	AProjectPlayer* NextPlayer = GS->GetNextAlivePlayer(CurrentPlayer);
+
+	if (NextPlayer)
+	{
+		PRINT_LOG(TEXT("Spectating Next Player: %s"), *NextPlayer->GetName());
+		SetViewTargetWithBlend(NextPlayer, 0.0f);
+	}
+	else
+	{
+		PRINT_LOG(TEXT("NextPlayer is NULL"));
+	}
 }
 

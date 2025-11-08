@@ -112,7 +112,10 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		for (auto const& OverlapResult : BoxOverlapResults)
 		{
 			AProjectPlayer* DetectedPlayer = Cast<AProjectPlayer>(OverlapResult.GetActor());
-			if (DetectedPlayer && DetectedPlayer->GetController()->IsPlayerController())
+			if (!DetectedPlayer) continue;
+			AController* PlayerController = DetectedPlayer->GetController();
+			if (!PlayerController) continue;
+			if (PlayerController->IsPlayerController())
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(APE_AIController::TargetKey, DetectedPlayer);
 				// 디버그 포인트와 라인 그리기

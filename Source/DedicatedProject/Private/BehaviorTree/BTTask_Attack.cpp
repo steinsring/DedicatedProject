@@ -70,17 +70,3 @@ void UBTTask_Attack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }
-
-void UBTTask_Attack::OnAttackFinished(UBehaviorTreeComponent* OwnerComp)
-{
-	auto Enemy = Cast<AEnemy>(OwnerComp->GetAIOwner()->GetPawn());
-	if (Enemy)
-	{
-		Enemy->OnAttackEnd.RemoveAll(this);
-	}
-
-	UBlackboardComponent* BB = OwnerComp->GetBlackboardComponent();
-	BB->SetValueAsBool(TEXT("bShouldWander"), true);
-
-	FinishLatentTask(*OwnerComp, EBTNodeResult::Succeeded);
-}

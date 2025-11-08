@@ -6,9 +6,12 @@
 #include "Player/PE_PlayerController.h"
 #include "Player/PE_PlayerState.h"
 #include "Player/ProjectPlayer.h"
+#include "Common_AnimInstance.h"
 #include "Map/PE_MapGenerator.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GameplayManager/PE_LevelTravelManager.h"
+
+#include "DedicatedProject.h"
 
 APE_GameMode::APE_GameMode() { //생성자
 	GameStateClass = APE_GameState::StaticClass(); // 게임 스테이트
@@ -52,10 +55,33 @@ void APE_GameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
     UE_LOG(LogTemp, Warning, TEXT("[GameMode] PostLogin called for %s"), *NewPlayer->GetName());
+
+    NewPlayer->GetOnNewPawnNotifier().AddLambda([this, NewPlayer](APawn* InPawn)
+    {
+        if (AProjectPlayer* ProjectPlayer = Cast<AProjectPlayer>(InPawn))
+        {
+            APE_GameState* GS = GetGameState<APE_GameState>();
+            if (GS)
+            {
+                GS->AddAlivePlayer(ProjectPlayer);
+                PRINT_LOG(TEXT("Added player to alive list in GameState. Total Alive Players: %d"), GS->AlivePlayers.Num());
+            }
+        }
+    });
 	
     if (NewPlayer->GetPawn())
     {
         UE_LOG(LogTemp, Warning, TEXT("[GameMode] Player already has Pawn: %s"), *NewPlayer->GetPawn()->GetName());
+
+        if (AProjectPlayer* ProjectPlayer = Cast<AProjectPlayer>(NewPlayer->GetPawn()))
+        {
+            APE_GameState* GS = GetGameState<APE_GameState>();
+            if (GS)
+            {
+                GS->AddAlivePlayer(ProjectPlayer);
+                PRINT_LOG(TEXT("Added player to alive list in GameState. Total Alive Players: %d"), GS->AlivePlayers.Num());
+            }
+        }
     }
     else
     {
@@ -119,3 +145,35 @@ void APE_GameMode::PlacePawnIfReady(APlayerController* PC)
     }
 }
 
+void APE_GameMode::HandlePlayerDeath(AController* DeadController)
+{
+	PRINT_LOG(TEXT("HandlePlayerDeath called"));
+	if (!DeadController) return;
+	APlayerController* DeadPC = Cast<APlayerController>(DeadController);
+	if (!DeadPC) return;
+
+	AProjectPlayer* DeadPlayer = Cast<AProjectPlayer>(DeadPC->GetPawn());
+    if (DeadPlayer)
+    {
+		PRINT_LOG(TEXT("Processing death for player: %s"), *DeadPlayer->GetName());
+		UCommon_AnimInstance* AnimInstance = Cast<UCommon_AnimInstance>(DeadPlayer->GetMesh()->GetAnimInstance());
+        if (AnimInstance) AnimInstance->SetIsDead(true);
+		DeadPlayer->DetachFromControllerPendingDestroy();
+
+		// 게임 상태에서 생존자/사망자 목록 갱신
+		APE_GameState* GS = GetGameState<APE_GameState>();
+        if (!GS) return;
+
+        // 관전 대상 찾기
+		AProjectPlayer* NextTarget = GS ? GS->GetNextAlivePlayer(DeadPlayer) : nullptr;
+        if (NextTarget)
+        {
+            DeadPC->SetViewTargetWithBlend(NextTarget, 0.0f);
+            PRINT_LOG(TEXT("Spectating Next Player: %s"), *NextTarget->GetName());
+        }
+
+        GS->RemoveAlivePlayer(DeadPlayer);
+        GS->AddDeadPlayer(DeadPlayer);
+        PRINT_LOG(TEXT("Updated GameState: AlivePlayers=%d, DeadPlayers=%d"), GS->AlivePlayers.Num(), GS->DeadPlayers.Num());
+    }
+}

@@ -3,12 +3,14 @@
 
 #include "CharacterCommon.h"
 #include "Common_AnimInstance.h"
+#include "Player/ProjectPlayer.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Enemy/PE_AIController.h"
 #include "HealthComponent.h"
 #include "BrainComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "DedicatedProject.h"
 
 // Sets default values
@@ -44,6 +46,12 @@ void ACharacterCommon::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 
 	Super::EndPlay(EndPlayReason);
+}
+
+void ACharacterCommon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ACharacterCommon, bIsDead);
 }
 
 
@@ -184,6 +192,7 @@ void ACharacterCommon::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterru
 
 void ACharacterCommon::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (!HasAuthority()) return;
 	if (!IsValid(OtherActor) || OtherActor == this || HitActors.Contains(OtherActor)) return;
 
 	HitActors.Add(OtherActor);
@@ -198,6 +207,35 @@ void ACharacterCommon::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent,
 		nullptr
 	);
 }
+
+//void ACharacterCommon::ApplyDamage_Server_Implementation(AActor* Target)
+//{
+//	if (Target)
+//	{
+//		UGameplayStatics::ApplyDamage(
+//			Target,
+//			AttackPower,
+//			GetController(),
+//			this,
+//			nullptr
+//		);
+//	}
+//	//ApplyDamage_Multicast(Target);
+//}
+//
+//void ACharacterCommon::ApplyDamage_Multicast_Implementation(AActor* Target)
+//{
+//	if (Target)
+//	{
+//		UGameplayStatics::ApplyDamage(
+//			Target,
+//			AttackPower,
+//			GetController(),
+//			this,
+//			nullptr
+//		);
+//	}
+//}
 
 void ACharacterCommon::SetHitbox(ECollisionEnabled::Type CollisionEnabled, UCapsuleComponent* HitBox)
 {
@@ -320,5 +358,25 @@ void ACharacterCommon::UpdateFadeOut()
 
 		// 완전히 사라진 뒤 Destroy
 		Destroy();
+	}
+}
+
+void ACharacterCommon::SetIsDead(bool bNewState)
+{
+	bIsDead = bNewState;
+
+	//애님인스턴스에 전달
+	if (UCommon_AnimInstance* AnimInstance = Cast<UCommon_AnimInstance>(GetMesh()->GetAnimInstance()))
+	{
+		AnimInstance->SetIsDead(bNewState);
+	}
+}
+
+void ACharacterCommon::OnRep_IsDead()
+{
+	//클라에서도 값이 바뀌면 애님인스턴스에 전달
+	if (UCommon_AnimInstance* AnimInstance = Cast<UCommon_AnimInstance>(GetMesh()->GetAnimInstance()))
+	{
+		AnimInstance->SetIsDead(bIsDead);
 	}
 }

@@ -64,6 +64,7 @@ void APE_ItemSpawner::Spawn(const FVector Location, const FRotator Rotation)
 	PRINT_LOG(TEXT("[ItemSpawner] Spawning item at Location: %s, Rotation: %s"),
 		*Location.ToString(),
 		*Rotation.ToString());
+	if (!SpawnedItem) return;
 	PRINT_LOG(TEXT("[ItemSpawner] Spawned: %s at %s"),
 		*SpawnedItem->GetName(),
 		*SpawnedItem->GetActorLocation().ToString());

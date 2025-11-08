@@ -99,7 +99,12 @@ void APE_BaseWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* 
 		ACharacterCommon* HitCharacter = Cast<ACharacterCommon>(OtherActor);
 		if (!HitCharacter) return;
 
-		HitCharacter->ACharacterCommon::TakeDamage(Damage, Event, GetInstigatorController(), this);
+		//HitCharacter->ACharacterCommon::TakeDamage(Damage, Event, GetInstigatorController(), this);
+		UHealthComponent* HitHealthComp = HitCharacter->FindComponentByClass<UHealthComponent>();
+		if (HitHealthComp)
+		{
+			HitHealthComp->ApplyDamage(Damage);
+		}
 
 		HitCharacter->PlayHitSound(OtherActor);
 		PRINT_LOG(TEXT("Hit"));

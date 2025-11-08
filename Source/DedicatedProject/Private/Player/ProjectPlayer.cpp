@@ -10,6 +10,7 @@
 #include "InputMappingContext.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "PE_GameMode.h"
 
 #include "Inventory/PE_InventoryComponent.h"
 #include "Enemy/PE_AIController.h"
@@ -34,6 +35,7 @@ AProjectPlayer::AProjectPlayer()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 
 	//스켈레탈 메쉬를 구조체로 불러와서
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Game/ParagonWraith/Characters/Heroes/Wraith/Meshes/Wraith.Wraith"));
@@ -368,6 +370,26 @@ float AProjectPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	HealthComp->ApplyDamage(CalculatedDamage);
 
 	return CalculatedDamage;
+}
+
+//void AProjectPlayer::Die_Server()
+//{
+//}
+//
+//void AProjectPlayer::Die_Multicast()
+//{
+//}
+
+void AProjectPlayer::Die()
+{
+	if (HasAuthority())
+	{
+		APE_GameMode* GM = GetWorld()->GetAuthGameMode<APE_GameMode>();
+		if (GM)
+		{
+			GM->HandlePlayerDeath(Controller);
+		}
+	}
 }
 
 void AProjectPlayer::SprintStart(const struct FInputActionValue& inputValue)

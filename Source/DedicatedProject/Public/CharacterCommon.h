@@ -78,6 +78,12 @@ public:
 	void OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	//UFUNCTION(Server, Reliable)
+	//void ApplyDamage_Server(AActor* Target);
+
+	//UFUNCTION(NetMulticast, Reliable)
+	//void ApplyDamage_Multicast(AActor* Target);
+
 	//블루프린트에서 해주기
 	UFUNCTION(BlueprintCallable)
 	void SetHitbox(ECollisionEnabled::Type CollisionEnabled, UCapsuleComponent* HitBox);
@@ -128,4 +134,15 @@ private:
 	float FadeOpacity;
 	FTimerHandle FadeTimerHandle;
 	FTimerHandle FadeUpdateTimerHandle;
+
+protected:
+	UPROPERTY(ReplicatedUsing = OnRep_IsDead, VisibleAnywhere, BlueprintReadOnly, Category = "State")
+	bool bIsDead = false;
+
+	UFUNCTION()
+	void OnRep_IsDead();
+
+public:
+	bool GetIsDead() const { return bIsDead; }
+	void SetIsDead(bool bNewState);
 };
