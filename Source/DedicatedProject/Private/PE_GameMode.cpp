@@ -168,7 +168,7 @@ void APE_GameMode::HandlePlayerDeath(AController* DeadController)
 		AProjectPlayer* NextTarget = GS ? GS->GetNextAlivePlayer(DeadPlayer) : nullptr;
         if (NextTarget)
         {
-            DeadPC->SetViewTargetWithBlend(NextTarget, 0.0f);
+            //DeadPC->SetViewTargetWithBlend(NextTarget, 0.0f);
             PRINT_LOG(TEXT("Spectating Next Player: %s"), *NextTarget->GetName());
         }
 
