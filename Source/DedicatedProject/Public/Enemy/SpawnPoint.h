@@ -11,6 +11,7 @@ enum class E_EnemyType : uint8
 {
 	ToiletMech		UMETA(DisplayName = "ToiletMech"),
 	Crunch		    UMETA(DisplayName = "Crunch"),
+	Player			UMETA(DisplayName = "Player"),
 	Boss		    UMETA(DisplayName = "Boss"),
 	Minion		    UMETA(DisplayName = "Minion")
 };

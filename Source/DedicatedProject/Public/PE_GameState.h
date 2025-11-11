@@ -26,6 +26,9 @@ public:
 	UPROPERTY(Replicated)
 	TArray<AProjectPlayer*> DeadPlayers;
 
+	UPROPERTY(Replicated)
+	TArray<APlayerState*> DeadPlayerStates;
+
 	void AddAlivePlayer(AProjectPlayer* NewPlayer);
 	void RemoveAlivePlayer(AProjectPlayer* DeadPlayer);
 

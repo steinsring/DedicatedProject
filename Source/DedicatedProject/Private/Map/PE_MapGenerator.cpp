@@ -10,6 +10,7 @@
 #include "Enemy/Crunch.h"
 #include "Enemy/PE_AIController.h"
 #include "Item/PE_ItemSpawner.h"
+#include "Player/ProjectPlayer.h"
 
 // Sets default values
 APE_MapGenerator::APE_MapGenerator()
@@ -511,8 +512,8 @@ void APE_MapGenerator::SpawnEnemies()
 				case E_EnemyType::Boss:
 					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
 					break;
-				case E_EnemyType::Minion:
-					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
+				case E_EnemyType::Player:
+					Enemy = GetWorld()->SpawnActor<AProjectPlayer>(Location, Rotation, SpawnParams);
 					break;
 				default:
 					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "HealthComponent.h"
 #include "CharacterCommon.h"
+#include "PE_Interactable.h"
 #include "SkillManagerComponent.h"
 #include <Components/BoxComponent.h>
 #include "ProjectPlayer.generated.h"
@@ -13,7 +14,7 @@ class UPE_Inventory;
 class UPE_InventoryComponent;
 
 UCLASS()
-class DEDICATEDPROJECT_API AProjectPlayer : public ACharacterCommon
+class DEDICATEDPROJECT_API AProjectPlayer : public ACharacterCommon, public IPE_Interactable
 {
 	GENERATED_BODY()
 
@@ -43,6 +44,20 @@ private:
 
 public:
 	FORCEINLINE UCameraComponent* GetPlayerCamComp() const { return tpsCamComp; }
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Power")
+	bool bIsPowerOn = true;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ActivatePower_Multicast();
+
+	UFUNCTION(Server, Reliable)
+	void RequestRespawn_Server(APlayerState* DeadPlayerState, AProjectPlayer* TargetDummy);
+
+	UFUNCTION()
+	void OpenRespawnUI(AProjectPlayer* TargetDummy);
 
 private:
 	// 플레이어 화면 조작--------------------------------------------------------------------------
@@ -91,6 +106,8 @@ protected:
 	struct FPE_CharacterStats* CharacterStats; // 데이터 테이블에서 단일 행을 참조해 캐릭터 스탯으로 사용
 	void UpdateCharacterStats(int32 CharacterLevel);
 	FORCEINLINE FPE_CharacterStats* GetCharacterStats() const { return CharacterStats; } //스탯 구조체를 위한 Getter함수
+
+	virtual void Interact(class AActor* Interactor) override; // IPE_Interactable 인터페이스 구현
 
 protected:
 	//달리기 관련 --------------------------------------------------------------------------

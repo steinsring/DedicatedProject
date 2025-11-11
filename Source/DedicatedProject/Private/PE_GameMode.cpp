@@ -177,3 +177,24 @@ void APE_GameMode::HandlePlayerDeath(AController* DeadController)
         PRINT_LOG(TEXT("Updated GameState: AlivePlayers=%d, DeadPlayers=%d"), GS->AlivePlayers.Num(), GS->DeadPlayers.Num());
     }
 }
+
+void APE_GameMode::HandlePlayerRespawn(APlayerState* DeadPS, AProjectPlayer* TargetDummy)
+{
+	if (!DeadPS || !TargetDummy) return;
+
+	APlayerController* DeadPC = Cast<APlayerController>(DeadPS->GetOwner());
+	if (!DeadPC) return;
+
+	APE_GameState* GS = GetGameState<APE_GameState>();
+	if (!GS) return;
+
+	// 관전 해제
+	DeadPC->SetViewTargetWithBlend(TargetDummy, 0.0f);
+	// Pawn Possess
+	DeadPC->Possess(TargetDummy);
+
+	// 게임 상태에서 생존자/사망자 목록 갱신
+	GS->RemoveDeadPlayer(Cast<AProjectPlayer>(TargetDummy));
+	GS->AddAlivePlayer(Cast<AProjectPlayer>(TargetDummy));
+	PRINT_LOG(TEXT("Player Respawned: %s. Updated GameState: AlivePlayers=%d, DeadPlayers=%d"), *TargetDummy->GetName(), GS->AlivePlayers.Num(), GS->DeadPlayers.Num());
+}

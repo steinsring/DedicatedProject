@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
+#include "Player/ProjectPlayer.h"
 #include "PE_GameMode.generated.h"
 
 /**
@@ -29,12 +30,13 @@ public:
 	UFUNCTION()
 	void PlacePawnIfReady(APlayerController* PC);
 
-	FVector GetTargetLocation()	const { return TargetLocation; }
+	FVector GetTheTargetLocation()	const { return TargetLocation; }
 	void SetTargetLocation(FVector Location) { TargetLocation = Location; }
 	bool GetbHasTarget()	const { return bHasTarget; }
 	void SetbHasTarget(bool bHas) { bHasTarget = bHas; }
 
 	void HandlePlayerDeath(AController* DeadController);
+	void HandlePlayerRespawn(APlayerState* DeadPS, AProjectPlayer* TargetDummy);
 
 protected:
 	// Called when the game starts or when spawned

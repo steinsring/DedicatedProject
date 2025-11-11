@@ -12,6 +12,7 @@ void APE_GameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(APE_GameState, AlivePlayers);
 	DOREPLIFETIME(APE_GameState, DeadPlayers);
+	DOREPLIFETIME(APE_GameState, DeadPlayerStates);
 }
 
 void APE_GameState::AddAlivePlayer(AProjectPlayer* NewPlayer)
@@ -38,6 +39,7 @@ void APE_GameState::AddDeadPlayer(AProjectPlayer* NewDeadPlayer)
 	if (NewDeadPlayer && !DeadPlayers.Contains(NewDeadPlayer))
 	{
 		DeadPlayers.Add(NewDeadPlayer);
+		DeadPlayerStates.Add(NewDeadPlayer->GetPlayerState());
 	}
 }
 
@@ -47,6 +49,7 @@ void APE_GameState::RemoveDeadPlayer(AProjectPlayer* RevivedPlayer)
 	if (RevivedPlayer && DeadPlayers.Contains(RevivedPlayer))
 	{
 		DeadPlayers.Remove(RevivedPlayer);
+		DeadPlayerStates.Remove(RevivedPlayer->GetPlayerState());
 	}
 }
 

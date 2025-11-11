@@ -11,6 +11,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "PE_GameMode.h"
+#include "Net/UnrealNetwork.h"
+#include "UI/PE_RespawnWidget.h"
+#include "GameFramework/GameStateBase.h"
 
 #include "Inventory/PE_InventoryComponent.h"
 #include "Enemy/PE_AIController.h"
@@ -28,6 +31,7 @@
 #include "Player/PE_PlayerController.h"
 #include "Player/PE_PlayerState.h"
 #include "Weapon/PE_WeaponProjectileComponent.h"
+
 
 
 // Sets default values
@@ -189,6 +193,12 @@ void AProjectPlayer::BeginPlay()
 
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapBegin);				// 이벤트 바인딩 : 아이템 감지 범위에 아이템 콜리전이 충돌했을때 
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapEnd);					// 이벤트 바인딩 : 충돌범위에서 아이템이 빠져나갔을때
+
+	if (!bIsPowerOn)
+	{
+		DisableInput(nullptr);
+		GetCharacterMovement()->DisableMovement();
+	}
 }
 
 // 서버: Possess 직후
@@ -270,6 +280,96 @@ void AProjectPlayer::PostInitializeComponents()
 	
 	RightFootHitBox->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnHitboxOverlap); //히트박스 오버랩 이벤트 바인딩
 }
+
+//------------------------------------------리스폰 관련--------------------------------------------------------
+
+void AProjectPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AProjectPlayer, bIsPowerOn);
+}
+
+// Power 활성화(플레이어에 의해 이동하는 것들이 보이도록)
+void AProjectPlayer::ActivatePower_Multicast_Implementation()
+{
+	bIsPowerOn = true;
+
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	EnableInput(Cast<APlayerController>(GetController()));
+}
+
+// 서버에 Respawn 요청
+void AProjectPlayer::RequestRespawn_Server_Implementation(APlayerState* DeadPlayerState, AProjectPlayer* TargetDummy)
+{
+	APE_GameMode* GM = GetWorld()->GetAuthGameMode<APE_GameMode>();
+	if (GM)
+	{
+		GM->HandlePlayerRespawn(DeadPlayerState, TargetDummy);
+	}
+}
+
+void AProjectPlayer::OpenRespawnUI(AProjectPlayer* TargetDummy)
+{
+	PRINT_LOG(TEXT("OpenRespawnUI Called"));
+	if (!IsLocallyControlled())
+	{
+		PRINT_LOG(TEXT("Not Locally Controlled"));
+		//return;
+	}
+
+	APlayerState* DeadPlayerState = TargetDummy->GetPlayerState();
+	if (!DeadPlayerState)
+	{
+		for (APlayerState* PS : GetWorld()->GetGameState()->PlayerArray)
+		{
+			if (PS && PS->GetPawn() == TargetDummy)
+			{
+				DeadPlayerState = PS;
+				PRINT_LOG(TEXT("Found DeadPlayerState from GameState"));
+				break;
+			}
+		}
+	}
+	if (!DeadPlayerState)
+	{
+		PRINT_ERROR_LOG(TEXT("DeadPlayerState is NULL"));
+		return;
+	}
+	
+	PRINT_LOG(TEXT("OpenRespawnUI Proceeded"));
+    TSubclassOf<UPE_RespawnWidget> WidgetClass = LoadClass<UPE_RespawnWidget>
+		(nullptr, TEXT("/Game/BluePrints/UI/WB_RespawnWidget.WB_RespawnWidget_C"));
+
+	if (WidgetClass)
+	{
+		PRINT_LOG(TEXT("WidgetClass Loaded"));
+		UPE_RespawnWidget* RespawnWidget = CreateWidget<UPE_RespawnWidget>(GetWorld(), WidgetClass);
+		if (RespawnWidget)
+		{
+			PRINT_LOG(TEXT("RespawnWidget Created"));
+			RespawnWidget->AddToViewport();
+			RespawnWidget->SetTargetDummy(TargetDummy);
+			if (!TargetDummy)
+			{
+				PRINT_LOG(TEXT("TargetDummy is NULL"));
+			}
+			RespawnWidget->SetTargetPlayerState(DeadPlayerState);
+			if (!DeadPlayerState)
+			{
+				PRINT_LOG(TEXT("TargetDummy's PlayerState is NULL"));
+			}
+
+			APlayerController* MyPC = Cast<APlayerController>(GetController());
+			if (MyPC)
+			{
+				PRINT_LOG(TEXT("Setting Input Mode to UI Only"));
+				MyPC->SetInputMode(FInputModeUIOnly());
+				MyPC->bShowMouseCursor = true;
+			}
+		}
+	}
+}
+//----------------------------------------------------------------------------------------------------------
 
 void AProjectPlayer::Turn(const FInputActionValue& inputValue)
 {
@@ -459,6 +559,13 @@ void AProjectPlayer::OnItemOverlapEnd(UPrimitiveComponent* OverlappedComp, AActo
 
 void AProjectPlayer::Interact()
 {
+	PRINT_LOG(TEXT("Interact Called"));
+	if (AProjectPlayer* DummyPlayer = Cast<AProjectPlayer>(FocusedItem.GetObject()))
+	{
+		OpenRespawnUI(DummyPlayer);
+		PRINT_LOG(TEXT("Interacting with DummyPlayer"));
+		return;
+	}
 	if (FocusedItem)
 	{
 		FocusedItem->Interact(this);
