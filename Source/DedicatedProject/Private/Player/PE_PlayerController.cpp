@@ -136,6 +136,11 @@ void APE_PlayerController::OnNextSpectateTarget()
 
 	AActor* CurrentViewTarget = GetViewTarget();
 	AProjectPlayer* CurrentPlayer = Cast<AProjectPlayer>(CurrentViewTarget);
+	if (!CurrentPlayer)
+	{
+		PRINT_LOG(TEXT("CurrentViewTarget is not AProjectPlayer"));
+		CurrentPlayer = GS->AlivePlayers[0]; // 현재 뷰 타겟이 플레이어가 아닌 경우 첫 번째 생존자 플레이어로 설정
+	}
 	AProjectPlayer* NextPlayer = GS->GetNextAlivePlayer(CurrentPlayer);
 
 	if (NextPlayer)

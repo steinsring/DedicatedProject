@@ -56,7 +56,14 @@ void UPE_RespawnWidget::InitializeRespawnList()
 			{
 				PRINT_LOG(TEXT("TargetDummy is NULL"));
 			}
+			NewBtn->ParentRespawnWidget = this;
 			RespawnListBox->AddChild(NewBtn);
 		}
 	}
+}
+
+void UPE_RespawnWidget::SetTargetDummy(AProjectPlayer* InTargetDummy)
+{
+	TargetDummy = InTargetDummy;
+	PRINT_LOG(TEXT("TargetDummy Set in RespawnWidget"));
 }

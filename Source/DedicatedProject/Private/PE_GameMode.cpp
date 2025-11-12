@@ -158,7 +158,9 @@ void APE_GameMode::HandlePlayerDeath(AController* DeadController)
 		PRINT_LOG(TEXT("Processing death for player: %s"), *DeadPlayer->GetName());
 		UCommon_AnimInstance* AnimInstance = Cast<UCommon_AnimInstance>(DeadPlayer->GetMesh()->GetAnimInstance());
         if (AnimInstance) AnimInstance->SetIsDead(true);
-		DeadPlayer->DetachFromControllerPendingDestroy();
+        
+
+		
 
 		// 게임 상태에서 생존자/사망자 목록 갱신
 		APE_GameState* GS = GetGameState<APE_GameState>();
@@ -174,6 +176,10 @@ void APE_GameMode::HandlePlayerDeath(AController* DeadController)
 
         GS->RemoveAlivePlayer(DeadPlayer);
         GS->AddDeadPlayer(DeadPlayer);
+        GS->DeadPlayerStates.Add(DeadPlayer->GetPlayerState<APlayerState>());
+
+        DeadPlayer->DetachFromControllerPendingDestroy();
+		
         PRINT_LOG(TEXT("Updated GameState: AlivePlayers=%d, DeadPlayers=%d"), GS->AlivePlayers.Num(), GS->DeadPlayers.Num());
     }
 }
@@ -196,5 +202,6 @@ void APE_GameMode::HandlePlayerRespawn(APlayerState* DeadPS, AProjectPlayer* Tar
 	// 게임 상태에서 생존자/사망자 목록 갱신
 	GS->RemoveDeadPlayer(Cast<AProjectPlayer>(TargetDummy));
 	GS->AddAlivePlayer(Cast<AProjectPlayer>(TargetDummy));
+	GS->DeadPlayerStates.Remove(DeadPS);
 	PRINT_LOG(TEXT("Player Respawned: %s. Updated GameState: AlivePlayers=%d, DeadPlayers=%d"), *TargetDummy->GetName(), GS->AlivePlayers.Num(), GS->DeadPlayers.Num());
 }

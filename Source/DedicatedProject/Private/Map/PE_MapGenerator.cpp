@@ -11,6 +11,7 @@
 #include "Enemy/PE_AIController.h"
 #include "Item/PE_ItemSpawner.h"
 #include "Player/ProjectPlayer.h"
+#include "GameFramework/CharacterMovementComponent.h" 
 
 // Sets default values
 APE_MapGenerator::APE_MapGenerator()
@@ -514,6 +515,12 @@ void APE_MapGenerator::SpawnEnemies()
 					break;
 				case E_EnemyType::Player:
 					Enemy = GetWorld()->SpawnActor<AProjectPlayer>(Location, Rotation, SpawnParams);
+					if (AProjectPlayer* DummyPlayer = Cast<AProjectPlayer>(Enemy))
+					{
+						DummyPlayer->bIsPowerOn = false;
+						DummyPlayer->DisableInput(nullptr);
+						DummyPlayer->GetCharacterMovement()->DisableMovement();
+					}
 					break;
 				default:
 					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);

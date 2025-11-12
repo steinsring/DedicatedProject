@@ -6,9 +6,9 @@
 
 #include "DedicatedProject.h"
 
-void UPE_RespawnBtn::OnClick_RespawnBtn(APlayerState* TargetPlayerState, AProjectPlayer* TargetDummy)
+void UPE_RespawnBtn::OnClick_RespawnBtn(APlayerState* DeadPlayerState, AProjectPlayer* TargetDummy)
 {
-	if (!TargetPlayerState)
+	if (!DeadPlayerState)
 	{
 		PRINT_LOG(TEXT("TargetPlayerState is NULL"));
 		//return;
@@ -19,7 +19,7 @@ void UPE_RespawnBtn::OnClick_RespawnBtn(APlayerState* TargetPlayerState, AProjec
 		//return;
 	}
 
-	if (!TargetPlayerState || !TargetDummy)
+	if (!DeadPlayerState || !TargetDummy)
 	{
 		return;
 	}
@@ -27,8 +27,18 @@ void UPE_RespawnBtn::OnClick_RespawnBtn(APlayerState* TargetPlayerState, AProjec
 	AProjectPlayer* TargetPlayerPawn = Cast<AProjectPlayer>(UGameplayStatics::GetPlayerPawn(this, 0));
 	if (TargetPlayerPawn)
 	{
-		TargetPlayerPawn->RequestRespawn_Server(TargetPlayerState, TargetDummy);
+		TargetPlayerPawn->RequestRespawn_Server(DeadPlayerState, TargetDummy);
 
-		RemoveFromParent();
+		if (ParentRespawnWidget)
+		{
+			ParentRespawnWidget->RemoveFromParent();
+			APlayerController* MyPC = Cast<APlayerController>(TargetPlayerPawn->GetController());
+			if (MyPC)
+			{
+				PRINT_LOG(TEXT("Setting Input Mode to Game Only"));
+				MyPC->SetInputMode(FInputModeGameOnly());
+				MyPC->bShowMouseCursor = false;
+			}
+		}
 	}
 }

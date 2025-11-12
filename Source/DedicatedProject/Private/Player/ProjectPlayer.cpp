@@ -11,6 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "PE_GameMode.h"
+#include "PE_GameState.h"
 #include "Net/UnrealNetwork.h"
 #include "UI/PE_RespawnWidget.h"
 #include "GameFramework/GameStateBase.h"
@@ -314,25 +315,12 @@ void AProjectPlayer::OpenRespawnUI(AProjectPlayer* TargetDummy)
 	if (!IsLocallyControlled())
 	{
 		PRINT_LOG(TEXT("Not Locally Controlled"));
-		//return;
+		return;
 	}
 
-	APlayerState* DeadPlayerState = TargetDummy->GetPlayerState();
-	if (!DeadPlayerState)
+	if (TargetDummy->bIsPowerOn)
 	{
-		for (APlayerState* PS : GetWorld()->GetGameState()->PlayerArray)
-		{
-			if (PS && PS->GetPawn() == TargetDummy)
-			{
-				DeadPlayerState = PS;
-				PRINT_LOG(TEXT("Found DeadPlayerState from GameState"));
-				break;
-			}
-		}
-	}
-	if (!DeadPlayerState)
-	{
-		PRINT_ERROR_LOG(TEXT("DeadPlayerState is NULL"));
+		PRINT_LOG(TEXT("TargetDummy is already active"));
 		return;
 	}
 	
@@ -347,17 +335,18 @@ void AProjectPlayer::OpenRespawnUI(AProjectPlayer* TargetDummy)
 		if (RespawnWidget)
 		{
 			PRINT_LOG(TEXT("RespawnWidget Created"));
-			RespawnWidget->AddToViewport();
 			RespawnWidget->SetTargetDummy(TargetDummy);
+			RespawnWidget->AddToViewport();
+			
 			if (!TargetDummy)
 			{
 				PRINT_LOG(TEXT("TargetDummy is NULL"));
 			}
-			RespawnWidget->SetTargetPlayerState(DeadPlayerState);
-			if (!DeadPlayerState)
-			{
-				PRINT_LOG(TEXT("TargetDummy's PlayerState is NULL"));
-			}
+			//RespawnWidget->SetTargetPlayerState(DeadPlayerState);
+			//if (!DeadPlayerState)
+			//{
+			//	PRINT_LOG(TEXT("TargetDummy's PlayerState is NULL"));
+			//}
 
 			APlayerController* MyPC = Cast<APlayerController>(GetController());
 			if (MyPC)
@@ -463,6 +452,11 @@ void AProjectPlayer::UpdateCharacterStats(int32 CharacterLevel) {
 	AttackPower = GetCharacterStats()->AttackPower; //공격력 업데이트
 }
 
+void AProjectPlayer::Interact(AActor* Interactor)
+{
+	PRINT_LOG(TEXT("AProjectPlayer Interact Called by %s"), *Interactor->GetName());
+}
+
 //TakeDamage 오버라이드
 float AProjectPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
@@ -560,7 +554,8 @@ void AProjectPlayer::OnItemOverlapEnd(UPrimitiveComponent* OverlappedComp, AActo
 void AProjectPlayer::Interact()
 {
 	PRINT_LOG(TEXT("Interact Called"));
-	if (AProjectPlayer* DummyPlayer = Cast<AProjectPlayer>(FocusedItem.GetObject()))
+	AProjectPlayer* DummyPlayer = Cast<AProjectPlayer>(FocusedItem.GetObject());
+	if (DummyPlayer != nullptr)
 	{
 		OpenRespawnUI(DummyPlayer);
 		PRINT_LOG(TEXT("Interacting with DummyPlayer"));

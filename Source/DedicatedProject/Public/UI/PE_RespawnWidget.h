@@ -27,14 +27,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Respawn")
 	AProjectPlayer* TargetDummy;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Respawn")
-	APlayerState* TargetPlayerState;
-
 	void InitializeRespawnList();
 
 	UFUNCTION()
-	void SetTargetDummy(AProjectPlayer* InTargetDummy) { TargetDummy = InTargetDummy; }
-
-	UFUNCTION()
-	void SetTargetPlayerState(APlayerState* InTargetPlayerState) { TargetPlayerState = InTargetPlayerState; }
+	void SetTargetDummy(AProjectPlayer* InTargetDummy);
 };

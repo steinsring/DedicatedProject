@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Player/ProjectPlayer.h"
+#include "UI/PE_RespawnWidget.h"
 #include "PE_RespawnBtn.generated.h"
 
 /**
@@ -17,11 +18,14 @@ class DEDICATEDPROJECT_API UPE_RespawnBtn : public UUserWidget
 	
 public:
 	UFUNCTION(BlueprintCallable)
-	void OnClick_RespawnBtn(APlayerState* TargetPlayerState, AProjectPlayer* TargetDummy);
+	void OnClick_RespawnBtn(APlayerState* DeadPlayerState, AProjectPlayer* TargetDummy);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Respawn")
 	APlayerState* RespawnPlayerState;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Respawn")
 	AProjectPlayer* RespawnTargetDummy;
+
+	UPROPERTY()
+	class UPE_RespawnWidget* ParentRespawnWidget;
 };
