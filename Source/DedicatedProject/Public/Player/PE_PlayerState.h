@@ -26,12 +26,13 @@ protected:
 	TArray<FItemData> InventoryData;
 
 	// -----------------------------------------------------------------
+public:
 	UFUNCTION()
 	void OnRep_InventoryData();												// 여기서 클라이언트의 UI 갱신
 
 public:
 	// 초기화 함수 -----------------------------------------------------------------------------
-	void InitializeDefaultData();											// Gamemode의 PostLogin에서 호출
+	void InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage);											// Gamemode의 PostLogin에서 호출
 
 	// 인벤토리 데이터 설정 함수 -----------------------------------------------------------------------------
 	bool IsEmptySlot(const int32 SlotNumber);
@@ -48,4 +49,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Events")
 	FOnInventoryChanged OnInventoryChanged;									// 나중에 함수들을 바인딩해서 실제로 사용
+
+	FORCEINLINE TArray<FItemData> GetInventoryData() const { return InventoryData; }
 };

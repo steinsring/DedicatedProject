@@ -12,11 +12,14 @@
 #include "GameplayManager/PE_LevelTravelManager.h"
 
 #include "DedicatedProject.h"
+#include "PE_GameInstance.h"
 
 APE_GameMode::APE_GameMode() { //생성자
 	GameStateClass = APE_GameState::StaticClass(); // 게임 스테이트
 	PlayerStateClass = APE_PlayerState::StaticClass(); // 플레이어 스테이트
 	PlayerControllerClass = APE_PlayerController::StaticClass(); // 플레이어 컨트롤러
+
+    //bUseSeamlessTravel = true;
 
 	// 플레이어 캐릭터 블루프린트 가져오기
 	static ConstructorHelpers::FClassFinder<APawn>PlayerPawnBPClass(TEXT("/Game/BluePrints/Player/BP_ProjectPlayer.BP_ProjectPlayer_C"));
@@ -54,6 +57,28 @@ void APE_GameMode::BeginPlay()
 void APE_GameMode::PostLogin(APlayerController* NewPlayer)
 {
     Super::PostLogin(NewPlayer);
+
+    // 플레이어 데이터 스테이지 전환시 복원 -----------------------------------------------
+    UPE_GameInstance* GI = GetGameInstance<UPE_GameInstance>();
+    if (!GI || !NewPlayer || !NewPlayer->PlayerState) return;
+
+    if (APE_PlayerState* PlayerState = NewPlayer->GetPlayerState<APE_PlayerState>())
+    { // PlayerState 초기화--------------------------------------------------------------
+        const FString Key = PlayerState->GetPlayerName();
+        TArray<FItemData> PlayerData = GI->GetStagePlayerData(Key);
+
+        AllPlayerState.Add(PlayerState);
+        if (PlayerData.IsEmpty())
+        {
+            PlayerState->InitializeDefaultData(PlayerData, true); // 이미 되어 있으면 내부에서 무시
+        }
+        else
+        {
+            PlayerState->InitializeDefaultData(PlayerData, false); // 이미 되어 있으면 내부에서 무시
+        }
+    }
+
+    //-------------------------------------------------------
     UE_LOG(LogTemp, Warning, TEXT("[GameMode] PostLogin called for %s"), *NewPlayer->GetName());
 
     NewPlayer->GetOnNewPawnNotifier().AddLambda([this, NewPlayer](APawn* InPawn)
@@ -99,14 +124,6 @@ void APE_GameMode::PostLogin(APlayerController* NewPlayer)
     }
 
     PlacePawnIfReady(NewPlayer);
-
-    // PlayerState 초기화--------------------------------------------------------------
-	
-    if (APE_PlayerState* PlayerState = NewPlayer->GetPlayerState<APE_PlayerState>())
-    {
-        AllPlayerState.Add(PlayerState);
-        PlayerState->InitializeDefaultData(); // 이미 되어 있으면 내부에서 무시
-    }
 }
 
 void APE_GameMode::SetPlayerLocation(FVector PlayerStartLocation)

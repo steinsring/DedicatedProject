@@ -7,6 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "DedicatedProject.h"
 #include "PE_GameInstance.h"
+#include "Player/PE_PlayerState.h"
 
 
 // Sets default values
@@ -73,7 +74,24 @@ void APE_LevelTravelManager::LevelTravel_Implementation()
 		return;
 	}
 
-	// 스테이지 정보를 GameInstance에서 가져와서 세팅
+	// 현재 접속해 있는 모든 플레이어 데이터 저장----------------------------------------------
+	GameInstance->ClearPlayerDataMap();
+
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		APlayerController* PC = It->Get();
+		if (!PC || !PC->PlayerState) continue;
+
+		APE_PlayerState* PS = Cast<APE_PlayerState>(PC->PlayerState);
+		if (!PS) continue;
+
+		TArray<FItemData> PlayerInventoryData = PS->GetInventoryData();
+
+		const FString Key = PS->GetPlayerName(); // 나중엔 UniqueNetId로 하면 더 안전
+		GameInstance->SaveStagePlayerData(Key, PlayerInventoryData);
+	}
+
+	// 스테이지 정보를 GameInstance에서 가져와서 세팅--------------------------------
 	int32 CurrentStage = GameInstance->GetCurrentLevelCount();
 	int32 MaxStage = GameInstance->GetMaxTravelLevelCount();
 	int32 NextStage = CurrentStage + 1;
@@ -84,6 +102,7 @@ void APE_LevelTravelManager::LevelTravel_Implementation()
 	{
 		PRINT_LOG(TEXT("Travel To Next Level : %s, Current Level : %d"), TEXT("Stage End"), CurrentStage);
 		World->ServerTravel(FString::Printf(TEXT("%s?listen"), TEXT("/Game/Maps/InGameMap1")));
+		//World->ServerTravel(TEXT("/Game/Maps/InGameMap1?listen"), true);
 	}
 	else 
 	{
