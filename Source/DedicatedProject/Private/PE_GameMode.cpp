@@ -68,14 +68,8 @@ void APE_GameMode::PostLogin(APlayerController* NewPlayer)
         TArray<FItemData> PlayerData = GI->GetStagePlayerData(Key);
 
         AllPlayerState.Add(PlayerState);
-        if (PlayerData.IsEmpty())
-        {
-            PlayerState->InitializeDefaultData(PlayerData, true); // 이미 되어 있으면 내부에서 무시
-        }
-        else
-        {
-            PlayerState->InitializeDefaultData(PlayerData, false); // 이미 되어 있으면 내부에서 무시
-        }
+        const bool bIsFirstStage = PlayerData.IsEmpty();
+        PlayerState->InitializeDefaultData(PlayerData, bIsFirstStage);
     }
 
     //-------------------------------------------------------
