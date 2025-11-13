@@ -20,4 +20,10 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	UAnimMontage* BasicAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PowerOn")
+	bool bIsPowerOn = true;
+
+	UFUNCTION()
+	void SetPowerState(bool bNewPowerState);
 };

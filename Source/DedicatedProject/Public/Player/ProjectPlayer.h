@@ -45,13 +45,15 @@ private:
 public:
 	FORCEINLINE UCameraComponent* GetPlayerCamComp() const { return tpsCamComp; }
 
+	//리스폰 관련	------------------------------------------------------------------------------
+
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Power")
 	bool bIsPowerOn = true;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 	UFUNCTION(NetMulticast, Reliable)
-	void ActivatePower_Multicast();
+	void SetPowerState_Multicast(bool bNewPowerState);
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(Server, Reliable)
 	void RequestRespawn_Server(APlayerState* DeadPlayerState, AProjectPlayer* TargetDummy);

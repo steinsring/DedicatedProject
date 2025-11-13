@@ -194,10 +194,12 @@ void APE_GameMode::HandlePlayerRespawn(APlayerState* DeadPS, AProjectPlayer* Tar
 	APE_GameState* GS = GetGameState<APE_GameState>();
 	if (!GS) return;
 
+	TargetDummy->SetPowerState_Multicast(true); // 활성화
 	// 관전 해제
 	DeadPC->SetViewTargetWithBlend(TargetDummy, 0.0f);
 	// Pawn Possess
 	DeadPC->Possess(TargetDummy);
+
 
 	// 게임 상태에서 생존자/사망자 목록 갱신
 	GS->RemoveDeadPlayer(Cast<AProjectPlayer>(TargetDummy));

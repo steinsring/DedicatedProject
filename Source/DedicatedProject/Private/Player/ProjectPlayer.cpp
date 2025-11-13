@@ -15,6 +15,7 @@
 #include "Net/UnrealNetwork.h"
 #include "UI/PE_RespawnWidget.h"
 #include "GameFramework/GameStateBase.h"
+#include "Player/PE_AnimInstance.h"
 
 #include "Inventory/PE_InventoryComponent.h"
 #include "Enemy/PE_AIController.h"
@@ -41,6 +42,9 @@ AProjectPlayer::AProjectPlayer()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
+	bAlwaysRelevant = true;
+	SetReplicates(true);
+	SetReplicateMovement(true);
 
 	//스켈레탈 메쉬를 구조체로 불러와서
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(TEXT("/Game/ParagonWraith/Characters/Heroes/Wraith/Meshes/Wraith.Wraith"));
@@ -195,11 +199,13 @@ void AProjectPlayer::BeginPlay()
 	InteractionZone->OnComponentBeginOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapBegin);				// 이벤트 바인딩 : 아이템 감지 범위에 아이템 콜리전이 충돌했을때 
 	InteractionZone->OnComponentEndOverlap.AddDynamic(this, &AProjectPlayer::OnItemOverlapEnd);					// 이벤트 바인딩 : 충돌범위에서 아이템이 빠져나갔을때
 
-	if (!bIsPowerOn)
-	{
-		DisableInput(nullptr);
-		GetCharacterMovement()->DisableMovement();
-	}
+	//if (HasAuthority())
+	//{
+	//	if (GetController() == nullptr)
+	//	{
+	//		SetPowerState_Multicast(false);
+	//	}
+	//}
 }
 
 // 서버: Possess 직후
@@ -290,13 +296,36 @@ void AProjectPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AProjectPlayer, bIsPowerOn);
 }
 
-// Power 활성화(플레이어에 의해 이동하는 것들이 보이도록)
-void AProjectPlayer::ActivatePower_Multicast_Implementation()
+void AProjectPlayer::SetPowerState_Multicast_Implementation(bool bNewPowerState)
 {
-	bIsPowerOn = true;
+	bIsPowerOn = bNewPowerState;
 
-	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-	EnableInput(Cast<APlayerController>(GetController()));
+	UPE_AnimInstance* Anim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
+	if (!Anim)
+	{
+		PRINT_ERROR_LOG(TEXT("AnimInstance is NULL in SetPowerState_Multicast"));
+		return;
+	}
+
+	if (bIsPowerOn)
+	{
+		//AnimInstance->bIsPowerOn = true;
+		Anim->SetPowerState(true);
+
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		EnableInput(Cast<APlayerController>(GetController()));
+		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	}
+	else
+	{
+		Anim->SetPowerState(false);
+		PRINT_LOG(TEXT("Power Off - Disable Movement"));
+
+		GetMesh()->GlobalAnimRateScale = 0.0f;
+		GetCharacterMovement()->DisableMovement();
+		DisableInput(Cast<APlayerController>(GetController()));
+		GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+	}
 }
 
 // 서버에 Respawn 요청

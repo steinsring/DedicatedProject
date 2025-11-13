@@ -33,3 +33,9 @@ void UPE_AnimInstance::NativeInitializeAnimation()
 	FString OwnerName = Owner ? Owner->GetName() : TEXT("Unknown");
 	PRINT_LOG(TEXT("My Character name : %s"), *OwnerName);
 }
+
+void UPE_AnimInstance::SetPowerState(bool bNewPowerState)
+{
+	bIsPowerOn = bNewPowerState;
+	PRINT_LOG(TEXT("Power State changed: %s"), bIsPowerOn ? TEXT("ON") : TEXT("OFF"));
+}
