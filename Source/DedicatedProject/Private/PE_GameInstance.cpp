@@ -8,6 +8,7 @@
 #include "Online/OnlineSessionNames.h"
 #include "Kismet/GameplayStatics.h"
 #include "DedicatedProject.h"
+#include "GameplayManager/FPlayerData.h"
 
 void UPE_GameInstance::Init()
 {
@@ -233,6 +234,21 @@ void UPE_GameInstance::NotifyLevelTravelTriggered(int32 Stage)
 void UPE_GameInstance::ResetLevelTravelCount()
 {
     LevelTravelCount = 1;
+}
+
+void UPE_GameInstance::SaveStagePlayerData(FString ID, TArray<FItemData> PlayerData)
+{
+    PlayerDataMap.Add(ID, PlayerData);
+}
+
+TArray<FItemData> UPE_GameInstance::GetStagePlayerData(FString ID)
+{
+    if (TArray<FItemData>* FoundData = PlayerDataMap.Find(ID))
+    {
+        return *FoundData;
+    }
+    
+    return {};
 }
 
 

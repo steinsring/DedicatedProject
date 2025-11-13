@@ -26,12 +26,12 @@ APE_ItemSpawner::APE_ItemSpawner()
 
 	if (Item2_BP.Succeeded())
 	{
-		SpawnableItems.Add(Item2_BP.Class);
+		//SpawnableItems.Add(Item2_BP.Class);
 	}
 
 	if (Item3_BP.Succeeded())
 	{
-		SpawnableItems.Add(Item3_BP.Class);
+		//SpawnableItems.Add(Item3_BP.Class);
 	}
 
 }

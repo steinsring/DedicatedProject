@@ -16,6 +16,7 @@
 #include "Inventory/FItemData.h"
 #include "UI/PE_HPBarWidget.h"
 #include "HealthComponent.h"
+#include "Player/PE_PlayerState.h"
 
 APE_PlayerController::APE_PlayerController()
 {
@@ -55,6 +56,11 @@ void APE_PlayerController::BeginPlay()
 	else
 	{
 		PRINT_ERROR_LOG(TEXT("InventoryWidget Create Fail"));
+	}
+
+	if (APE_PlayerState* PS = GetPlayerState<APE_PlayerState>())
+	{
+		PS->OnRep_InventoryData();
 	}
 
 	// 체력 --------------------------------------------------------------------------

@@ -6,15 +6,9 @@
 #include "GameFramework/PlayerState.h"
 #include "PE_LobbyPlayerState.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class DEDICATEDPROJECT_API APE_LobbyPlayerState : public APlayerState
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+
 };

@@ -8,18 +8,25 @@
 #include "Player/PE_PlayerController.h"
 #include "Player/ProjectPlayer.h"
 
-void APE_PlayerState::InitializeDefaultData()
+void APE_PlayerState::InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage)
 {
 	check(HasAuthority());	//서버 전용
 
 	// 인벤토리 데이터 초기화 ----------------------------------------
-	InventoryData.Reset();
-	InventoryData.SetNum(MaxInventorySlotNumber);
-
-	for (FItemData& ItemData : InventoryData)
+	if (isFirstStage)
 	{
-		ItemData.ItemID = NAME_None;
-		ItemData.Quantity = 0;
+		InventoryData.Reset();
+		InventoryData.SetNum(MaxInventorySlotNumber);
+
+		for (FItemData& ItemData : InventoryData)
+		{
+			ItemData.ItemID = NAME_None;
+			ItemData.Quantity = 0;
+		}
+	}
+	else
+	{
+		InventoryData = DefualtInventoryData;
 	}
 
 	ForceNetUpdate();	// 서버에서 복제되는 프로퍼티를 바꾼 직후 다음 넷 업데이트 사이클에 강제 전송

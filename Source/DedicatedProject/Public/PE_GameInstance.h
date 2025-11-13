@@ -54,4 +54,13 @@ public:
     int32 GetCurrentLevelCount() const { return LevelTravelCount; }
     int32 GetMaxTravelLevelCount() const { return MaxTravelBeforeLobby; }
     bool IsGameEnd() const { return LevelTravelCount <= MaxTravelBeforeLobby; }
+
+    // 스테이지 이동 ----------------------------------
+private:
+    TMap<FString, TArray<struct FItemData>> PlayerDataMap;
+
+public:
+    void ClearPlayerDataMap() { PlayerDataMap.Empty(); }
+    void SaveStagePlayerData(FString ID, TArray<FItemData> PlayerData);
+    TArray<FItemData> GetStagePlayerData(FString ID);
 };  

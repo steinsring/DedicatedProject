@@ -21,4 +21,10 @@ public:
 
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer);
+
+private:
+	UPROPERTY()
+	TArray<TObjectPtr<class APE_LobbyPlayerState>> AllPlayerState;
+
+	TArray<FString> PlayerList;
 };
