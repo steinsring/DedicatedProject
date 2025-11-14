@@ -41,6 +41,15 @@ APE_PlayerController::APE_PlayerController()
 		PRINT_ERROR_LOG(TEXT("HPBarWidgetAsset is NULL"));
 	}
 
+	// 조준점
+	static ConstructorHelpers::FClassFinder<UUserWidget> CrossHairBPClass(TEXT("/Game/BluePrints/UI/WB_CrossHair.WB_CrossHair_C"));
+	if (!CrossHairBPClass.Succeeded())
+	{
+		PRINT_ERROR_LOG(TEXT("InventoryWidgetBPClass is NULL"));
+		return;
+	}
+
+	CrossHairWidgetBPClass = CrossHairBPClass.Class;
 }
 
 void APE_PlayerController::BeginPlay()
@@ -80,6 +89,17 @@ void APE_PlayerController::BeginPlay()
 	else
 	{
 		PRINT_ERROR_LOG(TEXT("HPBarWidgetClass is NULL"));
+	}
+
+	// 조준점---------------------------------------------------
+	CrossHairWidget = CreateWidget<UUserWidget>(this, CrossHairWidgetBPClass);
+	if (CrossHairWidget)
+	{
+		CrossHairWidget->AddToViewport();
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("CrossHairWidget Create Fail"));
 	}
 }
 

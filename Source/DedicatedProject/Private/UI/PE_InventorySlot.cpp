@@ -12,7 +12,7 @@ void UPE_InventorySlot::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	ItemDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ItemDataTable.DT_ItemDataTable"));
+	//ItemDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ItemDataTable.DT_ItemDataTable"));
 
 	if (ItemDataTable)									//데이터 테이블이 참조되었는지 확인
 	{
@@ -46,26 +46,57 @@ void UPE_InventorySlot::SetItem(FName ItemID, int32 ItemQuantity)
 	{
 		ID = NAME_None;
 		Stack = 0;
-		IconImage->SetBrushFromTexture(nullptr);
-		IconImage->SetVisibility(ESlateVisibility::Hidden);
-		Number->SetText(FText::FromString(TEXT(" ")));
+		if (IconImage)
+		{
+			IconImage->SetBrushFromTexture(nullptr);
+			IconImage->SetVisibility(ESlateVisibility::Hidden);
+		}
+
+		if (Number)
+		{
+			Number->SetText(FText::FromString(TEXT(" ")));
+		}
 		return;
 	}
 
 	// 아이템이 남은 경우
 	FindItemData(ItemID);
-	if (IsValid(IconImage))
+
+	// ★ 1) 데이터 못 찾은 경우 처리
+	if (!SearchedItemData)
 	{
-		ID = ItemID;
-		Stack = ItemQuantity;
-		IconImage->SetBrushFromTexture(SearchedItemData->Icon, true);
-		IconImage->SetVisibility(ESlateVisibility::Visible);
-		Number->SetText(FText::AsNumber(Stack));
+		PRINT_LOG(TEXT("SetItem: ItemData not found for %s"), *ItemID.ToString());
+
+		// 안전하게 이 슬롯을 비우거나, placeholder로 처리
+		ID = NAME_None;
+		Stack = 0;
+
+		if (IconImage)
+		{
+			IconImage->SetBrushFromTexture(nullptr);
+			IconImage->SetVisibility(ESlateVisibility::Hidden);
+		}
+		if (Number)
+		{
+			Number->SetText(FText::FromString(TEXT(" ")));
+		}
+		return;
 	}
-	else
+
+	// ★ 2) 위젯 포인터 체크
+	if (!IconImage || !Number)
 	{
-		PRINT_LOG(TEXT("IconImage is NULL"));
+		PRINT_LOG(TEXT("SetItem: IconImage or Number is NULL"));
+		return;
 	}
+
+	// ★ 3) 여기까지 왔으면 모두 유효 → 안심하고 접근
+	ID = ItemID;
+	Stack = ItemQuantity;
+
+	IconImage->SetBrushFromTexture(SearchedItemData->Icon, true);
+	IconImage->SetVisibility(ESlateVisibility::Visible);
+	Number->SetText(FText::AsNumber(Stack));
 }
 
 FName UPE_InventorySlot::GetSlotInformation()

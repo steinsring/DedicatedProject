@@ -29,7 +29,7 @@ private:
 protected:
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item Data")
 	class UDataTable* ItemDataTable;
 	
 public:

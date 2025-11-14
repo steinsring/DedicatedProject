@@ -93,23 +93,23 @@ void APE_BaseWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* 
 	PRINT_LOG(TEXT("Hit1"));
 	if (OtherActor == GetOwner()) return;
 	PRINT_LOG(TEXT("Hit2"));
+
 	if (OtherActor && OtherActor != this)
 	{
-		const FDamageEvent Event(UDamageType::StaticClass());
 		ACharacterCommon* HitCharacter = Cast<ACharacterCommon>(OtherActor);
-		if (!HitCharacter) return;
-
-		//HitCharacter->ACharacterCommon::TakeDamage(Damage, Event, GetInstigatorController(), this);
-		UHealthComponent* HitHealthComp = HitCharacter->FindComponentByClass<UHealthComponent>();
-		if (HitHealthComp)
+		if (HitCharacter)
 		{
-			HitHealthComp->ApplyDamage(Damage);
+			UHealthComponent* HitHealthComp = HitCharacter->FindComponentByClass<UHealthComponent>();
+			if (HitHealthComp)
+			{
+				HitHealthComp->ApplyDamage(Damage);
+			}
+
+			HitCharacter->PlayHitSound(OtherActor);
+			PRINT_LOG(TEXT("Hit"));
 		}
-
-		HitCharacter->PlayHitSound(OtherActor);
-		PRINT_LOG(TEXT("Hit"));
+		// HitCharacter가 아니면(일반 액터) 아무것도 안 하고 그냥 Destroy로 내려감
 	}
-
 	
 	Destroy();
 }
