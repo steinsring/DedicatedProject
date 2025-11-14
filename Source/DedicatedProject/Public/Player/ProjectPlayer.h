@@ -47,11 +47,14 @@ public:
 
 	//리스폰 관련	------------------------------------------------------------------------------
 
-	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Power")
+	UPROPERTY(ReplicatedUsing=OnRep_PowerState)
 	bool bIsPowerOn = true;
 
-	UFUNCTION(NetMulticast, Reliable)
-	void SetPowerState_Multicast(bool bNewPowerState);
+	UFUNCTION()
+	void OnRep_PowerState();
+
+	UFUNCTION(Server, Reliable)
+	void SetPowerState_Server(bool bNewPowerState);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

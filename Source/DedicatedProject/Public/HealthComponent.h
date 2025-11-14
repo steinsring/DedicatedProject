@@ -40,6 +40,9 @@ public:
 	
 	void SetHP(float NewHP);
 
+	UFUNCTION(Server, Reliable)
+	void SetHP_Server(float NewHP);
+
 	void ApplyDamage(float DamageAmount);
 
 	float GetHPRatio();

@@ -94,6 +94,14 @@ void UHealthComponent::SetHP(float NewHP)
 	PRINT_LOG(TEXT("Current %s Health: %f"), *OwnerCharacter->GetName(), CurrentHealth);
 }
 
+void UHealthComponent::SetHP_Server_Implementation(float NewHP)
+{
+	CurrentHealth = NewHP;
+	OnRep_CurrentHealth();
+}
+
+
+
 //void UHealthComponent::ApplyDamage_Server_Implementation(float DamageAmount)
 //{
 //	ApplyDamage_Multicast(DamageAmount); // HP 감소

@@ -213,12 +213,32 @@ void AProjectPlayer::BeginPlay()
 void AProjectPlayer::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+
+	PRINT_LOG(TEXT("PossessedBy Called: %s"), *GetName());
+
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	GetMesh()->SetAnimInstanceClass(GetMesh()->GetAnimClass());
+	GetMesh()->GlobalAnimRateScale = 1.0f;
+
+	FTimerHandle Timer;
+	GetWorldTimerManager().SetTimer(Timer, [this]()
+	{
+		PlayerAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
+		//HealthComp->SetHP(HealthComp->GetMaxHealth());
+	}, 0.05f, false);
+
+	//PlayerAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
+	//HealthComp->SetHP(HealthComp->GetMaxHealth());
 }
 
 // 클라: 컨트롤러 복제 도착/변경시
 void AProjectPlayer::OnRep_Controller()
 {
 	Super::OnRep_Controller();
+
+	PRINT_LOG(TEXT("OnRep_Controller Called: %s"), *GetName());
+	PlayerAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
+	//HealthComp->SetHP(HealthComp->GetMaxHealth());
 }
 
 // Called every frame
@@ -236,6 +256,11 @@ void AProjectPlayer::Tick(float DeltaTime)
 	SetActorLocation(P);*/
 	AddMovementInput(direction);
 	direction = FVector::ZeroVector;
+
+	if (!PlayerAnim)
+	{
+		PlayerAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
+	}
 }
 
 // Called to bind functionality to input
@@ -291,15 +316,24 @@ void AProjectPlayer::PostInitializeComponents()
 
 //------------------------------------------리스폰 관련--------------------------------------------------------
 
-void AProjectPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AProjectPlayer::OnRep_PowerState()
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AProjectPlayer, bIsPowerOn);
-}
+	if (bIsPowerOn)
+	{
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		EnableInput(Cast<APlayerController>(GetController()));
+		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+		GetMesh()->GlobalAnimRateScale = 1.0f;
+	}
+	else
+	{
+		PRINT_LOG(TEXT("Power Off - Disable Movement"));
 
-void AProjectPlayer::SetPowerState_Multicast_Implementation(bool bNewPowerState)
-{
-	bIsPowerOn = bNewPowerState;
+		GetCharacterMovement()->DisableMovement();
+		DisableInput(Cast<APlayerController>(GetController()));
+		GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+		GetMesh()->GlobalAnimRateScale = 0.0f;
+	}
 
 	UPE_AnimInstance* Anim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
 	if (!Anim)
@@ -308,25 +342,20 @@ void AProjectPlayer::SetPowerState_Multicast_Implementation(bool bNewPowerState)
 		return;
 	}
 
-	if (bIsPowerOn)
-	{
-		//AnimInstance->bIsPowerOn = true;
-		Anim->SetPowerState(true);
+	Anim->SetPowerState(bIsPowerOn);
+}
 
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		EnableInput(Cast<APlayerController>(GetController()));
-		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	}
-	else
-	{
-		Anim->SetPowerState(false);
-		PRINT_LOG(TEXT("Power Off - Disable Movement"));
+void AProjectPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AProjectPlayer, bIsPowerOn);
+}
 
-		GetMesh()->GlobalAnimRateScale = 0.0f;
-		GetCharacterMovement()->DisableMovement();
-		DisableInput(Cast<APlayerController>(GetController()));
-		GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-	}
+void AProjectPlayer::SetPowerState_Server_Implementation(bool bNewPowerState)
+{
+	bIsPowerOn = bNewPowerState;
+	//서버에서도 반영되도록 직접 호출
+	OnRep_PowerState();
 }
 
 // 서버에 Respawn 요청
@@ -585,7 +614,7 @@ void AProjectPlayer::Interact()
 {
 	PRINT_LOG(TEXT("Interact Called"));
 	AProjectPlayer* DummyPlayer = Cast<AProjectPlayer>(FocusedItem.GetObject());
-	if (DummyPlayer != nullptr)
+	if (DummyPlayer != nullptr && DummyPlayer != this)
 	{
 		OpenRespawnUI(DummyPlayer);
 		PRINT_LOG(TEXT("Interacting with DummyPlayer"));

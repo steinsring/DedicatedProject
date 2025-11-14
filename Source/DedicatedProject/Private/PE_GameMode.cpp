@@ -82,7 +82,7 @@ void APE_GameMode::PostLogin(APlayerController* NewPlayer)
             APE_GameState* GS = GetGameState<APE_GameState>();
             if (GS)
             {
-                GS->AddAlivePlayer(ProjectPlayer);
+                GS->AddAlivePlayer(NewPlayer->PlayerState);
                 PRINT_LOG(TEXT("Added player to alive list in GameState. Total Alive Players: %d"), GS->AlivePlayers.Num());
             }
         }
@@ -97,7 +97,7 @@ void APE_GameMode::PostLogin(APlayerController* NewPlayer)
             APE_GameState* GS = GetGameState<APE_GameState>();
             if (GS)
             {
-                GS->AddAlivePlayer(ProjectPlayer);
+                GS->AddAlivePlayer(NewPlayer->PlayerState);
                 PRINT_LOG(TEXT("Added player to alive list in GameState. Total Alive Players: %d"), GS->AlivePlayers.Num());
             }
         }
@@ -169,9 +169,6 @@ void APE_GameMode::HandlePlayerDeath(AController* DeadController)
 		PRINT_LOG(TEXT("Processing death for player: %s"), *DeadPlayer->GetName());
 		UCommon_AnimInstance* AnimInstance = Cast<UCommon_AnimInstance>(DeadPlayer->GetMesh()->GetAnimInstance());
         if (AnimInstance) AnimInstance->SetIsDead(true);
-        
-
-		
 
 		// 게임 상태에서 생존자/사망자 목록 갱신
 		APE_GameState* GS = GetGameState<APE_GameState>();
@@ -185,9 +182,8 @@ void APE_GameMode::HandlePlayerDeath(AController* DeadController)
             PRINT_LOG(TEXT("Spectating Next Player: %s"), *NextTarget->GetName());
         }
 
-        GS->RemoveAlivePlayer(DeadPlayer);
-        GS->AddDeadPlayer(DeadPlayer);
-        GS->DeadPlayerStates.Add(DeadPlayer->GetPlayerState<APlayerState>());
+        GS->RemoveAlivePlayer(DeadController->PlayerState);
+        GS->AddDeadPlayer(DeadController->PlayerState);
 
         DeadPlayer->DetachFromControllerPendingDestroy();
 		
@@ -205,7 +201,13 @@ void APE_GameMode::HandlePlayerRespawn(APlayerState* DeadPS, AProjectPlayer* Tar
 	APE_GameState* GS = GetGameState<APE_GameState>();
 	if (!GS) return;
 
-	TargetDummy->SetPowerState_Multicast(true); // 활성화
+	TargetDummy->SetPlayerState(DeadPS);
+	TargetDummy->SetPowerState_Server(true); // 활성화
+	//UHealthComponent* HealthComp = TargetDummy->FindComponentByClass<UHealthComponent>();
+	//if (HealthComp)
+	//{
+	//	HealthComp->SetHP(HealthComp->GetMaxHealth()); // 체력 회복
+	//}
 	// 관전 해제
 	DeadPC->SetViewTargetWithBlend(TargetDummy, 0.0f);
 	// Pawn Possess
@@ -213,8 +215,7 @@ void APE_GameMode::HandlePlayerRespawn(APlayerState* DeadPS, AProjectPlayer* Tar
 
 
 	// 게임 상태에서 생존자/사망자 목록 갱신
-	GS->RemoveDeadPlayer(Cast<AProjectPlayer>(TargetDummy));
-	GS->AddAlivePlayer(Cast<AProjectPlayer>(TargetDummy));
-	GS->DeadPlayerStates.Remove(DeadPS);
+	GS->RemoveDeadPlayer(DeadPS);
+	GS->AddAlivePlayer(DeadPS);
 	PRINT_LOG(TEXT("Player Respawned: %s. Updated GameState: AlivePlayers=%d, DeadPlayers=%d"), *TargetDummy->GetName(), GS->AlivePlayers.Num(), GS->DeadPlayers.Num());
 }

@@ -34,7 +34,7 @@ void UPE_RespawnWidget::InitializeRespawnList()
 
 	RespawnListBox->ClearChildren();
 
-	for (auto* DeadPS : GS->DeadPlayerStates)
+	for (auto* DeadPS : GS->DeadPlayers)
 	{
 		if (!DeadPS)
 		{

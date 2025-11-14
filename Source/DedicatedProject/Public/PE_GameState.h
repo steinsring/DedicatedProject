@@ -21,19 +21,16 @@ protected:
 	
 public:
 	UPROPERTY(Replicated)
-	TArray<AProjectPlayer*> AlivePlayers;
+	TArray<APlayerState*> AlivePlayers;
 	
 	UPROPERTY(Replicated)
-	TArray<AProjectPlayer*> DeadPlayers;
+	TArray<APlayerState*> DeadPlayers;
 
-	UPROPERTY(Replicated)
-	TArray<APlayerState*> DeadPlayerStates;
+	void AddAlivePlayer(APlayerState* NewPlayerState);
+	void RemoveAlivePlayer(APlayerState* DeadPlayerState);
 
-	void AddAlivePlayer(AProjectPlayer* NewPlayer);
-	void RemoveAlivePlayer(AProjectPlayer* DeadPlayer);
-
-	void AddDeadPlayer(AProjectPlayer* NewDeadPlayer);
-	void RemoveDeadPlayer(AProjectPlayer* RevivedPlayer);
+	void AddDeadPlayer(APlayerState* NewDeadPlayerState);
+	void RemoveDeadPlayer(APlayerState* RevivedPlayerState);
 
 	AProjectPlayer* GetNextAlivePlayer(AProjectPlayer* CurrentPlayer);
 };

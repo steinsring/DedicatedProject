@@ -517,7 +517,7 @@ void APE_MapGenerator::SpawnEnemies()
 					Enemy = GetWorld()->SpawnActor<AProjectPlayer>(Location, Rotation, SpawnParams);
 					if (AProjectPlayer* DummyPlayer = Cast<AProjectPlayer>(Enemy))
 					{
-						DummyPlayer->SetPowerState_Multicast(false);
+						DummyPlayer->SetPowerState_Server(false);
 					}
 					break;
 				default:
