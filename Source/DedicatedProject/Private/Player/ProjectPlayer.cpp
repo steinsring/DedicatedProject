@@ -120,9 +120,10 @@ AProjectPlayer::AProjectPlayer()
 
 		// WeponProjectile ----------------------------------------------------------------------------
 		WeaponProjectileComponent = CreateDefaultSubobject<UPE_WeaponProjectileComponent>(TEXT("WeponProjectile"));
-		WeaponProjectileComponent->SetupAttachment(GetMesh(), TEXT("HealthBar"));
-		WeaponProjectileComponent->SetRelativeLocation(FVector(-26.f, 80.f, -10.f));
-		WeaponProjectileComponent->SetRelativeRotation(FRotator(0.f, 90.f, 0.f));
+		//WeaponProjectileComponent->SetupAttachment(GetMesh(), TEXT("HealthBar"));
+		WeaponProjectileComponent->SetupAttachment(springArmComp);
+		WeaponProjectileComponent->SetRelativeLocation(FVector(500.f, -51.f, -22.f));
+		WeaponProjectileComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 	}
 	else
 	{

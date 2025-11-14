@@ -51,6 +51,11 @@ void APE_LobbyPlayerController::BeginPlay()
 	{
 		PRINT_ERROR_LOG(TEXT("LobbyWidget Create Fail"));
 	}
+
+	if (IsLocalController())
+	{
+		OnRep_PlayerList();
+	}
 }
 
 void APE_LobbyPlayerController::UpdatePlayerList(const TArray<FString> DefaultPlayerList)

@@ -48,4 +48,12 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UPE_HPBarWidget> HPBarWidget; // 플레이어 UI 위젯 인스턴스
+
+private:
+	// 조준점  ----------------------------------------------------------------------------------
+	UPROPERTY(VisibleAnywhere, Category = "CrossHair")
+	TSubclassOf<class UUserWidget> CrossHairWidgetBPClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "CrossHair")
+	TObjectPtr<UUserWidget> CrossHairWidget;				// 실제 생성된 인벤토리 위젯 인스턴스
 };
