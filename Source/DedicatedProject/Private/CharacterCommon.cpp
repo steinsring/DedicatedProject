@@ -51,7 +51,11 @@ void ACharacterCommon::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void ACharacterCommon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
 	DOREPLIFETIME(ACharacterCommon, bIsDead);
+	DOREPLIFETIME(ACharacterCommon, bIsWandering);
+	DOREPLIFETIME(ACharacterCommon, bIsGoingBack);
+	DOREPLIFETIME(ACharacterCommon, bIsGoingLeft);
 }
 
 
@@ -373,6 +377,22 @@ void ACharacterCommon::SetIsDead(bool bNewState)
 	{
 		AnimInstance->SetIsDead(bNewState);
 	}
+}
+
+void ACharacterCommon::SetIsGoingBack(bool bNewState)
+{
+	if (bIsGoingBack == bNewState)
+		return;
+
+	bIsGoingBack = bNewState;
+}
+
+void ACharacterCommon::SetIsGoingLeft(bool bNewState)
+{
+	if (bIsGoingLeft == bNewState)
+		return;
+
+	bIsGoingLeft = bNewState;
 }
 
 void ACharacterCommon::OnRep_IsDead()

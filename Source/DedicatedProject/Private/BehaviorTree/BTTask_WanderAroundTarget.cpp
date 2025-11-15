@@ -49,8 +49,7 @@ EBTNodeResult::Type UBTTask_WanderAroundTarget::ExecuteTask(UBehaviorTreeCompone
 		MoveComp->MaxWalkSpeed = OriginalSpeed;
 	}
 
-	AnimInstance = Cast<UEnemy_AnimInstance>(AIChar->GetMesh()->GetAnimInstance());
-	if (AnimInstance) AnimInstance->SetGoingLeft(FMath::RandBool());
+	if (Character) Character->SetIsGoingLeft(FMath::RandBool());
 
 	//중심과 거리 계산
 	FVector Center = Target->GetActorLocation();
@@ -71,6 +70,10 @@ EBTNodeResult::Type UBTTask_WanderAroundTarget::ExecuteTask(UBehaviorTreeCompone
 		FNavLocation NavLocation;
 		if (NavSys->ProjectPointToNavigation(TargetPos, NavLocation))
 		{
+			if (Character)
+			{
+				Character->SetIsGoingBack(true);
+			}
 			AIController->MoveToLocation(NavLocation.Location, -1.0f, true, true, false, true, 0, true);
 			bHasRetreated = true;
 			return EBTNodeResult::InProgress;
@@ -96,6 +99,11 @@ void UBTTask_WanderAroundTarget::ReturnSpeedToOriginal()
 
 void UBTTask_WanderAroundTarget::StartOrbitMovement()
 {
+	if (ACharacterCommon* Character = Cast<ACharacterCommon>(AIPawn))
+	{
+		Character->SetIsGoingBack(false);   // ✅ 뒤로가기 해제
+	}
+
 	FVector Center = Target->GetActorLocation();
 	FVector AIPos = AIPawn->GetActorLocation();
 	FVector ToAI = AIPos - Center;
@@ -106,7 +114,13 @@ void UBTTask_WanderAroundTarget::StartOrbitMovement()
 	
 	//좌, 우 결정
 	float AngleDeltaDegree = OrbitAngleDegree;
-	if (!AnimInstance->IsGoingLeft)
+
+	bool bGoingLeft = true;
+	if (ACharacterCommon* Character = Cast<ACharacterCommon>(AIPawn))
+	{
+		bGoingLeft = Character->GetIsGoingLeft();
+	}
+	if (!bGoingLeft)
 	{
 		AngleDeltaDegree *= -1.0f;
 	}

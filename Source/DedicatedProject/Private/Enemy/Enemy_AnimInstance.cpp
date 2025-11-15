@@ -46,15 +46,44 @@ void UEnemy_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (::IsValid(Pawn))
 	{
 		AAIController* AIController = Cast<AAIController>(Pawn->GetController());
+		ACharacterCommon* Character = Cast<ACharacterCommon>(Pawn);
 		if (AIController)
 		{
 			UBlackboardComponent* BlackBoard = AIController->GetBlackboardComponent();
 			if (BlackBoard)
 			{
 				bool bWandering = BlackBoard->GetValueAsBool(TEXT("bShouldWander"));
-				SetWandering(bWandering);
+				Character->SetIsWandering(bWandering);
 				//PRINT_LOG(TEXT("IsWandering: %s"), bWandering ? TEXT("True") : TEXT("False"));
 			}
+		}
+
+		if (Character)
+		{
+			bool NewWandering = Character->GetIsWandering();
+			bool NewBack = Character->GetIsGoingBack();
+			bool NewLeft = Character->GetIsGoingLeft();
+
+			IsWandering = NewWandering;
+			bIsGoingBack = NewBack;
+			IsGoingLeft = NewLeft;
+
+			//디버그
+			//UE_LOG(LogTemp, Warning, TEXT("EnemyAnim [%s] Role=%d Back=%d Left=%d"),
+			//    *Pawn->GetName(),
+			//    (int32)Pawn->GetLocalRole(),
+			//    NewBack ? 1 : 0,
+			//    NewLeft ? 1 : 0);
+		}
+
+		static bool bPrinted = false;
+		if (!bPrinted)
+		{
+			bPrinted = true;
+			PRINT_LOG(TEXT("EnemyAnimClass [%s] Role=%d Class=%s"),
+				*Pawn->GetName(),
+				(int32)Pawn->GetLocalRole(),
+				*GetClass()->GetName());
 		}
 	}
 }

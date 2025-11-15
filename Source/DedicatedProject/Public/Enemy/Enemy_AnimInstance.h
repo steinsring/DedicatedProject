@@ -31,10 +31,17 @@ public:
 
 	bool GetGoingLeft() const { return IsGoingLeft; }
 
+	void SetIsGoingBack(bool bBack) { bIsGoingBack = bBack; }
+
+	bool GetIsGoingBack() const { return bIsGoingBack; }
+
 //protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
 	bool IsWandering = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
 	bool IsGoingLeft = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pawn")
+	bool bIsGoingBack = false;
 };

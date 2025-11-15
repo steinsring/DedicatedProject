@@ -142,9 +142,36 @@ protected:
 	UFUNCTION()
 	void OnRep_IsDead();
 
-	void RefreshBaseAnimInstance();
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Movement")
+	bool bIsWandering = false;
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Movement")
+	bool bIsGoingBack = false;
+
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Movement")
+	bool bIsGoingLeft = false;
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void SetIsWandering(bool bNewState) { bIsWandering = bNewState; }
+	
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	bool GetIsWandering() const { return bIsWandering; }
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void SetIsGoingBack(bool bNewState);
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	bool GetIsGoingBack() const { return bIsGoingBack; }
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void SetIsGoingLeft(bool bNewState);
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	bool GetIsGoingLeft() const { return bIsGoingLeft; }
+
+	void RefreshBaseAnimInstance();
+
 	bool GetIsDead() const { return bIsDead; }
 	void SetIsDead(bool bNewState);
 };
