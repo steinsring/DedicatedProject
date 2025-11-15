@@ -261,6 +261,17 @@ void AProjectPlayer::Tick(float DeltaTime)
 	{
 		PlayerAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
 	}
+
+	if (IsLocallyControlled() && Controller)
+	{
+		const FRotator CurrentViewRotation = Controller->GetControlRotation();
+
+		if (!CurrentViewRotation.Equals(LastSentViewRotation, 0.5f))
+		{
+			UpdateViewRotation_Server(CurrentViewRotation);
+			LastSentViewRotation = CurrentViewRotation;
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -349,6 +360,7 @@ void AProjectPlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AProjectPlayer, bIsPowerOn);
+	DOREPLIFETIME(AProjectPlayer, ReplicatedViewRotation);
 }
 
 void AProjectPlayer::SetPowerState_Server_Implementation(bool bNewPowerState)
@@ -447,6 +459,21 @@ void AProjectPlayer::LookUp(const FInputActionValue& inputValue)
 {
 	float value = inputValue.Get<float>();
 	AddControllerPitchInput(value);
+}
+
+void AProjectPlayer::UpdateViewRotation_Server_Implementation(const FRotator& NewViewRotation)
+{
+	ReplicatedViewRotation = NewViewRotation;
+}
+
+FRotator AProjectPlayer::GetViewRotation() const
+{
+	if (IsLocallyControlled() && Controller)
+	{
+		return Controller->GetControlRotation();
+	}
+
+	return ReplicatedViewRotation;
 }
 
 void AProjectPlayer::Move(const FInputActionValue& inputValue)

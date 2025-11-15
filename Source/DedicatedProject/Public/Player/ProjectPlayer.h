@@ -81,6 +81,19 @@ private:
 	//상하 회전 입력 처리
 	void LookUp(const struct FInputActionValue& inputValue);
 
+	UPROPERTY(Replicated)
+	FRotator ReplicatedViewRotation;
+
+	UPROPERTY()
+	FRotator LastSentViewRotation;
+
+	UFUNCTION(Server, Reliable)
+	void UpdateViewRotation_Server(const FRotator& NewViewRotation);
+
+public:
+	virtual FRotator GetViewRotation() const override;
+	FRotator GetReplicatedViewRotation() const { return ReplicatedViewRotation; }
+
 private:
 	// 플레이어 이동 --------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
