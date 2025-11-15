@@ -21,6 +21,7 @@ protected:
 
 public:
 	APE_PlayerController();
+	virtual void OnPossess(APawn* InPawn) override;
 
 private:
 	// 인벤토리 ----------------------------------------------------------------------------------
@@ -48,6 +49,14 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UPE_HPBarWidget> HPBarWidget; // 플레이어 UI 위젯 인스턴스
+
+	void BindHPBarToPawn(APawn* InPawn);
+
+protected:
+	virtual void OnRep_Pawn() override;
+
+public:
+	UPE_HPBarWidget* GetHPBarWidget() const { return HPBarWidget; }
 
 private:
 	// 조준점  ----------------------------------------------------------------------------------

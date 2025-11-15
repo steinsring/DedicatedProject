@@ -10,6 +10,8 @@
 #include "Map/PE_MapGenerator.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GameplayManager/PE_LevelTravelManager.h"
+#include "UI/PE_HPBarWidget.h"
+#include "HealthComponent.h"
 
 #include "DedicatedProject.h"
 #include "PE_GameInstance.h"
@@ -201,18 +203,27 @@ void APE_GameMode::HandlePlayerRespawn(APlayerState* DeadPS, AProjectPlayer* Tar
 	APE_GameState* GS = GetGameState<APE_GameState>();
 	if (!GS) return;
 
+    UHealthComponent* HealthComp = TargetDummy->FindComponentByClass<UHealthComponent>();
+    if (HealthComp)
+    {
+        HealthComp->SetHP(HealthComp->GetMaxHealth()); // 체력 회복
+    }
+
+    if (UCommon_AnimInstance* Anim =
+        Cast<UCommon_AnimInstance>(TargetDummy->GetMesh()->GetAnimInstance()))
+    {
+        Anim->SetIsDead(false);
+        Anim->Montage_Stop(0.0f);            // 혹시 죽음 몽타주 계속 물려있으면 클린업
+    }
+
 	TargetDummy->SetPlayerState(DeadPS);
+	TargetDummy->ResetAfterRespawn(); // 리셋
 	TargetDummy->SetPowerState_Server(true); // 활성화
-	//UHealthComponent* HealthComp = TargetDummy->FindComponentByClass<UHealthComponent>();
-	//if (HealthComp)
-	//{
-	//	HealthComp->SetHP(HealthComp->GetMaxHealth()); // 체력 회복
-	//}
+	
 	// 관전 해제
 	DeadPC->SetViewTargetWithBlend(TargetDummy, 0.0f);
 	// Pawn Possess
 	DeadPC->Possess(TargetDummy);
-
 
 	// 게임 상태에서 생존자/사망자 목록 갱신
 	GS->RemoveDeadPlayer(DeadPS);

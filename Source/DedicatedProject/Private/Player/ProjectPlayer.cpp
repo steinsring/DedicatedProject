@@ -417,6 +417,24 @@ void AProjectPlayer::OpenRespawnUI(AProjectPlayer* TargetDummy)
 		}
 	}
 }
+void AProjectPlayer::ResetAfterRespawn()
+{
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	GetMesh()->GlobalAnimRateScale = 1.0f;
+
+	PlayerAnim = Cast<UPE_AnimInstance>(GetMesh()->GetAnimInstance());
+	if (PlayerAnim)
+	{
+		PlayerAnim->SetIsDead(false);
+		PlayerAnim->SetPowerState(true);
+	}
+
+	if (ACharacterCommon* CommonChar = Cast<ACharacterCommon>(this))
+	{
+		CommonChar->SetIsDead(false);
+	}
+}
 //----------------------------------------------------------------------------------------------------------
 
 void AProjectPlayer::Turn(const FInputActionValue& inputValue)

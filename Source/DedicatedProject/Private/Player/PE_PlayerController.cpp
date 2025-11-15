@@ -54,7 +54,10 @@ APE_PlayerController::APE_PlayerController()
 
 void APE_PlayerController::BeginPlay()
 {
+	Super::BeginPlay();
+
 	if (!IsLocalController()) return;
+	//PRINT_LOG(TEXT("BeginPlay: %s, IsLocal=%d"), *GetName(), IsLocalController());
 
 	// Inventory UI 생성 ----------------------------------------------------------------------
 	InventoryWidget = CreateWidget<UPE_Inventory>(this, InventoryWidgetBPClass);
@@ -73,13 +76,14 @@ void APE_PlayerController::BeginPlay()
 	}
 
 	// 체력 --------------------------------------------------------------------------
-	if (HPBarWidgetClass)
+	if (!HPBarWidget && HPBarWidgetClass)
 	{
 		HPBarWidget = CreateWidget<UPE_HPBarWidget>(this, HPBarWidgetClass);
 		if (HPBarWidget)
 		{
+			PRINT_LOG(TEXT("HPBarWidget created in PC: %p"), HPBarWidget.Get());
 			HPBarWidget->AddToViewport();
-			HPBarWidget->BindToHealthComponent(GetPawn()->FindComponentByClass<UHealthComponent>());
+			BindHPBarToPawn(GetPawn());
 		}
 		else
 		{
@@ -125,6 +129,23 @@ void APE_PlayerController::SetupInputComponent()
 	{
 		EnhancedInput->BindAction(IA_Spectator, ETriggerEvent::Started, this, &APE_PlayerController::OnNextSpectateTarget);
 	}
+}
+
+void APE_PlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+	//if (!IsLocalController()) return;
+
+	//BindHPBarToPawn(InPawn);
+}
+
+void APE_PlayerController::OnRep_Pawn()
+{
+	Super::OnRep_Pawn();
+	if (!IsLocalController()) return;
+
+
+	BindHPBarToPawn(GetPawn());
 }
 
 void APE_PlayerController::ItemSlotSelect(int32 i)
@@ -181,3 +202,12 @@ void APE_PlayerController::OnNextSpectateTarget()
 	}
 }
 
+void APE_PlayerController::BindHPBarToPawn(APawn* InPawn)
+{
+	if (!HPBarWidget || !InPawn) return;
+
+	if (UHealthComponent* HealthComp = InPawn->FindComponentByClass<UHealthComponent>())
+	{
+		HPBarWidget->BindToHealthComponent(HealthComp);
+	}
+}

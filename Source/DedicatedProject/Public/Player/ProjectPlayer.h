@@ -64,6 +64,9 @@ public:
 	UFUNCTION()
 	void OpenRespawnUI(AProjectPlayer* TargetDummy);
 
+	UFUNCTION()
+	void ResetAfterRespawn();
+
 private:
 	// 플레이어 화면 조작--------------------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = "Input")

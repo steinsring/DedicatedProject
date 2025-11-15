@@ -94,14 +94,7 @@ void ACharacterCommon::Tick(float DeltaTime)
 void ACharacterCommon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	BaseAnimInstance = Cast<UCommon_AnimInstance>(GetMesh()->GetAnimInstance());
-
-	if (!BaseAnimInstance)
-	{
-		PRINT_LOG(TEXT("BaseAnim is NULL"));
-		return;
-	}
-	BaseAnimInstance->OnMontageEnded.AddDynamic(this, &ACharacterCommon::OnMontageEnded);
+	RefreshBaseAnimInstance();
 
 	//if (HealthComp)
 	//{
@@ -129,6 +122,9 @@ void ACharacterCommon::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 
 void ACharacterCommon::Attack(UAnimMontage* AnimMontage)
 {
+	//최신 인스턴스로 갱신
+	RefreshBaseAnimInstance();
+
 	if (IsAttacking) return;
 	HitActors.Empty();
 	if (HasAuthority())
@@ -149,6 +145,8 @@ void ACharacterCommon::StopMontage_Server_Implementation()
 
 void ACharacterCommon::StopMontage_Multicast_Implementation()
 {
+	RefreshBaseAnimInstance();
+
 	if (BaseAnimInstance)
 	{
 		BaseAnimInstance->StopAllMontages(0.1f);
@@ -180,6 +178,7 @@ void ACharacterCommon::PlayMontage_Server_Implementation(UAnimMontage* AnimMonta
 
 void ACharacterCommon::PlayMontage_Multicast_Implementation(UAnimMontage* AnimMontage)
 {
+	RefreshBaseAnimInstance();
 	BaseAnimInstance->PlayMontage(AnimMontage);
 }
 
@@ -271,6 +270,8 @@ void ACharacterCommon::ApplyStun_NetMulticast_Implementation(float Duration)
 {
 	if (bIsStunned) return;
 	bIsStunned = true;
+
+	RefreshBaseAnimInstance();
 
 	// 1) 현재 진행 중인 공격 끊기
 	if (BaseAnimInstance)
@@ -365,6 +366,8 @@ void ACharacterCommon::SetIsDead(bool bNewState)
 {
 	bIsDead = bNewState;
 
+	RefreshBaseAnimInstance();
+
 	//애님인스턴스에 전달
 	if (UCommon_AnimInstance* AnimInstance = Cast<UCommon_AnimInstance>(GetMesh()->GetAnimInstance()))
 	{
@@ -374,9 +377,44 @@ void ACharacterCommon::SetIsDead(bool bNewState)
 
 void ACharacterCommon::OnRep_IsDead()
 {
+	RefreshBaseAnimInstance();
+
 	//클라에서도 값이 바뀌면 애님인스턴스에 전달
 	if (UCommon_AnimInstance* AnimInstance = Cast<UCommon_AnimInstance>(GetMesh()->GetAnimInstance()))
 	{
 		AnimInstance->SetIsDead(bIsDead);
+	}
+}
+
+void ACharacterCommon::RefreshBaseAnimInstance()
+{
+	UAnimInstance* CurInstance = GetMesh() ? GetMesh()->GetAnimInstance() : nullptr;
+	UCommon_AnimInstance* NewBase = Cast<UCommon_AnimInstance>(CurInstance);
+
+	if (BaseAnimInstance == NewBase)
+	{
+		return; // 그대로면 할 거 없음
+	}
+
+	// 기존 인스턴스에서 델리게이트 정리
+	if (BaseAnimInstance &&
+		BaseAnimInstance->OnMontageEnded.IsAlreadyBound(this, &ACharacterCommon::OnMontageEnded))
+	{
+		BaseAnimInstance->OnMontageEnded.RemoveDynamic(this, &ACharacterCommon::OnMontageEnded);
+	}
+
+	BaseAnimInstance = NewBase;
+
+	if (BaseAnimInstance)
+	{
+		PRINT_LOG(TEXT("RefreshBaseAnimInstance: %s, AnimInstance=%s"),
+			*GetName(),
+			*BaseAnimInstance->GetName());
+
+		BaseAnimInstance->OnMontageEnded.AddDynamic(this, &ACharacterCommon::OnMontageEnded);
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("RefreshBaseAnimInstance: AnimInstance is NULL on %s"), *GetName());
 	}
 }

@@ -142,6 +142,8 @@ protected:
 	UFUNCTION()
 	void OnRep_IsDead();
 
+	void RefreshBaseAnimInstance();
+
 public:
 	bool GetIsDead() const { return bIsDead; }
 	void SetIsDead(bool bNewState);
