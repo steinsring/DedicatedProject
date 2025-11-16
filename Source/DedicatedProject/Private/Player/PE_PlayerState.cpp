@@ -7,6 +7,7 @@
 #include "Net/UnrealNetwork.h"			//DOREPLIFETIME_CONDITION
 #include "Player/PE_PlayerController.h"
 #include "Player/ProjectPlayer.h"
+#include <Item/PE_ItemDataTable.h>
 
 void APE_PlayerState::InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage)
 {
@@ -29,6 +30,17 @@ void APE_PlayerState::InitializeDefaultData(TArray<FItemData> DefualtInventoryDa
 		InventoryData = DefualtInventoryData;
 	}
 
+	ItemDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ItemDataTable.DT_ItemDataTable"));
+
+	if (ItemDataTable)									//데이터 테이블이 참조되었는지 확인
+	{
+		ItemDataTable->GetAllRows<FPE_ItemDataTable>(TEXT("ProjectPlayer"), ItemDataRows); //테이블의 모든 행을 지역배열로 가져온다.
+	}
+	else
+	{
+		PRINT_LOG(TEXT("ItemDataTable is NULL"));
+	}
+
 	ForceNetUpdate();	// 서버에서 복제되는 프로퍼티를 바꾼 직후 다음 넷 업데이트 사이클에 강제 전송
 }
 
@@ -38,6 +50,7 @@ void APE_PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	// 인벤토리는 보통 본인에게만 복제, 서버는 모든 state를 가지고있기때문
 	DOREPLIFETIME_CONDITION(APE_PlayerState, InventoryData, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(APE_PlayerState, CurrentQuantity, COND_OwnerOnly);
 }
 
 // 인벤토리 데이터가 변경될경우 자동으로 호출
@@ -132,5 +145,68 @@ void APE_PlayerState::UseItem_Server_Implementation(const int32 SlotNumber)
 	{// 호스트의 클라이언트만 실행시키기 위함
 		OnRep_InventoryData();
 	}
+}
+
+void APE_PlayerState::OnRep_FuelData()
+{
+	OnFuelChanged.Broadcast(CurrentQuantity);
+	PRINT_LOG(TEXT("Fuel BroadCast"));
+	Cast<AProjectPlayer>(GetPlayerController()->GetCharacter())->UpdateFuel(CurrentQuantity);
+}
+
+bool APE_PlayerState::IsEnoughFuel(int32 Quantity)
+{
+	if (CurrentQuantity > Quantity)	return true;
+
+	PRINT_LOG(TEXT("Not Enough Fuel"));
+	return false;
+}
+
+void APE_PlayerState::AddFuel(FName ItemID)
+{
+	AddFuel_Server(ItemID);
+}
+
+void APE_PlayerState::AddFuel_Server_Implementation(FName ItemID)
+{
+	SearchedItemData = nullptr;						// 이전결과 초기화
+
+	for (FPE_ItemDataTable* Row : ItemDataRows)		// ItemDataTable에서 아이템 정보 검색
+	{
+		if (Row->ItemID == ItemID)
+		{
+			SearchedItemData = Row;
+			break;
+		}
+	}
+
+	if (!SearchedItemData) return;
+
+	int32 Quantity = SearchedItemData->Quantity;
+
+	if (CurrentQuantity + Quantity > MaxQuantity)
+	{
+		PRINT_LOG(TEXT("Fuel is Over"));
+		return;
+	}
+
+	CurrentQuantity += Quantity;
+	PRINT_LOG(TEXT("Fuel : %d"), CurrentQuantity);
+	OnFuelChanged.Broadcast(CurrentQuantity);
+
+	if (GetPlayerController()->IsLocalController())
+	{
+		OnRep_FuelData();
+	}
+}
+
+void APE_PlayerState::UseFuel(int32 Quantity)
+{
+	UseFuel_Server(Quantity);
+}
+
+void APE_PlayerState::UseFuel_Server_Implementation(int32 Quantity)
+{
+	if (CurrentQuantity < Quantity)	return ;
 }
 

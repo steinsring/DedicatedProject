@@ -4,6 +4,8 @@
 #include "Fuel/PE_FuelComponent.h"
 #include "Fuel/PE_FuelWidget.h"
 #include "DedicatedProject.h"
+#include "Player/ProjectPlayer.h"
+#include "Player/PE_PlayerState.h"
 
 UPE_FuelComponent::UPE_FuelComponent()
 {
@@ -38,12 +40,14 @@ void UPE_FuelComponent::BeginPlay()
 
 void UPE_FuelComponent::AddFuel(FName ItemID)
 {
-	AddFuel_Server(ItemID);
+	AProjectPlayer* Chr = Cast<AProjectPlayer>(GetOwner());
+	APE_PlayerState* PS = Chr->GetPlayerState<APE_PlayerState>();
+	PS->AddFuel(ItemID);
 }
 
-void UPE_FuelComponent::AddFuel_Server_Implementation(FName ItemID)
+void UPE_FuelComponent::UpdateFuel(int32 Quantity)
 {
-	FuelWidgetInstance->AddFuel(ItemID);
+	FuelWidgetInstance->UpdateFuelUI(Quantity);
 }
 
 void UPE_FuelComponent::UseFuel(int32 Quantity)

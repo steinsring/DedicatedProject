@@ -194,8 +194,11 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Fuel")
 	TObjectPtr<class UPE_FuelComponent> FuelComponent;	// FuelComponent
+public:
+	void UpdateFuel(const int32 Quantity);
 
 	// Light -------------------------------------------------------------------------
+private:
 	UPROPERTY(VisibleAnywhere, Category = "Light")
 	TObjectPtr<class USpotLightComponent> SpotLightComp;
 

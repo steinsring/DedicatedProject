@@ -699,3 +699,8 @@ void AProjectPlayer::AddItemToInventory(FName ID, int32 Quantity)
 		InventoryComponent->AddItem(ID, Quantity, this);
 	}
 }
+
+void AProjectPlayer::UpdateFuel(const int32 Quantity)
+{
+	FuelComponent->UpdateFuel(Quantity);
+}

@@ -21,7 +21,7 @@ APE_ItemSpawner::APE_ItemSpawner()
 	// 유효하면 배열에 추가
 	if (Item1_BP.Succeeded())
 	{
-		SpawnableItems.Add(Item1_BP.Class);
+		//SpawnableItems.Add(Item1_BP.Class);
 	}
 
 	if (Item2_BP.Succeeded())
@@ -31,7 +31,7 @@ APE_ItemSpawner::APE_ItemSpawner()
 
 	if (Item3_BP.Succeeded())
 	{
-		//SpawnableItems.Add(Item3_BP.Class);
+		SpawnableItems.Add(Item3_BP.Class);
 	}
 
 }
