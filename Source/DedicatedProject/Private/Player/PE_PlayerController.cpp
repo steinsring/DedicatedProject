@@ -136,7 +136,7 @@ void APE_PlayerController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 	//if (!IsLocalController()) return;
 
-	//BindHPBarToPawn(InPawn);
+	BindHPBarToPawn(InPawn);
 }
 
 void APE_PlayerController::OnRep_Pawn()

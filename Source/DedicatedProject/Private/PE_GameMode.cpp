@@ -206,7 +206,8 @@ void APE_GameMode::HandlePlayerRespawn(APlayerState* DeadPS, AProjectPlayer* Tar
     UHealthComponent* HealthComp = TargetDummy->FindComponentByClass<UHealthComponent>();
     if (HealthComp)
     {
-        HealthComp->SetHP(HealthComp->GetMaxHealth()); // 체력 회복
+        HealthComp->SetHP_Server(HealthComp->GetMaxHealth()); // 체력 회복
+		PRINT_LOG(TEXT("TargetDummy Health Restored to Max: %f"), HealthComp->GetMaxHealth());
     }
 
     if (UCommon_AnimInstance* Anim =
