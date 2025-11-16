@@ -3,6 +3,7 @@
 
 #include "UI/PE_RespawnWidget.h"
 #include "PE_GameState.h"
+#include "Player/PE_PlayerState.h"
 #include "Components/VerticalBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/PE_RespawnBtn.h"
@@ -56,6 +57,12 @@ void UPE_RespawnWidget::InitializeRespawnList()
 			{
 				PRINT_LOG(TEXT("TargetDummy is NULL"));
 			}
+			
+			FString FullName = DeadPS->GetPlayerName();
+			FString PureName;
+			FullName.Split(TEXT("-"), &PureName, nullptr);
+			NewBtn->SetPlayerName(PureName);
+
 			NewBtn->ParentRespawnWidget = this;
 			RespawnListBox->AddChild(NewBtn);
 		}

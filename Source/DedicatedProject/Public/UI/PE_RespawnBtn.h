@@ -28,4 +28,10 @@ public:
 
 	UPROPERTY()
 	class UPE_RespawnWidget* ParentRespawnWidget;
+
+	void SetPlayerName(const FString& Name);
+
+protected:
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* PlayerName;
 };

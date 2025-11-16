@@ -3,6 +3,7 @@
 
 #include "UI/PE_RespawnBtn.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/TextBlock.h"
 
 #include "DedicatedProject.h"
 
@@ -40,5 +41,13 @@ void UPE_RespawnBtn::OnClick_RespawnBtn(APlayerState* DeadPlayerState, AProjectP
 				MyPC->bShowMouseCursor = false;
 			}
 		}
+	}
+}
+
+void UPE_RespawnBtn::SetPlayerName(const FString& Name)
+{
+	if (PlayerName)
+	{
+		PlayerName->SetText(FText::FromString(Name));
 	}
 }
