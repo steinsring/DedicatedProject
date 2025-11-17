@@ -607,6 +607,7 @@ void AProjectPlayer::Die()
 		if (GM)
 		{
 			GM->HandlePlayerDeath(Controller);
+			GM->AllPlayersDie();
 		}
 	}
 }

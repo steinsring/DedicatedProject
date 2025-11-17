@@ -24,7 +24,7 @@ UPE_FuelComponent::UPE_FuelComponent()
 	SetDrawSize(FVector2D(500.f, 500.f));
 	SetWidgetClass(FuelWidget);
 	SetRelativeLocation(FVector(-4.f, -30.f, 0.f));	// 배낭 옆 약간 띄우기
-	SetRelativeRotation(FRotator(0.f, 0.f, -50.f));
+	SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 	SetTranslucentSortPriority(5);					// 반투명 오브젝트의 렌더링 우선순위를 지정
 	SetTwoSided(true);								// 위젯이 앞뒤 양쪽
 	SetWorldScale3D(FVector(1.f, 0.03f, 0.1f));		// 실제 scale

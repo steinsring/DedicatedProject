@@ -231,4 +231,32 @@ void APE_GameMode::HandlePlayerRespawn(APlayerState* DeadPS, AProjectPlayer* Tar
 	GS->RemoveDeadPlayer(DeadPS);
 	GS->AddAlivePlayer(DeadPS);
 	PRINT_LOG(TEXT("Player Respawned: %s. Updated GameState: AlivePlayers=%d, DeadPlayers=%d"), *TargetDummy->GetName(), GS->AlivePlayers.Num(), GS->DeadPlayers.Num());
+
+
+}
+
+void APE_GameMode::AllPlayersDie()
+{
+    APE_GameState* GS = GetGameState<APE_GameState>();
+    if (!GS) return;
+
+    if (GS->AlivePlayers.Num() == 0)
+    {
+        UWorld* World = GetWorld();
+        if (World->GetAuthGameMode() == nullptr)
+        {
+            PRINT_ERROR_LOG(TEXT("Travel To Level : %s"), TEXT("World is Null"));
+            return;
+        }
+
+        UPE_GameInstance* GameInstance = GetGameInstance<UPE_GameInstance>();
+        if (GameInstance == nullptr)
+        {
+            PRINT_ERROR_LOG(TEXT("Travel To Level : %s"), TEXT("GameInstance is Null"));
+            return;
+        }
+
+        GameInstance->ResetLevelTravelCount();
+        World->ServerTravel(FString::Printf(TEXT("%s?listen"), TEXT("/Game/Maps/Lobby")));
+    }
 }

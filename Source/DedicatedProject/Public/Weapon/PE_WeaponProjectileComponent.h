@@ -24,6 +24,9 @@ public:
 	void SetProjectileClass(TSubclassOf<APE_BaseWeaponProjectile> NewProjectileClass)
 	{	ProjectileClass = NewProjectileClass;	}
 
+	UPROPERTY(EditAnywhere, Category = "FX")
+	UParticleSystem* MuzzleFlash;       // Cascade 파티클
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

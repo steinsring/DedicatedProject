@@ -43,4 +43,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	//virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
+public:
+	void AllPlayersDie();
 };

@@ -26,5 +26,7 @@ public:
 	FORCEINLINE USphereComponent* GetSphereCollision() const { return SphereCollision; }
 
 	FORCEINLINE UStaticMeshComponent* GetMesh() const { return Mesh; }
+protected:
+	virtual void BeginPlay() override;
 	
 };

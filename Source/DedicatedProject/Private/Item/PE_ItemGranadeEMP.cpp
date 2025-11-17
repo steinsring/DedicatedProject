@@ -13,6 +13,9 @@ APE_ItemGranadeEMP::APE_ItemGranadeEMP()
 		GetItemThrowableMesh()->SetStaticMesh(StaticMesh.Object);
 	}
 
+	ItemMesh->SetRelativeScale3D(FVector(0.5f));
+	ItemCollision->InitSphereRadius(1000.f);
+
 	bReplicates = true;
 }
 

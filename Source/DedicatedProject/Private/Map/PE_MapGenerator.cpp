@@ -124,15 +124,18 @@ APE_MapGenerator::APE_MapGenerator()
 
 	// 아이템 스포너 생성
 	ItemSpawner = CreateDefaultSubobject<APE_ItemSpawner>(TEXT("Item Spawner"));
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
 void APE_MapGenerator::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (GetLocalRole() != ROLE_Authority)
+
+	if (!HasAuthority())
+	{
 		return;
+	}
 
 	// BSP 알고리즘
 	RootNode = MakeBSPNode();

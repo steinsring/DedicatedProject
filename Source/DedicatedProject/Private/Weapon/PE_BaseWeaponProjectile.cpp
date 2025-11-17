@@ -21,7 +21,7 @@ APE_BaseWeaponProjectile::APE_BaseWeaponProjectile()
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);   // 트리거 전용
 	//SphereCollision->SetGenerateOverlapEvents(true);						// 오버랩시 이벤트
-	SphereCollision->InitSphereRadius(25.f);
+	SphereCollision->InitSphereRadius(1.2f);
 	SphereCollision->SetNotifyRigidBodyCollision(false);					// Hit 이벤트
 	SphereCollision->SetCollisionResponseToAllChannels(ECR_Block);
 	//SphereCollision->BodyInstance.SetCollisionProfileName("BlockAll");
@@ -58,7 +58,7 @@ APE_BaseWeaponProjectile::APE_BaseWeaponProjectile()
 	//ProjectileMovement->Friction = 0.2f;								// 마찰
 	ProjectileMovement->bShouldBounce = false;							// 바운스 설정
 	//ProjectileMovement->BounceVelocityStopSimulatingThreshold = 150.f;	// 너무 느리면 정지
-	Mesh->SetRelativeScale3D(FVector(3.0f));
+	Mesh->SetRelativeScale3D(FVector(0.5f));
 	bReplicates = true;
 }
 

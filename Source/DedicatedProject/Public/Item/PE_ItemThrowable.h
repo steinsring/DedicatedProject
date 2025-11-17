@@ -11,7 +11,7 @@ class DEDICATEDPROJECT_API APE_ItemThrowable : public AActor
 {
 	GENERATED_BODY()
 
-private:
+protected:
 	UPROPERTY(VisibleAnywhere, Category = "ItemThrowable")
 	TObjectPtr<UStaticMeshComponent> ItemMesh;							// 아이템 메시
 

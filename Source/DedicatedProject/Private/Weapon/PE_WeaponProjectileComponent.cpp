@@ -5,6 +5,7 @@
 #include "Weapon/PE_BaseWeaponProjectile.h"
 #include "Player/ProjectPlayer.h"
 #include "DedicatedProject.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values for this component's properties
