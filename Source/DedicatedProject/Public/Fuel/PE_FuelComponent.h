@@ -21,10 +21,6 @@ private:
 	UPROPERTY(Transient) // 저장/로드/에디터 저장 등에 포함되지 않는, 런타임 전용 값
 	TObjectPtr<UPE_FuelWidget> FuelWidgetInstance;
 
-	UFUNCTION(Server, Reliable)
-	void UseFuel_Server(int32 Quantity);
-
-
 protected:
 	virtual void BeginPlay() override;
 

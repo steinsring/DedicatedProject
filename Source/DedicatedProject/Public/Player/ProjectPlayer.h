@@ -242,4 +242,9 @@ private:
 
 public:
 	void Die();
+
+	// 스테이지 이동 RPC ----------------------------------------------
+	UFUNCTION(Server, Reliable)
+	void Server_RequestLevelTravel(class APE_LevelTravelManager* LevelManager);
+
 };

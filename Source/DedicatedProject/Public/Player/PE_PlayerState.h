@@ -41,7 +41,7 @@ public:
 
 public:
 	// 초기화 함수 -----------------------------------------------------------------------------
-	void InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage);											// Gamemode의 PostLogin에서 호출
+	void InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage, int32 DefualtFuelData);											// Gamemode의 PostLogin에서 호출
 
 	// 인벤토리 데이터 설정 함수 -----------------------------------------------------------------------------
 	bool IsEmptySlot(const int32 SlotNumber);

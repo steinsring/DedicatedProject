@@ -29,7 +29,6 @@ protected:
 
 public:
 	void UpdateFuelUI(const int32 Quantity);
-	void UseFuel(int32 Quantity);
 	
 	int32 GetCurrentFuel() const { return CurrentQuantity; }
 };

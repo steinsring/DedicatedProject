@@ -9,7 +9,7 @@
 #include "Player/ProjectPlayer.h"
 #include <Item/PE_ItemDataTable.h>
 
-void APE_PlayerState::InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage)
+void APE_PlayerState::InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage, int32 DefualtFuelData)
 {
 	check(HasAuthority());	//서버 전용
 
@@ -28,8 +28,11 @@ void APE_PlayerState::InitializeDefaultData(TArray<FItemData> DefualtInventoryDa
 	else
 	{
 		InventoryData = DefualtInventoryData;
+		CurrentQuantity = DefualtFuelData;
 	}
 
+
+	// 데이터 테이블 등록 ----------------------------------------
 	ItemDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_ItemDataTable.DT_ItemDataTable"));
 
 	if (ItemDataTable)									//데이터 테이블이 참조되었는지 확인
@@ -40,6 +43,8 @@ void APE_PlayerState::InitializeDefaultData(TArray<FItemData> DefualtInventoryDa
 	{
 		PRINT_LOG(TEXT("ItemDataTable is NULL"));
 	}
+
+
 
 	ForceNetUpdate();	// 서버에서 복제되는 프로퍼티를 바꾼 직후 다음 넷 업데이트 사이클에 강제 전송
 }
@@ -207,6 +212,20 @@ void APE_PlayerState::UseFuel(int32 Quantity)
 
 void APE_PlayerState::UseFuel_Server_Implementation(int32 Quantity)
 {
-	if (CurrentQuantity < Quantity)	return ;
+	if (CurrentQuantity - Quantity >= 0)
+	{
+		CurrentQuantity -= Quantity;
+	}
+	else
+	{
+		PRINT_LOG(TEXT("Not enough Fuel"));
+	}
+
+	OnFuelChanged.Broadcast(CurrentQuantity);
+
+	if (GetPlayerController()->IsLocalController())
+	{
+		OnRep_FuelData();
+	}
 }
 

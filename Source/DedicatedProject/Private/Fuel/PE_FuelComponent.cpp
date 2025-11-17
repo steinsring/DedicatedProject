@@ -52,12 +52,9 @@ void UPE_FuelComponent::UpdateFuel(int32 Quantity)
 
 void UPE_FuelComponent::UseFuel(int32 Quantity)
 {
-	UseFuel_Server(Quantity);
-}
-
-void UPE_FuelComponent::UseFuel_Server_Implementation(int32 Quantity)
-{
-	FuelWidgetInstance->UseFuel(Quantity);
+	AProjectPlayer* Chr = Cast<AProjectPlayer>(GetOwner());
+	APE_PlayerState* PS = Chr->GetPlayerState<APE_PlayerState>();
+	PS->UseFuel(Quantity);
 }
 
 bool UPE_FuelComponent::HasEnoughFuel(int32 Quantity) const

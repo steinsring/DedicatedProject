@@ -236,9 +236,10 @@ void UPE_GameInstance::ResetLevelTravelCount()
     LevelTravelCount = 1;
 }
 
-void UPE_GameInstance::SaveStagePlayerData(FString ID, TArray<FItemData> PlayerData)
+void UPE_GameInstance::SaveStagePlayerData(FString ID, TArray<FItemData> PlayerData, int32 FuelData)
 {
     PlayerDataMap.Add(ID, PlayerData);
+    FuelQuantity = FuelData;
 }
 
 TArray<FItemData> UPE_GameInstance::GetStagePlayerData(FString ID)
@@ -250,6 +251,7 @@ TArray<FItemData> UPE_GameInstance::GetStagePlayerData(FString ID)
     
     return {};
 }
+
 
 
 
