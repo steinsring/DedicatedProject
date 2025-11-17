@@ -54,6 +54,21 @@ void APE_LevelTravelManager::Interact(AActor* Interactor)
 		return;
 	}
 
+	APE_PlayerState* PS = PlayerCharacter->GetPlayerState<APE_PlayerState>();
+	if (!PS)
+	{
+		PRINT_LOG(TEXT("LevelTravelManager::Interact - Interactor is not APE_PlayerState"));
+		return;
+	}
+
+	if (!PS->IsEnoughFuel(RequiredFuel))
+	{
+		PRINT_LOG(TEXT("Not Enought Fuel"));
+		return;
+	}
+
+	PS->UseFuel(RequiredFuel);	// 요구치 사용
+
 	if (HasAuthority())
 	{
 		// 서버에서 직접 실행

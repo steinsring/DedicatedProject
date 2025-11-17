@@ -449,6 +449,25 @@ void AProjectPlayer::InputJump(const struct FInputActionValue& inputValue)
 void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)  
 {  
    PRINT_LOG(TEXT("InputAttack Called"));  
+   if (IsAttacking)
+   {
+	   PRINT_LOG(TEXT("Already Attacking - ignore input"));
+	   return;
+   }
+
+   APE_PlayerState* PS = GetPlayerState<APE_PlayerState>();
+   if (!PS)
+   {
+	   PRINT_ERROR_LOG(TEXT("APE_PlayerState is NULL"));
+	   return;
+   }
+
+   if (!PS->IsEnoughFuel(RequiredAttackFuel))
+   {
+	   PRINT_LOG(TEXT("Not Enough Fuel"));
+	   return;
+   }
+
    if (!PlayerAnim)  
    {  
        PRINT_ERROR_LOG(TEXT("PlayerAnim is NULL"));  
@@ -461,6 +480,7 @@ void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
 	   return;
    }
 
+   PS->UseFuel(RequiredAttackFuel);
    WeaponProjectileComponent->Fire();
    
    if (PlayerAnim->BasicAttack)  

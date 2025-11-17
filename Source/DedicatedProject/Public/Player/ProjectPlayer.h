@@ -101,6 +101,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "WeaponProjectile")
 	TObjectPtr<class UPE_WeaponProjectileComponent> WeaponProjectileComponent;
 
+	int32 RequiredAttackFuel = 100;
+
 public:
 	FORCEINLINE UPE_WeaponProjectileComponent* GetWeaponProjectileComponent() const { return WeaponProjectileComponent; }
 

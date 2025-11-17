@@ -161,7 +161,7 @@ void APE_PlayerState::OnRep_FuelData()
 
 bool APE_PlayerState::IsEnoughFuel(int32 Quantity)
 {
-	if (CurrentQuantity > Quantity)	return true;
+	if (CurrentQuantity >= Quantity)	return true;
 
 	PRINT_LOG(TEXT("Not Enough Fuel"));
 	return false;

@@ -103,10 +103,11 @@ public:
 	UFUNCTION()
 	void PlayHitSound(AActor* HitActor);
 
-private:
+protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Attack", meta = (AllowPrivateAccess = true))
 	bool IsAttacking;
 
+private:
 	UPROPERTY()
 	class UCommon_AnimInstance* BaseAnimInstance;
 

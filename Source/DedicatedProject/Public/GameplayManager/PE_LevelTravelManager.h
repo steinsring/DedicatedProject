@@ -28,6 +28,8 @@ private:
 
 	bool bTravelInProgress = false;						// 재진입 가드
 
+	int32 RequiredFuel = 100;							// 사용 연료량
+
 protected:
 	virtual void BeginPlay() override;
 
