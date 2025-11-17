@@ -23,23 +23,12 @@ private:
 	UPROPERTY(VisibleAnywhere, meta = (BindWidget))
 	UProgressBar* FuelProgressBar;
 
-	UPROPERTY(VisibleAnywhere, Category = "Item Data")
-	class UDataTable* ItemDataTable;
-
-	void FindItemData(FName ItemID);
-
-	TArray<FPE_ItemDataTable*> ItemDataRows;
-	struct FPE_ItemDataTable* SearchedItemData;
-
-	FORCEINLINE FPE_ItemDataTable* GetItemData() const { return SearchedItemData; }
-
 protected:
 	virtual void NativeConstruct() override;
 
 
 public:
-	void AddFuel(FName ItemID);
-	void UseFuel(int32 Quantity);
+	void UpdateFuelUI(const int32 Quantity);
 	
 	int32 GetCurrentFuel() const { return CurrentQuantity; }
 };

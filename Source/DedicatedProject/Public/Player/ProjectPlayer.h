@@ -117,6 +117,8 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "WeaponProjectile")
 	TObjectPtr<class UPE_WeaponProjectileComponent> WeaponProjectileComponent;
 
+	int32 RequiredAttackFuel = 100;
+
 public:
 	FORCEINLINE UPE_WeaponProjectileComponent* GetWeaponProjectileComponent() const { return WeaponProjectileComponent; }
 
@@ -210,8 +212,11 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Fuel")
 	TObjectPtr<class UPE_FuelComponent> FuelComponent;	// FuelComponent
+public:
+	void UpdateFuel(const int32 Quantity);
 
 	// Light -------------------------------------------------------------------------
+private:
 	UPROPERTY(VisibleAnywhere, Category = "Light")
 	TObjectPtr<class USpotLightComponent> SpotLightComp;
 
@@ -255,4 +260,9 @@ private:
 
 public:
 	void Die();
+
+	// 스테이지 이동 RPC ----------------------------------------------
+	UFUNCTION(Server, Reliable)
+	void Server_RequestLevelTravel(class APE_LevelTravelManager* LevelManager);
+
 };

@@ -8,6 +8,7 @@
 #include "DedicatedProject.h"
 #include "PE_GameInstance.h"
 #include "Player/PE_PlayerState.h"
+#include "Player/ProjectPlayer.h"
 
 
 // Sets default values
@@ -46,10 +47,41 @@ void APE_LevelTravelManager::Tick(float DeltaTime)
 
 void APE_LevelTravelManager::Interact(AActor* Interactor)
 {
-	LevelTravel();
+	AProjectPlayer* PlayerCharacter = Cast<AProjectPlayer>(Interactor);
+	if (!PlayerCharacter)
+	{
+		PRINT_LOG(TEXT("LevelTravelManager::Interact - Interactor is not AProjectPlayer"));
+		return;
+	}
+
+	APE_PlayerState* PS = PlayerCharacter->GetPlayerState<APE_PlayerState>();
+	if (!PS)
+	{
+		PRINT_LOG(TEXT("LevelTravelManager::Interact - Interactor is not APE_PlayerState"));
+		return;
+	}
+
+	if (!PS->IsEnoughFuel(RequiredFuel))
+	{
+		PRINT_LOG(TEXT("Not Enought Fuel"));
+		return;
+	}
+
+	PS->UseFuel(RequiredFuel);	// 요구치 사용
+
+	if (HasAuthority())
+	{
+		// 서버에서 직접 실행
+		LevelTravel();
+	}
+	else
+	{
+		// 클라이언트 → 서버 RPC
+		PlayerCharacter->Server_RequestLevelTravel(this);
+	}
 }
 
-void APE_LevelTravelManager::LevelTravel_Implementation()
+void APE_LevelTravelManager::LevelTravel()
 {
 	if (bTravelInProgress) // 중복 호출 방지
 	{
@@ -86,9 +118,10 @@ void APE_LevelTravelManager::LevelTravel_Implementation()
 		if (!PS) continue;
 
 		TArray<FItemData> PlayerInventoryData = PS->GetInventoryData();
+		int32 PlayerFuelData = PS->GetCurrentFuel();
 
 		const FString Key = PS->GetPlayerName(); // 나중엔 UniqueNetId로 하면 더 안전
-		GameInstance->SaveStagePlayerData(Key, PlayerInventoryData);
+		GameInstance->SaveStagePlayerData(Key, PlayerInventoryData, PlayerFuelData);
 	}
 
 	// 스테이지 정보를 GameInstance에서 가져와서 세팅--------------------------------

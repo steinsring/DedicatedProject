@@ -19,13 +19,16 @@ private:
 	TObjectPtr<class UStaticMeshComponent> InteractMesh; // 액터의 메시
 
 	// 레벨 관리----------------------------------------------------------------------------
-	UFUNCTION(Server,Reliable)
+public:
 	void LevelTravel();
 
+private:
 	UFUNCTION(NetMulticast, Reliable)					// 모든 클라+서버에서 실행
 	void Multicast_NotifyLevelTravelTriggered(int32 NextStage);
 
 	bool bTravelInProgress = false;						// 재진입 가드
+
+	int32 RequiredFuel = 100;							// 사용 연료량
 
 protected:
 	virtual void BeginPlay() override;

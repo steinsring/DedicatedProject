@@ -9,6 +9,8 @@
 #include "PE_PlayerState.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryChanged, TArray<FItemData>, NewInventory); //FOnInventoryChanged라는 델리게이트는 FItemData 타입의 인자(NewItem)를 받는 함수를 호출
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFuelChanged, int32, NewQuantity);
+
 UCLASS()
 class DEDICATEDPROJECT_API APE_PlayerState : public APlayerState
 {
@@ -25,6 +27,13 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_InventoryData)	// 값이 변경되면 OnRep_InventoryData()함수 자동 호출
 	TArray<FItemData> InventoryData;
 
+	// 데이터테이블 -----------------------------------------------------------------------------
+	UPROPERTY(VisibleAnywhere, Category = "Item Data Table")
+	class UDataTable* ItemDataTable;
+
+	TArray<struct FPE_ItemDataTable*> ItemDataRows;
+	struct FPE_ItemDataTable* SearchedItemData;
+
 	// -----------------------------------------------------------------
 public:
 	UFUNCTION()
@@ -32,7 +41,7 @@ public:
 
 public:
 	// 초기화 함수 -----------------------------------------------------------------------------
-	void InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage);											// Gamemode의 PostLogin에서 호출
+	void InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage, int32 DefualtFuelData);											// Gamemode의 PostLogin에서 호출
 
 	// 인벤토리 데이터 설정 함수 -----------------------------------------------------------------------------
 	bool IsEmptySlot(const int32 SlotNumber);
@@ -51,4 +60,33 @@ public:
 	FOnInventoryChanged OnInventoryChanged;									// 나중에 함수들을 바인딩해서 실제로 사용
 
 	FORCEINLINE TArray<FItemData> GetInventoryData() const { return InventoryData; }
+
+	// 연료 데이터 -----------------------------------------------------------------
+private:
+	int32 MaxQuantity = 10000;
+
+	UPROPERTY(ReplicatedUsing = OnRep_FuelData)
+	int32 CurrentQuantity = 0;
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "Events")
+	FOnFuelChanged OnFuelChanged;
+
+	UFUNCTION()
+	void OnRep_FuelData();												// 여기서 클라이언트의 UI 갱신
+
+	bool IsEnoughFuel(int32 Quantity);
+
+	void AddFuel(FName ItemID);
+
+	UFUNCTION(Server, Reliable)
+	void AddFuel_Server(FName ItemID);
+
+	void UseFuel(int32 Quantity);
+
+	UFUNCTION(Server, Reliable)
+	void UseFuel_Server(int32 Quantity);
+
+	FORCEINLINE int32 GetCurrentFuel() const { return CurrentQuantity; }
+
 };

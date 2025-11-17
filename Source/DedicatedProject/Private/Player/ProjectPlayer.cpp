@@ -33,6 +33,7 @@
 #include "Player/PE_PlayerController.h"
 #include "Player/PE_PlayerState.h"
 #include "Weapon/PE_WeaponProjectileComponent.h"
+#include "GameplayManager/PE_LevelTravelManager.h"
 
 
 
@@ -493,6 +494,25 @@ void AProjectPlayer::InputJump(const struct FInputActionValue& inputValue)
 void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)  
 {  
    PRINT_LOG(TEXT("InputAttack Called"));  
+   if (IsAttacking)
+   {
+	   PRINT_LOG(TEXT("Already Attacking - ignore input"));
+	   return;
+   }
+
+   APE_PlayerState* PS = GetPlayerState<APE_PlayerState>();
+   if (!PS)
+   {
+	   PRINT_ERROR_LOG(TEXT("APE_PlayerState is NULL"));
+	   return;
+   }
+
+   if (!PS->IsEnoughFuel(RequiredAttackFuel))
+   {
+	   PRINT_LOG(TEXT("Not Enough Fuel"));
+	   return;
+   }
+
    if (!PlayerAnim)  
    {  
        PRINT_ERROR_LOG(TEXT("PlayerAnim is NULL"));  
@@ -505,6 +525,7 @@ void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
 	   return;
    }
 
+   PS->UseFuel(RequiredAttackFuel);
    WeaponProjectileComponent->Fire();
    
    if (PlayerAnim->BasicAttack)  
@@ -743,4 +764,20 @@ void AProjectPlayer::AddItemToInventory(FName ID, int32 Quantity)
 	{
 		InventoryComponent->AddItem(ID, Quantity, this);
 	}
+}
+
+void AProjectPlayer::UpdateFuel(const int32 Quantity)
+{
+	FuelComponent->UpdateFuel(Quantity);
+}
+
+void AProjectPlayer::Server_RequestLevelTravel_Implementation(APE_LevelTravelManager* LevelManager)
+{// RPC를 위해 Character를 거쳐서 실행
+	if (!LevelManager)
+	{
+		PRINT_LOG(TEXT("Server_RequestLevelTravel_Implementation - LevelManager is null"));
+		return;
+	}
+
+	LevelManager->LevelTravel();   // 여기서 실제 서버 로직 실행
 }
