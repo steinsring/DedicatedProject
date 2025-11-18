@@ -21,6 +21,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+
+	// 모든 클라이언트에 폭발 이펙트 실행
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayExplosionEffects();
+
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Detect")
 	float ExplosionDelay = 2.0f;          // 폭발까지 딜레이
@@ -35,4 +40,7 @@ private:
 	// 폭발 효과 함수
 	UFUNCTION()
 	void Explosion();
+
+	UPROPERTY(EditAnywhere, Category = "FX")
+	class UParticleSystem* ExplosionEffect;
 };

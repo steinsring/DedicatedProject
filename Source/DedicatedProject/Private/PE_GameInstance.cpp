@@ -73,8 +73,21 @@ void UPE_GameInstance::CreateSession(const int32 MaxPlayers, const bool bIsLAN, 
     SessionSettings->bIsDedicated = false;
     SessionSettings->Set(SEARCH_PRESENCE, bIsLobby, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
     SessionSettings->Set(SEARCH_LOBBIES, bIsLobby, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+
+    FString HostNickname = TEXT("UnknownHost");
+    IOnlineSubsystem* OSS = IOnlineSubsystem::Get();
+    if (OSS)
+    {
+        IOnlineIdentityPtr Identity = OSS->GetIdentityInterface();
+        if (Identity.IsValid())
+        {
+            HostNickname = Identity->GetPlayerNickname(0);
+        }
+    }
+    FString RoomName = HostNickname + TEXT("님의 방");
+
     // CreateSession에서 Key-Value 설정
-    SessionSettings->Set(FName("SERVER_NAME_KEY"), FString("ServerEntry1"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+    SessionSettings->Set(FName("SERVER_NAME_KEY"), RoomName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
     // 실제 세션 생성
     const ULocalPlayer* LocalPlayer = GetFirstGamePlayer();                 // UGameViewportClient의 PlayerList[0] 참조, 현재 첫 번째 로컬 플레이어 객체를 반환

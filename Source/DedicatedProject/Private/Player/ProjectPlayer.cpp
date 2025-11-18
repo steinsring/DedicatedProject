@@ -133,7 +133,7 @@ AProjectPlayer::AProjectPlayer()
 		//WeaponProjectileComponent->SetupAttachment(GetMesh(), TEXT("HealthBar"));
 		WeaponProjectileComponent->SetupAttachment(springArmComp);
 		WeaponProjectileComponent->SetRelativeLocation(FVector(500.f, -51.f, -22.f));
-		WeaponProjectileComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+		WeaponProjectileComponent->SetRelativeRotation(FRotator(0.f, 3.f, 0.f));
 	}
 	else
 	{

@@ -62,6 +62,7 @@ private:
 
 public:
     void ClearPlayerDataMap() { PlayerDataMap.Empty(); }
+    void ClearFuel() { FuelQuantity = 0; }
     void SaveStagePlayerData(FString ID, TArray<FItemData> PlayerData, int32 FuelData);
     TArray<FItemData> GetStagePlayerData(FString ID);
     int32 GetStageFuelData() { return FuelQuantity; }

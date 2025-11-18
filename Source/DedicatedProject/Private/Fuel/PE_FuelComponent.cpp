@@ -28,6 +28,7 @@ UPE_FuelComponent::UPE_FuelComponent()
 	SetTranslucentSortPriority(5);					// 반투명 오브젝트의 렌더링 우선순위를 지정
 	SetTwoSided(true);								// 위젯이 앞뒤 양쪽
 	SetWorldScale3D(FVector(1.f, 0.03f, 0.1f));		// 실제 scale
+	//PrimaryComponentTick.TickGroup = TG_PostUpdateWork;
 }
 
 void UPE_FuelComponent::BeginPlay()

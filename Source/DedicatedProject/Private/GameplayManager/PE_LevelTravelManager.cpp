@@ -141,6 +141,8 @@ void APE_LevelTravelManager::LevelTravel()
 	{
 		PRINT_LOG(TEXT("Travel To Lobby : %s"), TEXT("Game End"));
 		GameInstance->ResetLevelTravelCount();
+		GameInstance->ClearPlayerDataMap();
+		GameInstance->ClearFuel();
 		World->ServerTravel(FString::Printf(TEXT("%s?listen"), TEXT("/Game/Maps/Lobby")));
 	}
 }
