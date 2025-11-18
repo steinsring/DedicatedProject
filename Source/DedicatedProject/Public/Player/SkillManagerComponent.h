@@ -44,7 +44,7 @@ public:
 	TArray<FPE_SkillDataTable> Skills;
 
 	UFUNCTION(BlueprintCallable)
-	void UnlockSkill(E_Skills Skill);
+	bool UnlockSkill(E_Skills Skill);
 
 	UFUNCTION(BlueprintCallable)
 	void LockSkill(E_Skills Skille);
@@ -81,6 +81,7 @@ public:
 	void ElectricShock();
 	void SeeThrough();
 
+	UFUNCTION(BlueprintCallable)
 	int32 GetSkillCost(E_Skills Skill) const;
 
 	//Skill RPC

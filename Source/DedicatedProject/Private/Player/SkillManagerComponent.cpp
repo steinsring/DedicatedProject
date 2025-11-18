@@ -41,11 +41,19 @@ USkillManagerComponent::USkillManagerComponent()
 }
 
 
-void USkillManagerComponent::UnlockSkill(E_Skills Skill)
+bool USkillManagerComponent::UnlockSkill(E_Skills Skill)
 {
 	int32 SkillIndex = static_cast<int32>(Skill);
+	if (Player->SkillPoints < GetSkillCost(Skill))
+	{
+		PRINT_LOG(TEXT("Not Enough Skill Points: %s"), *Skills[SkillIndex].SkillName.ToString());
+		return false;
+	}
+	Player->SkillPoints -= GetSkillCost(Skill);
+	//int32 SkillIndex = static_cast<int32>(Skill);
 	Skills[SkillIndex].bIsUnlocked = true;
 	PRINT_LOG(TEXT("Skill %s unlocked!"), *Skills[SkillIndex].SkillName.ToString());
+	return true;
 }
 
 void USkillManagerComponent::LockSkill(E_Skills Skill)
