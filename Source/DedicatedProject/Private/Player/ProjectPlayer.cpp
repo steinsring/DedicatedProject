@@ -698,11 +698,11 @@ void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
 {
 	//PRINT_LOG(TEXT("%s is activated"), *SkillManager->GetCurrentAugmentSkillName());
 	E_Skills CurrentAugmentSkill = SkillManager->GetCurrentAugmentSkill();
-	int32 cost = SkillManager->GetSkillCost(CurrentAugmentSkill);
+	int32 FuelCost = SkillManager->GetSkillFuelCost(CurrentAugmentSkill);
 
-	if (FuelComponent->HasEnoughFuel(cost) && !SkillManager->bIsAugmentSkillInCoolTime)
+	if (FuelComponent->HasEnoughFuel(FuelCost) && !SkillManager->bIsAugmentSkillInCoolTime)
 	{
-		FuelComponent->UseFuel(cost);
+		FuelComponent->UseFuel(FuelCost);
 		SkillManager->UseAugmentSkill(CurrentAugmentSkill);
 	}
 	else
@@ -735,16 +735,16 @@ void AProjectPlayer::WhileHoldingOverrideSkill(const FInputActionValue& inputVal
 void AProjectPlayer::OnReleaseOverrideSkill(const FInputActionValue& inputValue)
 {
 	E_Skills CurrentOverrideSkill = SkillManager->GetCurrentOverrideSkill();
-	int32 cost = SkillManager->GetSkillCost(CurrentOverrideSkill);
+	int32 FuelCost = SkillManager->GetSkillFuelCost(CurrentOverrideSkill);
 
-	if (FuelComponent->HasEnoughFuel(cost) && !SkillManager->bIsOverrideSkillInCoolTime)
+	if (FuelComponent->HasEnoughFuel(FuelCost) && !SkillManager->bIsOverrideSkillInCoolTime)
 	{
-		FuelComponent->UseFuel(cost);
+		FuelComponent->UseFuel(FuelCost);
 		SkillManager->UseOverrideSkill(CurrentOverrideSkill);
 	}
 	else
 	{
-		if (!FuelComponent->HasEnoughFuel(cost))
+		if (!FuelComponent->HasEnoughFuel(FuelCost))
 		{
 			PRINT_LOG(TEXT("Not Enough Fuel"));
 		}

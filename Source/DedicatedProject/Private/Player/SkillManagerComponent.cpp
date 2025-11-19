@@ -369,6 +369,12 @@ void USkillManagerComponent::ElectricShock()
 			return;
 		}
 		HitEnemy->ApplyStun(10.0f);
+		UHealthComponent* EnemyHealthComp = HitEnemy->FindComponentByClass<UHealthComponent>();
+		if (EnemyHealthComp)
+		{
+			EnemyHealthComp->ApplyDamage(ElectricShockDamage);
+			PRINT_LOG(TEXT("Electric Shock Damage Applied: %f"), ElectricShockDamage);
+		}
 	}
 }
 
@@ -527,6 +533,16 @@ int32 USkillManagerComponent::GetSkillCost(E_Skills Skill) const
 	if (Skills.IsValidIndex(SkillIndex))
 	{
 		return Skills[SkillIndex].Cost;
+	}
+	return 0;
+}
+
+int32 USkillManagerComponent::GetSkillFuelCost(E_Skills Skill) const
+{
+	int32 SkillIndex = static_cast<int32>(Skill);
+	if (Skills.IsValidIndex(SkillIndex))
+	{
+		return Skills[SkillIndex].FuelCost;
 	}
 	return 0;
 }

@@ -29,4 +29,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
 	float CoolTime;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill")
+	float FuelCost;
 };

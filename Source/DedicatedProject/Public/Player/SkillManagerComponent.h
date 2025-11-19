@@ -84,6 +84,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetSkillCost(E_Skills Skill) const;
 
+	UFUNCTION(BlueprintCallable)
+	int32 GetSkillFuelCost(E_Skills Skill) const;
+
 	//Skill RPC
 	UFUNCTION()
 	void UseAugmentSkill(E_Skills Skill);
@@ -122,6 +125,7 @@ private:
 	AActor* HitActor;
 	FHitResult HitResult;
 	AProjectPlayer* Player;
+	float ElectricShockDamage = 10.0f;
 
 	TArray<AActor*> DetectedItems;
 
