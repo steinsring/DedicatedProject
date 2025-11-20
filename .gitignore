@@ -16,3 +16,9 @@ DedicatedProject-Windows.ucas
 *.xcodeproj
 *.xcworkspace
 Content/Asset/Sci-fi_UI_Pack/Weapons/Skeletal_Meshes/Sci-fi_Rifle_02/SK_Sci-fi_Rifle_02_NoScope_NoMagazine.uasset
+Content/Sci_Fi_Laboratory/Meshes/man/Animation/man_garment.uasset
+Content/Sci_Fi_Laboratory/Meshes/Manipulator_d_1/Animation/d_1_garment_to_ue.uasset
+Content/Sci_Fi_Laboratory/Meshes/Manipulator_r_1/Animation/r_1_garment_to_ue.uasset
+Content/Sci_Fi_Laboratory/Meshes/S_d_1_final.uasset
+Content/Sci_Fi_Laboratory/Meshes/S_man_to_ue.uasset
+Content/Sci_Fi_Laboratory/Meshes/S_r_1_final.uasset

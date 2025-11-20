@@ -84,7 +84,7 @@ void UPE_GameInstance::CreateSession(const int32 MaxPlayers, const bool bIsLAN, 
             HostNickname = Identity->GetPlayerNickname(0);
         }
     }
-    FString RoomName = HostNickname + TEXT("님의 방");
+    FString RoomName = HostNickname + TEXT("'s Lobby");
 
     // CreateSession에서 Key-Value 설정
     SessionSettings->Set(FName("SERVER_NAME_KEY"), RoomName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
