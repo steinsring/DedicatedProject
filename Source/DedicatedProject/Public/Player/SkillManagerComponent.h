@@ -138,6 +138,9 @@ private:
 	float DefenseUpDuration = 10.0f;
 	float SpeedUpDuration = 10.0f;
 	float SeeThroughDuration = 5.0f;
+	float SightHackingDuration = 5.0f;
 
 	void StartSkillCoolTime(E_SkillType SkillType, E_Skills Skill);
+
+	void SetCoolTimeOnOff(E_SkillType SkillType, bool bIsInCoolTime);
 };

@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "CharacterCommon.h"
+#include "Enemy/Enemy.h"
 
 #include "DedicatedProject.h"
 
@@ -46,7 +47,7 @@ void UEnemy_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (::IsValid(Pawn))
 	{
 		AAIController* AIController = Cast<AAIController>(Pawn->GetController());
-		ACharacterCommon* Character = Cast<ACharacterCommon>(Pawn);
+		AEnemy* Character = Cast<AEnemy>(Pawn);
 		if (AIController)
 		{
 			UBlackboardComponent* BlackBoard = AIController->GetBlackboardComponent();

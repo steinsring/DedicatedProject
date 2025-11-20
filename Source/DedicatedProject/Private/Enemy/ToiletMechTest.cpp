@@ -70,6 +70,10 @@ AToiletMechTest::AToiletMechTest()
 		RightHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
+	//모자이크 위치 및 회전 조정
+	SightHackMesh->SetRelativeRotation(FRotator(0, 0, 90));
+	SightHackMesh->SetRelativeLocation(FVector(0, 50, 0));
+
 	//데이터 테이블을 불러오기
 	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableAsset(TEXT
 					("'/Game/DataTable/DT_ToiletMechStats.DT_ToiletMechStats'"));

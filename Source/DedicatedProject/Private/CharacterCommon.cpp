@@ -53,9 +53,6 @@ void ACharacterCommon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ACharacterCommon, bIsDead);
-	DOREPLIFETIME(ACharacterCommon, bIsWandering);
-	DOREPLIFETIME(ACharacterCommon, bIsGoingBack);
-	DOREPLIFETIME(ACharacterCommon, bIsGoingLeft);
 }
 
 
@@ -211,50 +208,6 @@ void ACharacterCommon::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent,
 	);
 }
 
-//void ACharacterCommon::ApplyDamage_Server_Implementation(AActor* Target)
-//{
-//	if (Target)
-//	{
-//		UGameplayStatics::ApplyDamage(
-//			Target,
-//			AttackPower,
-//			GetController(),
-//			this,
-//			nullptr
-//		);
-//	}
-//	//ApplyDamage_Multicast(Target);
-//}
-//
-//void ACharacterCommon::ApplyDamage_Multicast_Implementation(AActor* Target)
-//{
-//	if (Target)
-//	{
-//		UGameplayStatics::ApplyDamage(
-//			Target,
-//			AttackPower,
-//			GetController(),
-//			this,
-//			nullptr
-//		);
-//	}
-//}
-
-void ACharacterCommon::SetHitbox(ECollisionEnabled::Type CollisionEnabled, UCapsuleComponent* HitBox)
-{
-	if (CollisionEnabled == ECollisionEnabled::NoCollision)
-		HitActors.Empty();
-
-	if (HitBox)
-	{
-		HitBox->SetCollisionEnabled(CollisionEnabled);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("HitBox is NULL"));
-	}
-}
-
 float ACharacterCommon::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	HealthComp->ApplyDamage(DamageAmount);
@@ -377,22 +330,6 @@ void ACharacterCommon::SetIsDead(bool bNewState)
 	{
 		AnimInstance->SetIsDead(bNewState);
 	}
-}
-
-void ACharacterCommon::SetIsGoingBack(bool bNewState)
-{
-	if (bIsGoingBack == bNewState)
-		return;
-
-	bIsGoingBack = bNewState;
-}
-
-void ACharacterCommon::SetIsGoingLeft(bool bNewState)
-{
-	if (bIsGoingLeft == bNewState)
-		return;
-
-	bIsGoingLeft = bNewState;
 }
 
 void ACharacterCommon::OnRep_IsDead()

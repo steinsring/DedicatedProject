@@ -78,16 +78,6 @@ public:
 	void OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	//UFUNCTION(Server, Reliable)
-	//void ApplyDamage_Server(AActor* Target);
-
-	//UFUNCTION(NetMulticast, Reliable)
-	//void ApplyDamage_Multicast(AActor* Target);
-
-	//블루프린트에서 해주기
-	UFUNCTION(BlueprintCallable)
-	void SetHitbox(ECollisionEnabled::Type CollisionEnabled, UCapsuleComponent* HitBox);
-
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent,
 		AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -143,34 +133,7 @@ protected:
 	UFUNCTION()
 	void OnRep_IsDead();
 
-	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Movement")
-	bool bIsWandering = false;
-
-	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Movement")
-	bool bIsGoingBack = false;
-
-	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Movement")
-	bool bIsGoingLeft = false;
-
 public:
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	void SetIsWandering(bool bNewState) { bIsWandering = bNewState; }
-	
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	bool GetIsWandering() const { return bIsWandering; }
-
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	void SetIsGoingBack(bool bNewState);
-
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	bool GetIsGoingBack() const { return bIsGoingBack; }
-
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	void SetIsGoingLeft(bool bNewState);
-
-	UFUNCTION(BlueprintCallable, Category = "Movement")
-	bool GetIsGoingLeft() const { return bIsGoingLeft; }
-
 	void RefreshBaseAnimInstance();
 
 	bool GetIsDead() const { return bIsDead; }

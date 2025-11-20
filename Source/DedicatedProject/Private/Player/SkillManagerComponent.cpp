@@ -85,7 +85,7 @@ void USkillManagerComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-
+	Player = Cast<AProjectPlayer>(GetOwner());
 }
 
 //////////////////Augment Skill////////////////////
@@ -240,23 +240,42 @@ void USkillManagerComponent::UseOverrideSkill(E_Skills Skill)
 		return;
 	}
 
-	//서버가 아닌 경우
-	if (GetOwnerRole() < ROLE_Authority)
-	{
-		UseOverrideSkill_Server(Skill); //서버에 요청
-	}
-	//서버(호스트)인 경우
-	else
-	{
-		UseOverrideSkill_Multicast(Skill); //서버(호스트)면 바로 실행
-	}
+	UseOverrideSkill_Server(Skill);
+	////서버가 아닌 경우
+	//if (GetOwnerRole() < ROLE_Authority)
+	//{
+	//	UseOverrideSkill_Server(Skill); //서버에 요청
+	//}
+	////서버(호스트)인 경우
+	//else
+	//{
+	//	UseOverrideSkill_Multicast(Skill); //서버(호스트)면 바로 실행
+	//}
 
 	StartSkillCoolTime(E_SkillType::Override, Skill);
 }
 
 void USkillManagerComponent::UseOverrideSkill_Server_Implementation(E_Skills Skill)
 {
-	UseOverrideSkill_Multicast(Skill);
+	//UseOverrideSkill_Multicast(Skill);
+	switch (Skill)
+	{
+	case E_Skills::SightHacking:
+		SightHacking();
+		break;
+	case E_Skills::Slow:
+		Slow();
+		break;
+	case E_Skills::ElectricShock:
+		ElectricShock();
+		break;
+	case E_Skills::SeeThrough:
+		if (Player->IsLocallyControlled())
+			SeeThrough();
+		break;
+	default:
+		break;
+	}
 }
 
 void USkillManagerComponent::UseOverrideSkill_Multicast_Implementation(E_Skills Skill)
@@ -283,6 +302,12 @@ void USkillManagerComponent::UseOverrideSkill_Multicast_Implementation(E_Skills 
 
 void USkillManagerComponent::GetHitResultActor(float Distance)
 {
+	Player = Cast<AProjectPlayer>(GetOwner());
+	if (Player == nullptr)
+	{
+		PRINT_LOG(TEXT("Player is null"));
+		return;
+	}
 	UCameraComponent* PlayerCamera = Player->GetPlayerCamComp();
 	if (PlayerCamera == nullptr)
 	{
@@ -319,6 +344,8 @@ void USkillManagerComponent::GetHitResultActor(float Distance)
 
 void USkillManagerComponent::SightHacking()
 {
+	GetHitResultActor(1000.f);
+
 	PRINT_LOG(TEXT("Sight Hacking Activated"));
 
 	if (!HitActor)
@@ -341,7 +368,21 @@ void USkillManagerComponent::SightHacking()
 		return;
 	}
 
-	EnemyController->DisableDetect(10.0f);
+	EnemyController->DisableDetect(SightHackingDuration);
+	HitEnemy->SetSightHacked_Server(true);
+	PRINT_LOG(TEXT("SightHacked Set True"));
+
+	if (UWorld* World = GetWorld())
+	{
+		FTimerHandle TimerHandle;
+		TWeakObjectPtr<USkillManagerComponent> WeakThis(this);
+		World->GetTimerManager().SetTimer(TimerHandle, [WeakThis]()
+			{
+				AEnemy* HitEnemy = Cast<AEnemy>(WeakThis->HitActor);
+				HitEnemy->SetSightHacked_Server(false);
+				PRINT_LOG(TEXT("SightHacked Set False"));
+			}, WeakThis->SightHackingDuration, false);
+	}
 }
 
 void USkillManagerComponent::Slow()
@@ -486,25 +527,23 @@ void USkillManagerComponent::StartSkillCoolTime(E_SkillType SkillType, E_Skills 
 	}
 
 	PRINT_LOG(TEXT("Skill Cool Time Started"));
-	switch (SkillType)
-	{	
-	case E_SkillType::Augment:
-		bIsAugmentSkillInCoolTime = true;
-		break;
-	case E_SkillType::Override:
-		bIsOverrideSkillInCoolTime = true;
-		break;
-	default:
-		break;
-	}
+	SetCoolTimeOnOff(SkillType, true);
 
 	int32 SkillIndex = static_cast<int32>(Skill);
 	if (!Skills.IsValidIndex(SkillIndex))
 	{
 		PRINT_LOG(TEXT("Invalid Skill Index"));
+		SetCoolTimeOnOff(SkillType, false);
 		return;
 	}
 	float CoolTime = Skills[SkillIndex].CoolTime;
+	PRINT_LOG(TEXT("Cool Time: %f"), CoolTime);
+	if (CoolTime <= 0.f)
+	{
+		PRINT_LOG(TEXT("No Cool Time for this Skill"));
+		SetCoolTimeOnOff(SkillType, false);
+		return;
+	}
 
 	FTimerHandle TimerHandle = (SkillType == E_SkillType::Augment) ? AugmentSkillCoolTimeTimerHandle : OverrideSkillCoolTimeTimerHandle;
 	TWeakObjectPtr<USkillManagerComponent> WeakThis(this);
@@ -525,6 +564,21 @@ void USkillManagerComponent::StartSkillCoolTime(E_SkillType SkillType, E_Skills 
 		}
 		PRINT_LOG(TEXT("Skill Cool Time Ended"));
 	}, CoolTime, false);
+}
+
+void USkillManagerComponent::SetCoolTimeOnOff(E_SkillType SkillType, bool bIsInCoolTime)
+{
+	switch (SkillType)
+	{
+	case E_SkillType::Augment:
+		bIsAugmentSkillInCoolTime = bIsInCoolTime;
+		break;
+	case E_SkillType::Override:
+		bIsOverrideSkillInCoolTime = bIsInCoolTime;
+		break;
+	default:
+		break;
+	}
 }
 
 int32 USkillManagerComponent::GetSkillCost(E_Skills Skill) const

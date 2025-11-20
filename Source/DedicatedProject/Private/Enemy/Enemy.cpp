@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Enemy/Enemy.h"
 #include "Enemy/PE_AIController.h"
@@ -10,6 +10,7 @@
 #include "Enemy/PE_ToiletMechStats.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/ProjectPlayer.h"
+#include "Net/UnrealNetwork.h"
 
 #include "DedicatedProject.h"
 
@@ -22,6 +23,34 @@ AEnemy::AEnemy()
 	bReplicates = true;
 	bAlwaysRelevant = true;
 	SetReplicateMovement(true);
+
+	//SightHacking용 눈 이펙트 메쉬 컴포넌트 생성
+	SightHackMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SightHackMesh"));
+	SightHackMesh->SetupAttachment(GetMesh(), TEXT("SightHack"));
+
+	SightHackMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SightHackMesh->SetCastShadow(false);
+	SightHackMesh->SetVisibility(true, true);
+
+	SightHackMesh->SetRelativeScale3D(FVector(0.25f, 0.5f, 0.5f));
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> PlaneMesh(
+		TEXT("/Engine/BasicShapes/Plane.Plane")
+	);
+	if (PlaneMesh.Succeeded())
+	{
+		PRINT_LOG(TEXT("PlaneMesh Load Success"));
+		SightHackMesh->SetStaticMesh(PlaneMesh.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> MosaicMat(
+		TEXT("/Game/Asset/UI/M_Mosaic.M_Mosaic") 
+	);
+	if (MosaicMat.Succeeded())
+	{
+		PRINT_LOG(TEXT("MosaicMat Load Success"));
+		SightHackMesh->SetMaterial(0, MosaicMat.Object);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -29,6 +58,39 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (EyeMaterialIndex >= 0 && GetMesh())
+	{
+		MosaicMID = GetMesh()->CreateDynamicMaterialInstance(EyeMaterialIndex);
+	}
+
+	//bSightHacked = true;
+	UpdateSightHackeVisual();
+}
+
+void AEnemy::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AEnemy, bIsWandering);
+	DOREPLIFETIME(AEnemy, bIsGoingBack);
+	DOREPLIFETIME(AEnemy, bIsGoingLeft);
+
+	DOREPLIFETIME(AEnemy, bSightHacked);
+}
+
+void AEnemy::SetHitbox(ECollisionEnabled::Type CollisionEnabled, UCapsuleComponent* HitBox)
+{
+	if (CollisionEnabled == ECollisionEnabled::NoCollision)
+		HitActors.Empty();
+
+	if (HitBox)
+	{
+		HitBox->SetCollisionEnabled(CollisionEnabled);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HitBox is NULL"));
+	}
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -44,6 +106,41 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	}
 
 	return 0.0f;
+}
+
+void AEnemy::SetIsGoingBack(bool bNewState)
+{
+	if (bIsGoingBack == bNewState)
+		return;
+
+	bIsGoingBack = bNewState;
+}
+
+void AEnemy::SetIsGoingLeft(bool bNewState)
+{
+	if (bIsGoingLeft == bNewState)
+		return;
+
+	bIsGoingLeft = bNewState;
+}
+
+void AEnemy::OnRep_SightHacked()
+{
+	UpdateSightHackeVisual();
+}
+
+void AEnemy::UpdateSightHackeVisual()
+{
+	if (!SightHackMesh)
+		return;
+
+	SightHackMesh->SetVisibility(bSightHacked, true);
+}
+
+void AEnemy::SetSightHacked_Server_Implementation(bool bNewState)
+{
+	bSightHacked = bNewState;
+	UpdateSightHackeVisual();
 }
 
 // Called every frame

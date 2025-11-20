@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Navigation/PathFollowingComponent.h"
 
+#include "Enemy/Enemy.h"
 #include "CharacterCommon.h"
 
 #include "DedicatedProject.h"
@@ -49,7 +50,8 @@ EBTNodeResult::Type UBTTask_WanderAroundTarget::ExecuteTask(UBehaviorTreeCompone
 		MoveComp->MaxWalkSpeed = OriginalSpeed;
 	}
 
-	if (Character) Character->SetIsGoingLeft(FMath::RandBool());
+	AEnemy* Enemy = Cast<AEnemy>(AIChar);
+	if (Enemy) Enemy->SetIsGoingLeft(FMath::RandBool());
 
 	//중심과 거리 계산
 	FVector Center = Target->GetActorLocation();
@@ -70,9 +72,9 @@ EBTNodeResult::Type UBTTask_WanderAroundTarget::ExecuteTask(UBehaviorTreeCompone
 		FNavLocation NavLocation;
 		if (NavSys->ProjectPointToNavigation(TargetPos, NavLocation))
 		{
-			if (Character)
+			if (Enemy)
 			{
-				Character->SetIsGoingBack(true);
+				Enemy->SetIsGoingBack(true);
 			}
 			AIController->MoveToLocation(NavLocation.Location, -1.0f, true, true, false, true, 0, true);
 			bHasRetreated = true;
@@ -99,9 +101,10 @@ void UBTTask_WanderAroundTarget::ReturnSpeedToOriginal()
 
 void UBTTask_WanderAroundTarget::StartOrbitMovement()
 {
-	if (ACharacterCommon* Character = Cast<ACharacterCommon>(AIPawn))
+	AEnemy* Enemy = Cast<AEnemy>(AIPawn);
+	if (Enemy)
 	{
-		Character->SetIsGoingBack(false);   // ✅ 뒤로가기 해제
+		Enemy->SetIsGoingBack(false);   // ✅ 뒤로가기 해제
 	}
 
 	FVector Center = Target->GetActorLocation();
@@ -116,9 +119,9 @@ void UBTTask_WanderAroundTarget::StartOrbitMovement()
 	float AngleDeltaDegree = OrbitAngleDegree;
 
 	bool bGoingLeft = true;
-	if (ACharacterCommon* Character = Cast<ACharacterCommon>(AIPawn))
+	if (Enemy)
 	{
-		bGoingLeft = Character->GetIsGoingLeft();
+		bGoingLeft = Enemy->GetIsGoingLeft();
 	}
 	if (!bGoingLeft)
 	{
