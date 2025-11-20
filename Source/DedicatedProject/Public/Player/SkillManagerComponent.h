@@ -109,9 +109,14 @@ public:
 	bool bIsAugmentSkillInCoolTime = false;
 	bool bIsOverrideSkillInCoolTime = false;
 
+	void SetTargetHighlight(AActor* NewTarget);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	UPROPERTY()
+	AActor* HighlightedActor = nullptr;
 
 private:
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
@@ -133,6 +138,7 @@ private:
 
 	FTimerHandle AugmentSkillCoolTimeTimerHandle;
 	FTimerHandle OverrideSkillCoolTimeTimerHandle;
+	FTimerHandle SightHackingTimerHandle;
 
 	float AttackUpDuration = 10.0f;
 	float DefenseUpDuration = 10.0f;

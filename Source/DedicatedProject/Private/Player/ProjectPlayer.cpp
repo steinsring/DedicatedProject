@@ -753,6 +753,11 @@ void AProjectPlayer::OnReleaseOverrideSkill(const FInputActionValue& inputValue)
 			PRINT_LOG(TEXT("In CoolTime"));
 		}
 	}
+
+	if (SkillManager)
+	{
+		SkillManager->SetTargetHighlight(nullptr);
+	}
 }
 
 void AProjectPlayer::AddItemToInventory(FName ID, int32 Quantity)

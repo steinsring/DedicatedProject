@@ -315,7 +315,8 @@ void USkillManagerComponent::GetHitResultActor(float Distance)
 		return;
 	}
 
-	FVector Start = Player->GetActorLocation();
+	//FVector Start = Player->GetActorLocation();
+	FVector Start = PlayerCamera->GetComponentLocation();
 	FVector End = Start + (PlayerCamera->GetForwardVector() * Distance);
 
 	FCollisionQueryParams Params;
@@ -329,8 +330,21 @@ void USkillManagerComponent::GetHitResultActor(float Distance)
 		Params
 	);
 
-	FColor LineColor = bHit ? FColor::Red : FColor::Green;
-	DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 1.0f);
+	//FColor LineColor = bHit ? FColor::Red : FColor::Green;
+	//DrawDebugLine(GetWorld(), Start, End, LineColor, false, 2.0f, 0, 1.0f);
+
+	//로컬 클라에서만 하이라이트
+	if (Player->IsLocallyControlled())
+	{
+		if (bHit)
+		{
+			SetTargetHighlight(HitResult.GetActor());
+		}
+		else
+		{//히트하지 않았으면 하이라이트 제거
+			SetTargetHighlight(nullptr);
+		}
+	}
 
 	if (bHit)
 	{
@@ -338,8 +352,68 @@ void USkillManagerComponent::GetHitResultActor(float Distance)
 		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.0f);
 		HitActor = HitResult.GetActor();
 	}
+	else
+	{
+		HitActor = nullptr;
+	}
 
 	return;
+}
+
+void USkillManagerComponent::SetTargetHighlight(AActor* NewTarget)
+{
+	if (HighlightedActor && HighlightedActor != NewTarget)
+	{
+		//이전 하이라이트 제거
+		TArray<UStaticMeshComponent*> StaticMeshComps;
+		HighlightedActor->GetComponents<UStaticMeshComponent>(StaticMeshComps);
+		for (UStaticMeshComponent* MeshComp : StaticMeshComps)
+		{
+			if (MeshComp)
+			{
+				MeshComp->SetRenderCustomDepth(false);
+			}
+		}
+
+		TArray<USkeletalMeshComponent*> SkeletalMeshComps;
+		HighlightedActor->GetComponents<USkeletalMeshComponent>(SkeletalMeshComps);
+		for (USkeletalMeshComponent* MeshComp : SkeletalMeshComps)
+		{
+			if (MeshComp)
+			{
+				MeshComp->SetRenderCustomDepth(false);
+			}
+		}
+	}
+
+	if (Cast<AEnemy>(NewTarget))
+	{
+		HighlightedActor = NewTarget;
+		if (!HighlightedActor) return;
+
+		//새로운 하이라이트 설정
+		TArray<UStaticMeshComponent*> StaticMeshCompsNew;
+		HighlightedActor->GetComponents<UStaticMeshComponent>(StaticMeshCompsNew);
+		for (UStaticMeshComponent* MeshComp : StaticMeshCompsNew)
+		{
+			if (MeshComp)
+			{
+				MeshComp->SetRenderCustomDepth(true);
+				MeshComp->SetCustomDepthStencilValue(1);
+			}
+		}
+
+		TArray<USkeletalMeshComponent*> SkeletalMeshCompsNew;
+		HighlightedActor->GetComponents<USkeletalMeshComponent>(SkeletalMeshCompsNew);
+		for (USkeletalMeshComponent* MeshComp : SkeletalMeshCompsNew)
+		{
+			if (MeshComp)
+			{
+				MeshComp->SetRenderCustomDepth(true);
+				MeshComp->SetCustomDepthStencilValue(1);
+			}
+		}
+	}
 }
 
 void USkillManagerComponent::SightHacking()
@@ -374,14 +448,24 @@ void USkillManagerComponent::SightHacking()
 
 	if (UWorld* World = GetWorld())
 	{
-		FTimerHandle TimerHandle;
+		const float Duration = SightHackingDuration;
+		
+		TWeakObjectPtr<AEnemy> WeakHitEnemy(HitEnemy);
 		TWeakObjectPtr<USkillManagerComponent> WeakThis(this);
-		World->GetTimerManager().SetTimer(TimerHandle, [WeakThis]()
+		World->GetTimerManager().SetTimer
+		(
+			SightHackingTimerHandle, 
+			FTimerDelegate::CreateLambda([WeakThis, WeakHitEnemy]()
 			{
-				AEnemy* HitEnemy = Cast<AEnemy>(WeakThis->HitActor);
+				if (!WeakThis.IsValid() || !WeakHitEnemy.IsValid()) return;
+				
+				AEnemy* HitEnemy = WeakHitEnemy.Get();
 				HitEnemy->SetSightHacked_Server(false);
 				PRINT_LOG(TEXT("SightHacked Set False"));
-			}, WeakThis->SightHackingDuration, false);
+			}), 
+			WeakThis->SightHackingDuration, 
+			false
+		);
 	}
 }
 
@@ -428,25 +512,33 @@ void USkillManagerComponent::SeeThrough()
 	{
 		FTimerHandle TimerHandle;
 		TWeakObjectPtr<USkillManagerComponent> WeakThis(this);
-		World->GetTimerManager().SetTimer(TimerHandle, [WeakThis]()
-		{
-			for (auto Item : WeakThis->DetectedItems)
+		World->GetTimerManager().SetTimer
+		(
+			TimerHandle, 
+			FTimerDelegate::CreateLambda([WeakThis]()
 			{
-				if (Item)
+				if (!WeakThis.IsValid()) return;
+
+				for (auto Item : WeakThis->DetectedItems)
 				{
-					TArray<UStaticMeshComponent*> MeshComps;
-					Item->GetComponents<UStaticMeshComponent>(MeshComps);
-					for (UStaticMeshComponent* MeshComp : MeshComps)
+					if (Item)
 					{
-						if (MeshComp)
+						TArray<UStaticMeshComponent*> MeshComps;
+						Item->GetComponents<UStaticMeshComponent>(MeshComps);
+						for (UStaticMeshComponent* MeshComp : MeshComps)
 						{
-							MeshComp->SetRenderCustomDepth(false);
+							if (MeshComp)
+							{
+								MeshComp->SetRenderCustomDepth(false);
+							}
 						}
 					}
 				}
-			}
-			PRINT_LOG(TEXT("See Through Deactivated"));
-		}, WeakThis->SeeThroughDuration, false);
+				PRINT_LOG(TEXT("See Through Deactivated"));
+			}), 
+			WeakThis->SeeThroughDuration, 
+			false
+		);
 	}
 }
 
