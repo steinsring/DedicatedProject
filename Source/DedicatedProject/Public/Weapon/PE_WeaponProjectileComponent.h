@@ -36,7 +36,13 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void Fire();																		// 클라에서 실행
+
+	void Fire_Enemy();																	// 적 AI용 클라에서 실행
+
 private:
 	UFUNCTION(Server, Reliable)
-	void Fire_Server();																	// 클라에서 실행
+	void Fire_Server();	
+																// 클라에서 실행
+	UFUNCTION(Server, Reliable)
+	void Fire_Enemy_Server();
 };

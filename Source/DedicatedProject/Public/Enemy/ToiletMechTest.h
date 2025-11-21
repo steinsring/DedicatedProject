@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Enemy/Enemy.h"
+//#include "Weapon/PE_WeaponProjectileComponent.h"
 #include "ToiletMechTest.generated.h"
 
 /**
@@ -30,4 +31,16 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Hitbox")
 	UCapsuleComponent* RightHandHitBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Hitbox")
+	UCapsuleComponent* RightFootHitBox;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Hitbox")
+	UCapsuleComponent* HeadHitBox;
+
+	class UPE_WeaponProjectileComponent* GetWeaponProjectileComponent() const { return WeaponProjectileComponent; }
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = "WeaponProjectile")
+	TObjectPtr<class UPE_WeaponProjectileComponent> WeaponProjectileComponent;
 };

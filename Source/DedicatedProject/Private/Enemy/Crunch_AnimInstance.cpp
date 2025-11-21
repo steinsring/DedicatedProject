@@ -19,6 +19,30 @@ UCrunch_AnimInstance::UCrunch_AnimInstance()
 	}
 	AttackMontages.Add(AttackPattern1);
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AttackMontage2
+	(TEXT("/Game/ParagonCrunch/Characters/Heroes/Crunch/Animations/Attack2_Montage.Attack2_Montage"));
+	if (AttackMontage2.Succeeded())
+	{
+		AttackPattern2 = AttackMontage2.Object;
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("AttackMontage2 is NULL"));
+	}
+	AttackMontages.Add(AttackPattern2);
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> AttackMontage3
+	(TEXT("/Game/ParagonCrunch/Characters/Heroes/Crunch/Animations/Attack2_Montage.Attack2_Montage"));
+	if (AttackMontage3.Succeeded())
+	{
+		AttackPattern3 = AttackMontage3.Object;
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("AttackMontage2 is NULL"));
+	}
+	AttackMontages.Add(AttackPattern3);
+
 	//스턴 몽타주
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> TempMontage
 	(TEXT("/Game/ParagonCrunch/Characters/Heroes/Crunch/Animations/Stun_Montage.Stun_Montage"));

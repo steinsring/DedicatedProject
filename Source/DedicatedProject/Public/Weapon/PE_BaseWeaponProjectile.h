@@ -22,7 +22,7 @@ private:
 	TObjectPtr<class UProjectileMovementComponent> ProjectileMovement;
 
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
-	float Damage = 50.f;
+	float Damage = 10.f;
 public:	
 	// Sets default values for this actor's properties
 	APE_BaseWeaponProjectile();

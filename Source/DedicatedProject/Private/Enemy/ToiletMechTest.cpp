@@ -6,6 +6,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
+#include "Weapon/PE_WeaponProjectileComponent.h"
 
 #include "Enemy/PE_ToiletMechStats.h"
 #include "Kismet/GameplayStatics.h"
@@ -48,9 +49,13 @@ AToiletMechTest::AToiletMechTest()
 		//히트박스 세팅
 		LeftHandHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("LeftHandHitbox"));
 		RightHandHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RightHandHitbox"));
+		RightFootHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("RightFootHitbox"));
+		HeadHitBox = CreateDefaultSubobject<UCapsuleComponent>(TEXT("HeadHitbox"));
 
 		LeftHandHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_l"));
 		RightHandHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("hand_r"));
+		RightFootHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("foot_r"));
+		HeadHitBox->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("head"));
 
 		//왼손
 		LeftHandHitBox->SetCapsuleHalfHeight(30.0f);
@@ -63,11 +68,32 @@ AToiletMechTest::AToiletMechTest()
 		RightHandHitBox->SetRelativeLocation(FVector(-15.0f, -6.0f, 0.0f));
 		RightHandHitBox->SetRelativeRotation(FRotator(0.0f, 83.0f, 16.0f));
 
+		//오른발
+		RightFootHitBox->SetCapsuleHalfHeight(30.0f);
+		RightFootHitBox->SetCapsuleRadius(20.0f);
+		RightFootHitBox->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
+		RightFootHitBox->SetRelativeLocation(FVector(0.0f, -20.0f, 0.0f));
+
+		//머리
+		HeadHitBox->SetCapsuleHalfHeight(40.0f);
+		HeadHitBox->SetCapsuleRadius(25.0f);
+		HeadHitBox->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
+		HeadHitBox->SetRelativeLocation(FVector(-20.0f, 10.0f, 0.0f));
+
 		//UE_LOG(LogTemp, Warning, TEXT("ToiletMechTest: Hitboxes initialized."));
 
 		//공격을 안할 처음에는 콜리전을 꺼준다.(공격 실행시 켜주고 공격 끝나면 꺼주어야 함)
 		LeftHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		RightHandHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		RightFootHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		HeadHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		// WeponProjectile ----------------------------------------------------------------------------
+		WeaponProjectileComponent = CreateDefaultSubobject<UPE_WeaponProjectileComponent>(TEXT("WeponProjectile"));
+		//WeaponProjectileComponent->SetupAttachment(GetMesh(), TEXT("HealthBar"));
+		WeaponProjectileComponent->SetupAttachment(RightHandHitBox);
+		WeaponProjectileComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.f));
+		WeaponProjectileComponent->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
 	}
 
 	//모자이크 위치 및 회전 조정
@@ -128,5 +154,7 @@ void AToiletMechTest::PostInitializeComponents()
    Super::PostInitializeComponents();  
 
    LeftHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMechTest::OnHitboxOverlap);  
-   RightHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMechTest::OnHitboxOverlap);  
+   RightHandHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMechTest::OnHitboxOverlap);
+   RightFootHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMechTest::OnHitboxOverlap);
+   HeadHitBox->OnComponentBeginOverlap.AddDynamic(this, &AToiletMechTest::OnHitboxOverlap);
 }
