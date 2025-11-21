@@ -11,6 +11,7 @@
 #include "Enemy/PE_AIController.h"
 #include "Enemy/Enemy.h"
 
+#include "Player/PE_PlayerState.h"
 #include "DedicatedProject.h"
 
 
@@ -24,35 +25,69 @@ USkillManagerComponent::USkillManagerComponent()
 	CurrentAugmentSkill = E_Skills::None;
 	CurrentOverrideSkill = E_Skills::None;
 
-	Player = Cast<AProjectPlayer>(GetOwner());
-
-	UDataTable* SkillDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_SkillDataTable.DT_SkillDataTable"));
-	if (SkillDataTable)
-	{
-		TArray<FPE_SkillDataTable*> AllSkills;
-		SkillDataTable->GetAllRows<FPE_SkillDataTable>(TEXT("SkillData"), AllSkills);
-		for (auto* Skill : AllSkills)
-		{
-			Skills.Add(*Skill);
-		}
-	}
-
 	SetIsReplicatedByDefault(true); // 컴포넌트가 기본적으로 복제되도록 설정
 }
 
+// Called when the game starts
+void USkillManagerComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// ...
+	Player = Cast<AProjectPlayer>(GetOwner());
+
+	APE_PlayerState* PS = Player ? Cast<APE_PlayerState>(Player->GetPlayerState()) : nullptr;
+	if(PS)
+	{
+		OnSkillPointFromPlayerState(PS->GetSkillPoint());
+		OnSkillStateFromPlayerState(PS->GetSkills());
+	}
+}
 
 bool USkillManagerComponent::UnlockSkill(E_Skills Skill)
 {
-	int32 SkillIndex = static_cast<int32>(Skill);
-	if (Player->SkillPoints < GetSkillCost(Skill))
+	APE_PlayerState* PS = GetPEPlayerState();
+	if (!PS)
 	{
-		PRINT_LOG(TEXT("Not Enough Skill Points: %s"), *Skills[SkillIndex].SkillName.ToString());
+		PRINT_LOG(TEXT("UnlockSkill: PlayerState is null"));
 		return false;
 	}
-	Player->SkillPoints -= GetSkillCost(Skill);
-	//int32 SkillIndex = static_cast<int32>(Skill);
-	Skills[SkillIndex].bIsUnlocked = true;
-	PRINT_LOG(TEXT("Skill %s unlocked!"), *Skills[SkillIndex].SkillName.ToString());
+
+	// PlayerState가 들고 있는 최신 스킬 배열 기준으로 체크
+	const TArray<FPE_SkillDataTable>& SkillArray = PS->GetSkills();
+
+	int32 SkillIndex = static_cast<int32>(Skill);
+	if (!SkillArray.IsValidIndex(SkillIndex))
+	{
+		PRINT_LOG(TEXT("UnlockSkill: Invalid Skill Index %d, Num=%d"),
+			SkillIndex, SkillArray.Num());
+		return false;
+	}
+
+	const FPE_SkillDataTable& SkillData = SkillArray[SkillIndex];
+
+	// 이미 언락된 스킬이면 실패
+	if (SkillData.bIsUnlocked)
+	{
+		PRINT_LOG(TEXT("UnlockSkill: %s already unlocked"), *SkillData.SkillName.ToString());
+		return false;
+	}
+
+	// 현재 스킬포인트는 PlayerState 기준으로 읽는다
+	CurrentSkillPoint = PS->GetSkillPoint();
+	if (CurrentSkillPoint < SkillData.Cost)
+	{
+		PRINT_LOG(TEXT("Not Enough Skill Points: %s (Have: %d, Need: %d)"),
+			*SkillData.SkillName.ToString(), CurrentSkillPoint, SkillData.Cost);
+		return false;
+	}
+
+	CurrentSkillPoint -= SkillData.Cost;
+	PRINT_LOG(TEXT("UnlockSkill Local: Spend %d, New CurrentSkillPoint=%d"),
+		SkillData.Cost, CurrentSkillPoint);
+	// 여기까지 왔으면 "로컬 판단으로는 성공" → 서버에 요청 + true 반환
+	PS->UnlockSkill_Server(Skill);
+
 	return true;
 }
 
@@ -75,17 +110,36 @@ void USkillManagerComponent::SetOverrideSkill(E_Skills skill)
 
 bool USkillManagerComponent::IsSkillUnlocked(E_Skills Skill) const
 {
+	// 1) PlayerState 가져오기
+	APE_PlayerState* PS = GetPEPlayerState();
+	if (!PS)
+	{
+		PRINT_LOG(TEXT("IsSkillUnlocked: PlayerState is null"));
+		return false;
+	}
+
+	// 2) PlayerState의 Skills 배열 기준으로 판정
+	const TArray<FPE_SkillDataTable>& SkillArray = PS->GetSkills();
+
 	int32 SkillIndex = static_cast<int32>(Skill);
-	return Skills[SkillIndex].bIsUnlocked;
+	if (!SkillArray.IsValidIndex(SkillIndex))
+	{
+		PRINT_LOG(TEXT("IsSkillUnlocked: Invalid index %d, Num=%d"),
+			SkillIndex, SkillArray.Num());
+		return false;
+	}
+
+	return SkillArray[SkillIndex].bIsUnlocked;
 }
 
-// Called when the game starts
-void USkillManagerComponent::BeginPlay()
+void USkillManagerComponent::OnSkillPointFromPlayerState(int32 NewSkillPoint)
 {
-	Super::BeginPlay();
+	CurrentSkillPoint = NewSkillPoint;
+}
 
-	// ...
-	Player = Cast<AProjectPlayer>(GetOwner());
+void USkillManagerComponent::OnSkillStateFromPlayerState(const TArray<FPE_SkillDataTable>& NewSkills)
+{
+	Skills = NewSkills;
 }
 
 //////////////////Augment Skill////////////////////
@@ -168,7 +222,6 @@ void USkillManagerComponent::ActivateAugmentSkill(E_Skills skill, float Multipli
 		}
 	}
 }
-
 
 void USkillManagerComponent::AttackUp()
 {
@@ -675,12 +728,24 @@ void USkillManagerComponent::SetCoolTimeOnOff(E_SkillType SkillType, bool bIsInC
 
 int32 USkillManagerComponent::GetSkillCost(E_Skills Skill) const
 {
-	int32 SkillIndex = static_cast<int32>(Skill);
-	if (Skills.IsValidIndex(SkillIndex))
+	APE_PlayerState* PS = GetPEPlayerState();
+	if (!PS)
 	{
-		return Skills[SkillIndex].Cost;
+		PRINT_LOG(TEXT("GetSkillCost: PlayerState is null"));
+		return 0;
 	}
-	return 0;
+
+	const TArray<FPE_SkillDataTable>& SkillArray = PS->GetSkills();
+
+	int32 SkillIndex = static_cast<int32>(Skill);
+	if (!SkillArray.IsValidIndex(SkillIndex))
+	{
+		PRINT_LOG(TEXT("GetSkillCost: Invalid index %d, Num=%d"),
+			SkillIndex, SkillArray.Num());
+		return 0;
+	}
+
+	return SkillArray[SkillIndex].Cost;
 }
 
 int32 USkillManagerComponent::GetSkillFuelCost(E_Skills Skill) const
@@ -691,4 +756,12 @@ int32 USkillManagerComponent::GetSkillFuelCost(E_Skills Skill) const
 		return Skills[SkillIndex].FuelCost;
 	}
 	return 0;
+}
+
+APE_PlayerState* USkillManagerComponent::GetPEPlayerState() const
+{
+	AProjectPlayer* OwnerPlayer = Cast<AProjectPlayer>(GetOwner());
+	if (!OwnerPlayer) return nullptr;
+
+	return OwnerPlayer->GetPlayerState<APE_PlayerState>();
 }

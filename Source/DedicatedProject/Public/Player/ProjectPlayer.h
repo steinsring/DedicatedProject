@@ -237,8 +237,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	USkillManagerComponent* GetSkillManager() const { return SkillManager; }
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skills")
-	int32 SkillPoints = 10;
+	UFUNCTION(BlueprintCallable)
+	int32 GetSkillPoint() const;
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skills")
+	//int32 SkillPoints = 10;
 
 	// Augment Skill 관련 ---------------------------------------------------------------
 	float GetAttackPower() const { return AttackPower; }

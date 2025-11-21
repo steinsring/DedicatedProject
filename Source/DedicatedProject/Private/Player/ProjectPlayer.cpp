@@ -591,6 +591,15 @@ float AProjectPlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageE
 	return CalculatedDamage;
 }
 
+int32 AProjectPlayer::GetSkillPoint() const
+{
+	if (APE_PlayerState* PS = GetPlayerState<APE_PlayerState>())
+	{
+		return PS->GetSkillPoint();
+	}
+	return 0;
+}
+
 //void AProjectPlayer::Die_Server()
 //{
 //}

@@ -9,6 +9,7 @@
 #include "SkillManagerComponent.generated.h"
 
 class AProjectPlayer; // forward declaration
+class APE_PlayerState;
 
 UENUM(BlueprintType)
 enum class E_Skills : uint8
@@ -39,6 +40,9 @@ class DEDICATEDPROJECT_API USkillManagerComponent : public UActorComponent
 public:
 	// Sets default values for this component's properties
 	USkillManagerComponent();
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetSkillPoint() const { return CurrentSkillPoint; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
 	TArray<FPE_SkillDataTable> Skills;
@@ -72,6 +76,9 @@ public:
 
 	E_Skills GetCurrentAugmentSkill() const { return CurrentAugmentSkill; }
 	E_Skills GetCurrentOverrideSkill() const { return CurrentOverrideSkill; }
+
+	void OnSkillPointFromPlayerState(int32 NewSkillPoint);
+	void OnSkillStateFromPlayerState(const TArray<FPE_SkillDataTable>& NewSkills);
 
 	void AttackUp();
 	void DefenseUp();
@@ -111,6 +118,9 @@ public:
 
 	void SetTargetHighlight(AActor* NewTarget);
 
+	UFUNCTION(BlueprintCallable)
+	APE_PlayerState* GetPEPlayerState() const;
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -124,6 +134,9 @@ private:
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")
 	E_Skills CurrentOverrideSkill;
+
+	UPROPERTY(VisibleAnywhere)
+	int32 CurrentSkillPoint = 0;
 
 	void ActivateAugmentSkill(E_Skills skill, float Multiplier);
 

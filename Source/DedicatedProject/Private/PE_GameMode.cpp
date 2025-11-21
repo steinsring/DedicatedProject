@@ -73,6 +73,7 @@ void APE_GameMode::PostLogin(APlayerController* NewPlayer)
         AllPlayerState.Add(PlayerState);
         const bool bIsFirstStage = PlayerData.IsEmpty();
         PlayerState->InitializeDefaultData(PlayerData, bIsFirstStage, PreviousFuel);
+		PlayerState->InitializeSkillPoint(10);
     }
 
     //-------------------------------------------------------

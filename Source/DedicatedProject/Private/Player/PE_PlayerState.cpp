@@ -6,6 +6,7 @@
 #include "DedicatedProject.h"
 #include "Net/UnrealNetwork.h"			//DOREPLIFETIME_CONDITION
 #include "Player/PE_PlayerController.h"
+#include "Player/SkillManagerComponent.h"
 #include "Player/ProjectPlayer.h"
 #include <Item/PE_ItemDataTable.h>
 
@@ -44,9 +45,34 @@ void APE_PlayerState::InitializeDefaultData(TArray<FItemData> DefualtInventoryDa
 		PRINT_LOG(TEXT("ItemDataTable is NULL"));
 	}
 
-
+	UDataTable* SkillDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_SkillDataTable.DT_SkillDataTable"));
+	if (SkillDataTable)
+	{
+		TArray<FPE_SkillDataTable*> AllSkills;
+		SkillDataTable->GetAllRows<FPE_SkillDataTable>(TEXT("SkillData"), AllSkills);
+		for (auto* Skill : AllSkills)
+		{
+			Skills.Add(*Skill);
+		}
+	}
 
 	ForceNetUpdate();	// 서버에서 복제되는 프로퍼티를 바꾼 직후 다음 넷 업데이트 사이클에 강제 전송
+}
+
+void APE_PlayerState::InitializeSkillPoint(int32 DefaultSkillPoint)
+{
+	check(HasAuthority());
+
+	SkillPoint = DefaultSkillPoint;
+
+	// 초기값을 SkillManagerComponent 쪽으로도 보내주고 싶으면
+	PushSkillPointToComponent();
+
+	// 리슨 서버의 로컬 클라 UI 즉시 갱신용
+	if (GetPlayerController() && GetPlayerController()->IsLocalController())
+	{
+		OnRep_SkillPoint();
+	}
 }
 
 void APE_PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -55,7 +81,9 @@ void APE_PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	// 인벤토리는 보통 본인에게만 복제, 서버는 모든 state를 가지고있기때문
 	DOREPLIFETIME_CONDITION(APE_PlayerState, InventoryData, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(APE_PlayerState, Skills, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(APE_PlayerState, CurrentQuantity, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(APE_PlayerState, SkillPoint, COND_OwnerOnly);
 }
 
 // 인벤토리 데이터가 변경될경우 자동으로 호출
@@ -229,3 +257,114 @@ void APE_PlayerState::UseFuel_Server_Implementation(int32 Quantity)
 	}
 }
 
+void APE_PlayerState::AddSkillPoint_Server_Implementation(int32 Point)
+{
+	if (!HasAuthority()) return;
+
+	SkillPoint += Point;
+	PushSkillPointToComponent();
+
+	if (GetPlayerController() && GetPlayerController()->IsLocalController())
+	{
+		OnRep_SkillPoint();
+	}
+}
+
+void APE_PlayerState::UseSkillPoint_Server_Implementation(int32 Point)
+{
+	if (!HasAuthority()) return;
+
+	if (SkillPoint < Point)
+	{
+		PRINT_LOG(TEXT("Not Enough Skill Point"));
+		return;
+	}
+
+	SkillPoint -= Point;
+	PushSkillPointToComponent();
+
+	if (GetPlayerController() && GetPlayerController()->IsLocalController())
+	{
+		OnRep_SkillPoint();
+	}
+}
+
+void APE_PlayerState::UnlockSkill_Server_Implementation(E_Skills Skill)
+{
+	UnlockSkill_Internal(Skill);
+
+	PushSkillPointToComponent();
+	PushSkillStateToComponent();
+
+	if (GetPlayerController() && GetPlayerController()->IsLocalController())
+	{
+		OnRep_SkillState();
+		OnRep_SkillPoint();
+	}
+}
+
+void APE_PlayerState::UnlockSkill_Internal(E_Skills Skill)
+{
+	if (!HasAuthority()) return;
+
+	int32 SkillIndex = static_cast<int32>(Skill);
+	if (!Skills.IsValidIndex(SkillIndex))
+	{
+		PRINT_LOG(TEXT("Invalid Skill Index"));
+		return;
+	}
+
+	FPE_SkillDataTable& SkillData = Skills[SkillIndex];
+	if (SkillData.bIsUnlocked)
+	{
+		PRINT_LOG(TEXT("Skill %s is already unlocked"), *SkillData.SkillName.ToString());
+		return;
+	}
+
+	PRINT_LOG(TEXT("UnlockSkill_Internal: SkillPoint=%d, Cost=%d, Skill=%s"),
+		SkillPoint, SkillData.Cost, *SkillData.SkillName.ToString());
+	if (SkillPoint < SkillData.Cost)
+	{
+		PRINT_LOG(TEXT("Not Enough Skill Points: %s"), *SkillData.SkillName.ToString());
+		return;
+	}
+
+	SkillPoint -= SkillData.Cost;
+	SkillData.bIsUnlocked = true;
+}
+
+void APE_PlayerState::PushSkillPointToComponent()
+{
+	AProjectPlayer* Player = Cast<AProjectPlayer>(
+		GetPlayerController() ? GetPlayerController()->GetCharacter() : nullptr
+	);
+	if (!Player) return;
+
+	if (USkillManagerComponent* SkillMgr = Player->FindComponentByClass<USkillManagerComponent>())
+	{
+		SkillMgr->OnSkillPointFromPlayerState(SkillPoint);
+	}
+}
+
+void APE_PlayerState::PushSkillStateToComponent()
+{
+	AProjectPlayer* Player = Cast<AProjectPlayer>(
+		GetPlayerController() ? GetPlayerController()->GetCharacter() : nullptr
+	);
+	if (!Player) return;
+
+	if (USkillManagerComponent* SkillMgr = Player->FindComponentByClass<USkillManagerComponent>())
+	{
+		SkillMgr->OnSkillStateFromPlayerState(Skills);
+	}
+}
+
+void APE_PlayerState::OnRep_SkillPoint()
+{
+	PushSkillPointToComponent();
+}
+
+void APE_PlayerState::OnRep_SkillState()
+{
+	PushSkillStateToComponent();
+}

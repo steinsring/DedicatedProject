@@ -6,7 +6,10 @@
 #include "GameFramework/PlayerState.h"
 #include "Inventory/FItemData.h"
 #include "Inventory/PE_InventoryComponent.h"
+#include "Player/PE_SkillDataTable.h"
 #include "PE_PlayerState.generated.h"
+
+class USkillManagerComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInventoryChanged, TArray<FItemData>, NewInventory); //FOnInventoryChanged라는 델리게이트는 FItemData 타입의 인자(NewItem)를 받는 함수를 호출
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFuelChanged, int32, NewQuantity);
@@ -34,6 +37,9 @@ protected:
 	TArray<struct FPE_ItemDataTable*> ItemDataRows;
 	struct FPE_ItemDataTable* SearchedItemData;
 
+	UPROPERTY(ReplicatedUsing = "OnRep_SkillState")
+	TArray<FPE_SkillDataTable> Skills;
+
 	// -----------------------------------------------------------------
 public:
 	UFUNCTION()
@@ -41,7 +47,8 @@ public:
 
 public:
 	// 초기화 함수 -----------------------------------------------------------------------------
-	void InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage, int32 DefualtFuelData);											// Gamemode의 PostLogin에서 호출
+	void InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage, int32 DefualtFuelData);	// Gamemode의 PostLogin에서 호출
+	void InitializeSkillPoint(int32 DefaultSkillPoint);
 
 	// 인벤토리 데이터 설정 함수 -----------------------------------------------------------------------------
 	bool IsEmptySlot(const int32 SlotNumber);
@@ -61,12 +68,32 @@ public:
 
 	FORCEINLINE TArray<FItemData> GetInventoryData() const { return InventoryData; }
 
+	UFUNCTION(BlueprintCallable)
+	int32 GetSkillPoint() { return SkillPoint; }
+
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE TArray<FPE_SkillDataTable> GetSkills() { return Skills; }
+
+	UFUNCTION(Server, Reliable)
+	void AddSkillPoint_Server(int32 Point);
+
+	UFUNCTION(Server, Reliable)
+	void UseSkillPoint_Server(int32 Point);
+
+	UFUNCTION(Server, Reliable)
+	void UnlockSkill_Server(E_Skills Skill);
+
 	// 연료 데이터 -----------------------------------------------------------------
 private:
 	int32 MaxQuantity = 10000;
 
 	UPROPERTY(ReplicatedUsing = OnRep_FuelData)
 	int32 CurrentQuantity = 0;
+
+	UPROPERTY(ReplicatedUsing = OnRep_SkillPoint)
+	int32 SkillPoint = 10;
+
+	void UnlockSkill_Internal(E_Skills Skill);
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Events")
@@ -89,4 +116,15 @@ public:
 
 	FORCEINLINE int32 GetCurrentFuel() const { return CurrentQuantity; }
 
+	UFUNCTION()
+	void PushSkillPointToComponent();
+	
+	UFUNCTION()
+	void PushSkillStateToComponent();
+
+	UFUNCTION()
+	void OnRep_SkillPoint();
+
+	UFUNCTION()
+	void OnRep_SkillState();
 };
