@@ -79,7 +79,9 @@ APE_MapGenerator::APE_MapGenerator()
 	TArray<FString> BPRoom4Paths = {
 		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_CommonNodeEntry4.BP_CommonNodeEntry4_C")
 	};
-
+	TArray<FString> BPRoom4Paths_1 = {
+		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_CommonNodeEntry4-1.BP_CommonNodeEntry4-1_C")
+	};
 	TArray<FString> BPStartRoomPaths = {
 		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_StartNode1.BP_StartNode1_C")
 	};
@@ -115,12 +117,20 @@ APE_MapGenerator::APE_MapGenerator()
 		if (LoadedClass)
 			GeneratableMapsExit3.Add(LoadedClass);
 	}
-	for (const FString& Path : BPRoom4Paths)
+	//for (const FString& Path : BPRoom4Paths)
+	//{
+	//	UClass* LoadedClass = LoadClass<AActor>(nullptr, *Path);
+	//	if (LoadedClass)
+	//		GeneratableMapsExit4.Add(LoadedClass);
+	//}
+	for (const FString& Path : BPRoom4Paths_1)
 	{
 		UClass* LoadedClass = LoadClass<AActor>(nullptr, *Path);
 		if (LoadedClass)
 			GeneratableMapsExit4.Add(LoadedClass);
 	}
+
+	PRINT_LOG(TEXT("GeneratableMapsExit4 count: %d"), GeneratableMapsExit4.Num());
 
 	// 아이템 스포너 생성
 	ItemSpawner = CreateDefaultSubobject<APE_ItemSpawner>(TEXT("Item Spawner"));
@@ -367,6 +377,7 @@ AActor* APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
 	}
 
 	AActor* SpawnedMap = nullptr;
+	PRINT_LOG(TEXT("Mask = %d, GeneratableMapsExit4.Num = %d"), Mask, GeneratableMapsExit4.Num());
 
 	switch (Mask)
 	{
@@ -442,8 +453,18 @@ AActor* APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
 		break;
 	case EXIT_Left | EXIT_Right | EXIT_Top | EXIT_Bottom:
 		Map = GeneratableMapsExit4[FMath::RandRange(0, GeneratableMapsExit4.Num() - 1)];
+		PRINT_LOG(TEXT("Spawn 4-way room class: %s"), *Map->GetName());
 		Rotation = 90 * FMath::RandRange(0, 3);
 		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, Rotation, 0));
+		if (SpawnedMap)
+		{
+			PRINT_LOG(TEXT("Spawned 4-way room actor: %s at %s"),
+				*SpawnedMap->GetName(), *SpawnedMap->GetActorLocation().ToString());
+		}
+		else
+		{
+			PRINT_LOG(TEXT("Failed to spawn 4-way room"));
+		}
 		Node->isSpawned = true;
 		break;
 	default:
@@ -451,6 +472,7 @@ AActor* APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
 		break;
 	}
 
+	PRINT_LOG(TEXT("Mask = %d"), Mask);
 	return SpawnedMap;
 }
 
