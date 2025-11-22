@@ -77,10 +77,8 @@ APE_MapGenerator::APE_MapGenerator()
 		TEXT("/Game/Asset/HomeMade/NodeEntry3/BP_CommonNode3.BP_CommonNode3_C")
 	};
 	TArray<FString> BPRoom4Paths = {
-		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_CommonNodeEntry4.BP_CommonNodeEntry4_C")
-	};
-	TArray<FString> BPRoom4Paths_1 = {
-		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_4wayRoom_1.BP_4wayRoom_1_C")
+		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_CommonNodeEntry4.BP_CommonNodeEntry4_C"),
+		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_CommonNode_4path_3.BP_CommonNode_4path_3_C")
 	};
 	TArray<FString> BPStartRoomPaths = {
 		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_StartNode1.BP_StartNode1_C")
@@ -118,12 +116,6 @@ APE_MapGenerator::APE_MapGenerator()
 			GeneratableMapsExit3.Add(LoadedClass);
 	}
 	for (const FString& Path : BPRoom4Paths)
-	{
-		UClass* LoadedClass = LoadClass<AActor>(nullptr, *Path);
-		if (LoadedClass)
-			GeneratableMapsExit4.Add(LoadedClass);
-	}
-	for (const FString& Path : BPRoom4Paths_1)
 	{
 		UClass* LoadedClass = LoadClass<AActor>(nullptr, *Path);
 		if (LoadedClass)
@@ -460,10 +452,6 @@ AActor* APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
 		{
 			PRINT_LOG(TEXT("Spawned 4-way room actor: %s at %s"),
 				*SpawnedMap->GetName(), *SpawnedMap->GetActorLocation().ToString());
-		}
-		else
-		{
-			PRINT_LOG(TEXT("Failed to spawn 4-way room"));
 		}
 		Node->isSpawned = true;
 		break;
