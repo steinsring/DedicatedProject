@@ -3,6 +3,7 @@
 
 #include "Enemy/PE_AIController.h"
 #include "GameFramework/Character.h" 
+#include "Enemy/PlayerAI.h"
 
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardData.h"
@@ -27,10 +28,25 @@ APE_AIController::APE_AIController()
 		BBAsset = BBObject.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/AI/BT_PECharacter.BT_PECharacter"));
-	if (BTObject.Succeeded())
+	auto ControllingPawn = GetCharacter();
+	if (!ControllingPawn) return;
+
+	APlayerAI* PlayerEnemy = Cast<APlayerAI>(ControllingPawn);
+	if (PlayerEnemy != nullptr)
 	{
-		BTAsset = BTObject.Object;
+		static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/AI/BT_PEEnemy.BT_PEEnemy"));
+		if (BTObject.Succeeded())
+		{
+			BTAsset = BTObject.Object;
+		}
+	}
+	else
+	{
+		static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/AI/BT_PECharacter.BT_PECharacter"));
+		if (BTObject.Succeeded())
+		{
+			BTAsset = BTObject.Object;
+		}
 	}
 
 	BBComp = GetBlackboardComponent();

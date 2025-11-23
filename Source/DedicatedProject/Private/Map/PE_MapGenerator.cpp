@@ -68,7 +68,8 @@ APE_MapGenerator::APE_MapGenerator()
 		TEXT("/Game/Asset/HomeMade/NodeEntry1/BP_CommonNode1.BP_CommonNode1_C")
 	};
 	TArray<FString> BPRoom2_1Paths = {
-		TEXT("/Game/Asset/HomeMade/NodeEntry2-1/BP_CommonNode2-1-1.BP_CommonNode2-1-1_C")
+		TEXT("/Game/Asset/HomeMade/NodeEntry2-1/BP_CommonNode2-1-1.BP_CommonNode2-1-1_C"),
+		TEXT("/Game/Asset/HomeMade/NodeEntry2-1/BP_CommonNode_2path_plz5.BP_CommonNode_2path_plz5_C")
 	};
 	TArray<FString> BPRoom2_2Paths = {
 		TEXT("/Game/Asset/HomeMade/NodeEntry2-2/BP_CommonNode2-2-1.BP_CommonNode2-2-1_C")
@@ -78,7 +79,7 @@ APE_MapGenerator::APE_MapGenerator()
 	};
 	TArray<FString> BPRoom4Paths = {
 		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_CommonNodeEntry4.BP_CommonNodeEntry4_C"),
-		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_CommonNode_4path_3.BP_CommonNode_4path_3_C")
+		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_CommonNode_4path_4.BP_CommonNode_4path_4_C")
 	};
 	TArray<FString> BPStartRoomPaths = {
 		TEXT("/Game/Asset/HomeMade/NodeEntry4/BP_StartNode1.BP_StartNode1_C")
@@ -369,7 +370,8 @@ AActor* APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
 	}
 
 	AActor* SpawnedMap = nullptr;
-	PRINT_LOG(TEXT("Mask = %d, GeneratableMapsExit4.Num = %d"), Mask, GeneratableMapsExit4.Num());
+	//PRINT_LOG(TEXT("Mask = %d, GeneratableMapsExit4.Num = %d"), Mask, GeneratableMapsExit4.Num());
+	PRINT_LOG(TEXT("Mask = %d, GeneratableMapsExit2_1.Num = %d"), Mask, GeneratableMapsExit2_1.Num());
 
 	switch (Mask)
 	{
@@ -395,7 +397,13 @@ AActor* APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
 		break;
 	case EXIT_Left | EXIT_Right:
 		Map = GeneratableMapsExit2_1[FMath::RandRange(0, GeneratableMapsExit2_1.Num() - 1)];
+		PRINT_LOG(TEXT("Spawn 2-way room class: %s"), *Map->GetName());
 		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator::ZeroRotator);
+		if (SpawnedMap)
+		{
+			PRINT_LOG(TEXT("Spawned 2-way room actor: %s at %s"),
+				*SpawnedMap->GetName(), *SpawnedMap->GetActorLocation().ToString());
+		}
 		Node->isSpawned = true;
 		break;
 	case EXIT_Left | EXIT_Top:
@@ -420,7 +428,13 @@ AActor* APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
 		break;
 	case EXIT_Top | EXIT_Bottom:
 		Map = GeneratableMapsExit2_1[FMath::RandRange(0, GeneratableMapsExit2_1.Num() - 1)];
+		PRINT_LOG(TEXT("Spawn 2-way room class: %s"), *Map->GetName());
 		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, 90, 0));
+		if (SpawnedMap)
+		{
+			PRINT_LOG(TEXT("Spawned 2-way room actor: %s at %s"),
+				*SpawnedMap->GetName(), *SpawnedMap->GetActorLocation().ToString());
+		}
 		Node->isSpawned = true;
 		break;
 	case EXIT_Left | EXIT_Right | EXIT_Top:
@@ -445,14 +459,14 @@ AActor* APE_MapGenerator::SpawnMap(TSharedPtr<FBSPNode>& Node) {
 		break;
 	case EXIT_Left | EXIT_Right | EXIT_Top | EXIT_Bottom:
 		Map = GeneratableMapsExit4[FMath::RandRange(0, GeneratableMapsExit4.Num() - 1)];
-		PRINT_LOG(TEXT("Spawn 4-way room class: %s"), *Map->GetName());
+		//PRINT_LOG(TEXT("Spawn 4-way room class: %s"), *Map->GetName());
 		Rotation = 90 * FMath::RandRange(0, 3);
 		SpawnedMap = GetWorld()->SpawnActor<AActor>(Map, Location, FRotator(0, Rotation, 0));
-		if (SpawnedMap)
-		{
-			PRINT_LOG(TEXT("Spawned 4-way room actor: %s at %s"),
-				*SpawnedMap->GetName(), *SpawnedMap->GetActorLocation().ToString());
-		}
+		//if (SpawnedMap)
+		//{
+		//	PRINT_LOG(TEXT("Spawned 4-way room actor: %s at %s"),
+		//		*SpawnedMap->GetName(), *SpawnedMap->GetActorLocation().ToString());
+		//}
 		Node->isSpawned = true;
 		break;
 	default:
