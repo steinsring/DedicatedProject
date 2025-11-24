@@ -40,6 +40,12 @@ public:
 	
 private:
 	UPROPERTY()
+	class UBehaviorTree* BTEnemyAsset;
+
+	UPROPERTY()
+	class UBehaviorTree* BTPlayerAIAsset;
+
+	UPROPERTY()
 	class UBehaviorTree* BTAsset;
 
 	UPROPERTY()

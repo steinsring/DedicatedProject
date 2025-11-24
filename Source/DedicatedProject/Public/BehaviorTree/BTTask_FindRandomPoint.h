@@ -32,5 +32,5 @@ public:
 	float MinDistance = 200.0f;
 
 	UPROPERTY(EditAnywhere, Category = "BlackBoard")
-	float MaxDistance = 800.0f;
+	float MaxDistance = 400.0f;
 };

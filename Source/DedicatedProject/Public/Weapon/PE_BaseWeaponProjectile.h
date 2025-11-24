@@ -33,6 +33,8 @@ public:
 
 	void InitVelocity(const FVector& ShootDir);
 
+	void SetVelocity(const FVector& ShootDir, float Speed);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

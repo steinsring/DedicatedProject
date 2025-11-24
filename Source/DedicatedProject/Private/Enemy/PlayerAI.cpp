@@ -55,8 +55,8 @@ APlayerAI::APlayerAI()
 	}
 
 	//모자이크 위치 및 회전 조정
-	SightHackMesh->SetRelativeRotation(FRotator(0, 0, 90));
-	SightHackMesh->SetRelativeLocation(FVector(0, 50, 0));
+	SightHackMesh->SetRelativeRotation(FRotator(90.f, 90.f, 0.f));
+	SightHackMesh->SetRelativeLocation(FVector(0.f, 50.f, 150.f));
 
 	//데이터 테이블을 불러오기
 	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableAsset(TEXT
@@ -78,6 +78,8 @@ APlayerAI::APlayerAI()
 
 void APlayerAI::BeginPlay()
 {
+	Super::BeginPlay();
+
 	//데이터 테이블에서 AttackPower 가져오기
 	if (DataTable)
 	{

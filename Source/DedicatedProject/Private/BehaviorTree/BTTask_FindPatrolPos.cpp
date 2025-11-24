@@ -5,6 +5,7 @@
 #include "Enemy/PE_AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "NavigationSystem.h"
+#include "DedicatedProject.h"
 
 //이 클래스를 통해 BehaviorTree에 FindPatrolPos라는 태스크(노드)가 만들어짐
 UBTTask_FindPatrolPos::UBTTask_FindPatrolPos()
@@ -22,6 +23,7 @@ EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& O
 	auto ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 	if (nullptr == ControllingPawn)
 		return EBTNodeResult::Failed;
+	PRINT_LOG(TEXT("FindPatrolPos Pawn : %s"), *ControllingPawn->GetName());
 
 	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
 	if(nullptr == NavSystem)
@@ -45,7 +47,7 @@ EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& O
 	PatrolPoints = Controller->WayPoints;
 	if (PatrolPoints.Num() == 0) 
 		return EBTNodeResult::Failed;
-	UE_LOG(LogTemp, Log, TEXT("PatrolPoints Count : %d"), PatrolPoints.Num());
+	PRINT_LOG(TEXT("PatrolPoints Count : %d"), PatrolPoints.Num());
 
 	CurrentPatrolIndex = FMath::Clamp(CurrentPatrolIndex, 0, PatrolPoints.Num() - 1);
 	if (!PatrolPoints.IsValidIndex(CurrentPatrolIndex))
