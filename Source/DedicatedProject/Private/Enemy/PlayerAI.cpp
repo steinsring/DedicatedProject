@@ -1,5 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
+#include "Enemy/PlayerAI.h"
+
 #include "Enemy/ToiletMechTest.h"
 #include "Enemy/PE_AIController.h"
 
@@ -11,7 +13,6 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "DedicatedProject.h"
-#include "Enemy/PlayerAI.h"
 
 APlayerAI::APlayerAI()
 {
@@ -34,7 +35,7 @@ APlayerAI::APlayerAI()
 
 		//ProjectPlayer 불루프린트 클래스에 애니메이션 블루프린트를 세팅해준다.
 		GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-		static ConstructorHelpers::FClassFinder<UAnimInstance> PlayerAIAnim(TEXT("/Game/ParagonWraith/Characters/Heroes/Wraith/Wraith_AnimBlueprint.Wraith_AnimBlueprint_C"));
+		static ConstructorHelpers::FClassFinder<UAnimInstance> PlayerAIAnim(TEXT("/Game/BluePrints/Enemy/AB_PlayerAIAnimBlueprint.AB_PlayerAIAnimBlueprint_C"));
 		if (PlayerAIAnim.Succeeded())
 		{
 			GetMesh()->SetAnimInstanceClass(PlayerAIAnim.Class);

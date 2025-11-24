@@ -8,6 +8,7 @@
 #include <Enemy/SpawnPoint.h>
 #include <Enemy/ToiletMechTest.h>
 #include "Enemy/Crunch.h"
+#include "Enemy/PlayerAI.h"
 #include "Enemy/PE_AIController.h"
 #include "Item/PE_ItemSpawner.h"
 #include "Player/ProjectPlayer.h"
@@ -537,8 +538,8 @@ void APE_MapGenerator::SpawnEnemies()
 				case E_EnemyType::Crunch:
 					Enemy = GetWorld()->SpawnActor<ACrunch>(Location, Rotation, SpawnParams);
 					break;
-				case E_EnemyType::Boss:
-					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
+				case E_EnemyType::PlayerAI:
+					Enemy = GetWorld()->SpawnActor<APlayerAI>(Location, Rotation, SpawnParams);
 					break;
 				case E_EnemyType::Player:
 					Enemy = GetWorld()->SpawnActor<AProjectPlayer>(Location, Rotation, SpawnParams);
@@ -546,6 +547,9 @@ void APE_MapGenerator::SpawnEnemies()
 					{
 						DummyPlayer->SetPowerState_Server(false);
 					}
+					break;
+				case E_EnemyType::Boss:
+					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
 					break;
 				default:
 					Enemy = GetWorld()->SpawnActor<AToiletMechTest>(Location, Rotation, SpawnParams);
