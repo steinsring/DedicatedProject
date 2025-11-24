@@ -35,13 +35,13 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void Fire();																		// 클라에서 실행
+	void Fire(FVector TargetPoint);																		// 클라에서 실행
 
 	void Fire_Enemy();																	// 적 AI용 클라에서 실행
 
 private:
 	UFUNCTION(Server, Reliable)
-	void Fire_Server();	
+	void Fire_Server(FVector TargetPoint);
 																// 클라에서 실행
 	UFUNCTION(Server, Reliable)
 	void Fire_Enemy_Server();

@@ -31,6 +31,8 @@ public:
 	FORCEINLINE UStaticMeshComponent* GetMesh() const { return Mesh; }
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 
+	void InitVelocity(const FVector& ShootDir);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
