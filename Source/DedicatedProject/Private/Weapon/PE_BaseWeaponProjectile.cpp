@@ -66,7 +66,7 @@ APE_BaseWeaponProjectile::APE_BaseWeaponProjectile()
 void APE_BaseWeaponProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	ProjectileMovement->SetVelocityInLocalSpace(FVector::ForwardVector * ProjectileMovement->InitialSpeed);
+	//ProjectileMovement->SetVelocityInLocalSpace(FVector::ForwardVector * ProjectileMovement->InitialSpeed);
 	ProjectileMovement->Activate(true);
 
 	// 2) 소유자의 모든 PrimitiveComponent 를 콤포넌트 단위로 무시 (메시/캡슐 포함)
@@ -112,4 +112,12 @@ void APE_BaseWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* 
 	}
 	
 	Destroy();
+}
+
+void APE_BaseWeaponProjectile::InitVelocity(const FVector& ShootDir)
+{
+	if (ProjectileMovement)
+	{
+		ProjectileMovement->Velocity = ShootDir * ProjectileMovement->InitialSpeed;
+	}
 }

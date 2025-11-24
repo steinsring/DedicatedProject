@@ -250,13 +250,29 @@ void AProjectPlayer::Tick(float DeltaTime)
 	//플레이어 이동 처리
 	//등속 운동
 	//P(결과 위치) = P_0(현재위치) + vt
-	direction = FTransform(GetControlRotation()).TransformVector(direction); //이동방향을 컨트롤 방향 기준으로 변환
+	//direction = FTransform(GetControlRotation()).TransformVector(direction); //이동방향을 컨트롤 방향 기준으로 변환
 	/*FVector P0 = GetActorLocation();
 	FVector vt = direction * walkSpeed * DeltaTime;
 	FVector P = P0 + vt;
 	SetActorLocation(P);*/
-	AddMovementInput(direction);
-	direction = FVector::ZeroVector;
+	// 1) 컨트롤러 가져오기 (널일 수 있으니 변수에 먼저 저장)
+	AController* MyController = GetController();
+
+	// 2) 이동 처리
+	if (!direction.IsNearlyZero())
+	{
+		if (MyController) // 널 체크 필수
+		{
+			FRotator ControlRot = MyController->GetControlRotation();
+			ControlRot.Pitch = 0.f;
+			ControlRot.Roll = 0.f;
+
+			direction = ControlRot.RotateVector(direction);
+		}
+
+		AddMovementInput(direction);
+		direction = FVector::ZeroVector;
+	}
 
 	if (!PlayerAnim)
 	{
@@ -526,7 +542,28 @@ void AProjectPlayer::InputAttack(const FInputActionValue& inputValue)
    }
 
    PS->UseFuel(RequiredAttackFuel);
-   WeaponProjectileComponent->Fire();
+
+   // 카메라 기준으로 레이 트레이스
+   FVector CamLoc = tpsCamComp->GetComponentLocation();
+   FVector CamDir = tpsCamComp->GetForwardVector();
+   const float TraceDistance = 12000.f;
+
+   FVector TraceStart = CamLoc;
+   FVector TraceEnd = CamLoc + CamDir * TraceDistance;
+
+   FHitResult Hit;
+   FCollisionQueryParams Params;
+   Params.AddIgnoredActor(this);
+
+   FVector TargetPoint = TraceEnd;	
+
+   if (GetWorld()->LineTraceSingleByChannel(
+	   Hit, TraceStart, TraceEnd, ECC_Visibility, Params))
+   {
+	   TargetPoint = Hit.ImpactPoint;	// Ray가 닿은 지점
+   }
+
+   WeaponProjectileComponent->Fire(TargetPoint);
    
    if (PlayerAnim->BasicAttack)  
    {  

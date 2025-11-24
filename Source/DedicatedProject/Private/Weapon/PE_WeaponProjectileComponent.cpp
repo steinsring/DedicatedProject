@@ -42,9 +42,9 @@ void UPE_WeaponProjectileComponent::TickComponent(float DeltaTime, ELevelTick Ti
 	// ...
 }
 
-void UPE_WeaponProjectileComponent::Fire()
+void UPE_WeaponProjectileComponent::Fire(FVector TargetPoint)
 {
-	Fire_Server();
+	Fire_Server(TargetPoint);
 }
 
 void UPE_WeaponProjectileComponent::Fire_Enemy()
@@ -52,18 +52,29 @@ void UPE_WeaponProjectileComponent::Fire_Enemy()
 	Fire_Enemy_Server();
 }
 
-void UPE_WeaponProjectileComponent::Fire_Server_Implementation()
+void UPE_WeaponProjectileComponent::Fire_Server_Implementation(FVector TargetPoint)
 {
 	if (ProjectileClass)
 	{
 		AProjectPlayer* const Character = Cast<AProjectPlayer>(GetOwner());	//컴포넌트의 소유자(Owner)를 AProjectPlayer로 캐스팅
-		const FVector ItemSpawnLocation = GetComponentLocation();
-		const FRotator ItemSpawnRotation = GetComponentRotation();
-		FActorSpawnParameters ItemSpawnParams = FActorSpawnParameters();
+		const FVector MuzzleLoc = GetComponentLocation();					// 실제 발사 위치
+		const FVector ShootDir = (TargetPoint - MuzzleLoc).GetSafeNormal();
+		const FRotator ShootRot = ShootDir.Rotation();						// 발사 방향
+		//const FRotator ItemSpawnRotation = GetComponentRotation();			
+		FActorSpawnParameters ItemSpawnParams;
 		ItemSpawnParams.Owner = GetOwner();									// 투사체의 소유자 설정
 		ItemSpawnParams.Instigator = Character;								// 투사체를 던진 플레이어 설정
 
-		GetWorld()->SpawnActor<APE_BaseWeaponProjectile>(ProjectileClass, ItemSpawnLocation, ItemSpawnRotation, ItemSpawnParams);
+		// 발사체 스폰
+		APE_BaseWeaponProjectile* Projectile = GetWorld()->SpawnActor<APE_BaseWeaponProjectile>(ProjectileClass, MuzzleLoc, ShootRot, ItemSpawnParams);
+		
+		if (!Projectile)
+		{
+			PRINT_LOG(TEXT("Projectile spawn failed"));
+			return;
+		}
+
+		Projectile->InitVelocity(ShootDir);
 	}
 	else
 	{
