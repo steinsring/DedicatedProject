@@ -26,15 +26,31 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	bool bCanDetect = BB->GetValueAsBool("bCanDetect");
 	if (!bCanDetect) return;
 
-	APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
-	if (nullptr == ControllingPawn) return;
+	APawn* ControllingPawn = OwnerComp.GetAIOwner() ? OwnerComp.GetAIOwner()->GetPawn() : nullptr;
+	if (!ControllingPawn) return;
+
+	AActor* CurrentTarget = Cast<AActor>(BB->GetValueAsObject(APE_AIController::TargetKey));
+	if (CurrentTarget)
+	{
+		float Distance = FVector::Dist(ControllingPawn->GetActorLocation(), CurrentTarget->GetActorLocation());
+
+		if (Distance > LoseTargetDistance)
+		{
+			BB->ClearValue(APE_AIController::TargetKey);
+		}
+		else
+		{
+			return;
+		}
+	}
 
 	UWorld* World = ControllingPawn->GetWorld();
 	if (!World) return;
+
 	FVector Forward = ControllingPawn->GetActorForwardVector();
 	FVector Center = ControllingPawn->GetActorLocation();
 
-	FVector BoxExtent(300.0f, 300.0f, 100.0f);
+	FVector BoxExtent(500.0f, 300.0f, 100.0f);
 	FQuat Rotation = ControllingPawn->GetActorQuat();
 
 	TArray<FOverlapResult> BoxOverlapResults;
@@ -81,5 +97,5 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		0.2f
 	);
 
-	BB->ClearValue(APE_AIController::TargetKey);
+	//BB->ClearValue(APE_AIController::TargetKey);
 }

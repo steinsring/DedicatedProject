@@ -7,6 +7,9 @@
 #include "Player/ProjectPlayer.h"
 #include "CharacterCommon.h"
 #include "Engine/DamageEvents.h"
+#include "Enemy/Enemy.h"
+#include "Enemy/PE_AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 #include "DedicatedProject.h"
 
@@ -103,6 +106,34 @@ void APE_BaseWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* 
 			if (HitHealthComp)
 			{
 				HitHealthComp->ApplyDamage(Damage);
+			}
+
+			if (HasAuthority())
+			{
+				AEnemy* Enemy = Cast<AEnemy>(HitCharacter);
+				if (Enemy)
+				{
+					// 발사한 플레이어 찾기 (Instigator 우선, 없으면 Owner fallback)
+					AProjectPlayer* Attacker = Cast<AProjectPlayer>(GetInstigator());
+					if (!Attacker)
+					{
+						Attacker = Cast<AProjectPlayer>(GetOwner());
+					}
+
+					if (Attacker)
+					{
+						// Enemy의 AIController → Blackboard에 Target 셋
+						if (APE_AIController* AICon = Cast<APE_AIController>(Enemy->GetController()))
+						{
+							if (UBlackboardComponent* BB = AICon->GetBlackboardComponent())
+							{
+								BB->SetValueAsObject(APE_AIController::TargetKey, Attacker);
+								BB->SetValueAsObject(TEXT("PrevTarget"), Attacker);
+								BB->SetValueAsBool(TEXT("bCanDetect"), true);
+							}
+						}
+					}
+				}
 			}
 
 			HitCharacter->PlayHitSound(OtherActor);

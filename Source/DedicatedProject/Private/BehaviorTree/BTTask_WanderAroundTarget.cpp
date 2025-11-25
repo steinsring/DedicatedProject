@@ -154,6 +154,13 @@ void UBTTask_WanderAroundTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uin
 		return;
 	}
 
+	if (!OwnerComp.GetBlackboardComponent()->GetValueAsObject(TEXT("Target")))
+	{
+		ReturnSpeedToOriginal();
+		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
+		return;
+	}
+
 	FVector ToTarget = Target->GetActorLocation() - AIPawn->GetActorLocation();
 	ToTarget.Z = 0.0f;
 

@@ -6,6 +6,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 #include "Enemy/PE_ToiletMechStats.h"
 #include "Kismet/GameplayStatics.h"
@@ -101,6 +102,19 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		float DamageMultiplier = Player->GetAttackPowerMultiplier();
 		float CalculatedDamage = DamageAmount * DamageMultiplier;
 		HealthComp->ApplyDamage(CalculatedDamage);
+
+		APE_AIController* AICon = Cast<APE_AIController>(GetController());
+		if (AICon)
+		{
+			PRINT_LOG(TEXT("AICon Exist"));
+			UBlackboardComponent* BB = AICon->GetBlackboardComponent();
+			if (BB)
+			{
+				PRINT_LOG(TEXT("BB Exist"));
+				BB->SetValueAsObject(APE_AIController::TargetKey, Player);
+				BB->SetValueAsObject(TEXT("PrevTarget"), Player);
+			}
+		}
 
 		return CalculatedDamage;
 	}

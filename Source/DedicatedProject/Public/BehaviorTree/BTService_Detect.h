@@ -20,4 +20,6 @@ public:
 protected:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
+private:
+	float LoseTargetDistance = 1000.0f;
 };
