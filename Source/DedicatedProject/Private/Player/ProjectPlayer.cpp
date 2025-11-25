@@ -738,6 +738,12 @@ void AProjectPlayer::Interact()
 		FocusedItem->Interact(this);
 	}
 	// 밑에 여러 작용 추가
+	// 알림창
+	APE_PlayerController* PC = Cast<APE_PlayerController>(GetController());
+	if (PC)
+	{
+		PC->CreateNotify();
+	}
 }
 
 void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)

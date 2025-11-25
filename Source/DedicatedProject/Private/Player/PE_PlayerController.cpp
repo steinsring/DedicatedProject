@@ -17,18 +17,20 @@
 #include "UI/PE_HPBarWidget.h"
 #include "HealthComponent.h"
 #include "Player/PE_PlayerState.h"
+#include "UI/PE_NotifyWindow.h"
 
 APE_PlayerController::APE_PlayerController()
 {
 	// Inventory UI 로드 ----------------------------------------------------------------------
 	static ConstructorHelpers::FClassFinder<UPE_Inventory> WidgetBPClass(TEXT("/Game/BluePrints/UI/WB_Inventory.WB_Inventory_C"));
-	if (!WidgetBPClass.Succeeded())
+	if (WidgetBPClass.Succeeded())
+	{
+		InventoryWidgetBPClass = WidgetBPClass.Class;
+	}
+	else
 	{
 		PRINT_ERROR_LOG(TEXT("InventoryWidgetBPClass is NULL"));
-		return;
 	}
-
-	InventoryWidgetBPClass = WidgetBPClass.Class;
 
 	// HealthComp UI 로드 ----------------------------------------------------------------------
 	static ConstructorHelpers::FClassFinder<UUserWidget> HPBarWidgetAsset(TEXT("WidgetBlueprint'/Game/BluePrints/UI/WB_HPBar.WB_HPBar_C'"));
@@ -43,13 +45,25 @@ APE_PlayerController::APE_PlayerController()
 
 	// 조준점
 	static ConstructorHelpers::FClassFinder<UUserWidget> CrossHairBPClass(TEXT("/Game/BluePrints/UI/WB_CrossHair.WB_CrossHair_C"));
-	if (!CrossHairBPClass.Succeeded())
+	if (CrossHairBPClass.Succeeded())
+	{
+		CrossHairWidgetBPClass = CrossHairBPClass.Class;
+	}
+	else
 	{
 		PRINT_ERROR_LOG(TEXT("InventoryWidgetBPClass is NULL"));
-		return;
 	}
 
-	CrossHairWidgetBPClass = CrossHairBPClass.Class;
+	// Notify UI 로드 ---------------------------------------------------------------------- 
+	static ConstructorHelpers::FClassFinder<UPE_NotifyWindow> NotifyWidget(TEXT("/Game/BluePrints/UI/WB_NotifyWindow.WB_NotifyWindow_C")); 
+	if (NotifyWidget.Succeeded()) 
+	{ 
+		NotifyWidgetClass = NotifyWidget.Class; //블루프린트에서 위젯 클래스를 불러온다. 
+	} 
+	else 
+	{ 
+		PRINT_ERROR_LOG(TEXT("NotifyWidgetClass is NULL")); 
+	}
 }
 
 void APE_PlayerController::BeginPlay()
@@ -210,4 +224,19 @@ void APE_PlayerController::BindHPBarToPawn(APawn* InPawn)
 	{
 		HPBarWidget->BindToHealthComponent(HealthComp);
 	}
+}
+
+void APE_PlayerController::CreateNotify()
+{
+	// NotifyWidget UI 생성 ----------------------------------------------------------------------
+	UPE_NotifyWindow* NotifyWidget = CreateWidget<UPE_NotifyWindow>(this, NotifyWidgetClass);
+	if (!NotifyWidget)
+	{
+		PRINT_LOG(TEXT("NotifyWidget is Not Created!"));
+		return;
+	}
+
+	NotifyWidget->AddToViewport();
+
+	InventoryWidget->CreateNotify(NotifyWidget);
 }

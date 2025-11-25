@@ -5,9 +5,11 @@
 #include "Components/UniformGridPanel.h"
 #include "Components/UniformGridSlot.h"
 #include "Components/Overlay.h"
+#include "Components/VerticalBox.h"
 #include "UI/PE_InventorySlot.h"
 #include "DedicatedProject.h"
 #include "Inventory/FItemData.h"
+#include "UI/PE_NotifyWindow.h"
 
 void UPE_Inventory::NativeConstruct()
 {
@@ -22,6 +24,11 @@ void UPE_Inventory::NativeConstruct()
 	ItemSlots[3] = InventorySlot_3;
 	ItemSlots[4] = InventorySlot_4;
 	ItemSlots[5] = InventorySlot_5;
+
+	if (NotifyWindow)
+	{
+		NotifyWindow->ClearChildren();
+	}
 	/*
 	int32 Count = ItemGridPanel->GetChildrenCount();
 	for (int32 i = 0; i < Count; ++i)
@@ -96,4 +103,9 @@ void UPE_Inventory::UseItem(const int SlotNumber)
 		CheckingSlot->UseItem();
 		return;
 	}
+}
+
+void UPE_Inventory::CreateNotify(UPE_NotifyWindow* NotifyWidget)
+{
+	NotifyWindow->AddChild(NotifyWidget);
 }

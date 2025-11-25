@@ -65,4 +65,11 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "CrossHair")
 	TObjectPtr<UUserWidget> CrossHairWidget;				// 실제 생성된 인벤토리 위젯 인스턴스
+
+
+	// 알림창 ----------------------------------------------------------------------------------
+	UPROPERTY(VisibleAnywhere, Category = "Notify")
+	TSubclassOf<class UPE_NotifyWindow> NotifyWidgetClass;
+public:
+	void CreateNotify();
 };

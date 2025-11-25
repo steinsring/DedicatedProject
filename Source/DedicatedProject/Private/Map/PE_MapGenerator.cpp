@@ -35,7 +35,8 @@ APE_MapGenerator::APE_MapGenerator()
 		BoxFaces[i] = CreateDefaultSubobject<UStaticMeshComponent>(*Name);
 		BoxFaces[i]->SetStaticMesh(CubeMesh.Object);
 		BoxFaces[i]->SetupAttachment(GenerateArea);
-		BoxFaces[i]->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		BoxFaces[i]->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		BoxFaces[i]->SetCollisionProfileName(TEXT("BlockAll"));
 	}
 
 	// GenerateArea 크기 가져오기
@@ -70,7 +71,8 @@ APE_MapGenerator::APE_MapGenerator()
 	};
 	TArray<FString> BPRoom2_1Paths = {
 		TEXT("/Game/Asset/HomeMade/NodeEntry2-1/BP_CommonNode2-1-1.BP_CommonNode2-1-1_C"),
-		TEXT("/Game/Asset/HomeMade/NodeEntry2-1/BP_CommonNode_2path_plz5.BP_CommonNode_2path_plz5_C")
+		TEXT("/Game/Asset/HomeMade/NodeEntry2-1/BP_CommonNode_2path_plz5.BP_CommonNode_2path_plz5_C"),
+		TEXT("/Game/Asset/HomeMade/NodeEntry2-1/BP_Laboratory2-1_1.BP_Laboratory2-1_1_C")
 	};
 	TArray<FString> BPRoom2_2Paths = {
 		TEXT("/Game/Asset/HomeMade/NodeEntry2-2/BP_CommonNode2-2-1.BP_CommonNode2-2-1_C")

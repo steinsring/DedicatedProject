@@ -21,6 +21,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Inventory")
 	int32 MaxInventorySlotNumber = 6;										// 최대 인벤토리 슬롯 개수
 
+
 protected:
 	virtual void NativeConstruct() override;
 	
@@ -56,6 +57,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UPE_InventorySlot> WeaponSlot_1 = nullptr;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UVerticalBox> NotifyWindow = nullptr;
+
 	// 아이템 추가 함수
 	void SetInventoryData(const TArray<struct FItemData>& ServerInventoryData);
 
@@ -65,4 +69,7 @@ public:
 	bool IsEmptySlot(const int SlotNumber) const;
 
 	void UseItem(const int SlotNumber);
+
+	// 알림창
+	void CreateNotify(class UPE_NotifyWindow* NotifyWidget);
 };

@@ -14,7 +14,8 @@ class DEDICATEDPROJECT_API UPE_NotifyWindow : public UUserWidget
 {
 	GENERATED_BODY()
 	
-	
-	
-	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> NotifyText = nullptr;
+public:
+	void SetText();
 };
