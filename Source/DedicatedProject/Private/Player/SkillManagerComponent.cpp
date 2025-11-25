@@ -402,7 +402,7 @@ void USkillManagerComponent::GetHitResultActor(float Distance)
 	if (bHit)
 	{
 		PRINT_LOG(TEXT("Hit Actor: %s"), *HitResult.GetActor()->GetName());
-		DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.0f);
+		//DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 12, FColor::Yellow, false, 2.0f);
 		HitActor = HitResult.GetActor();
 	}
 	else

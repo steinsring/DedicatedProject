@@ -78,8 +78,8 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(APE_AIController::TargetKey, DetectedPlayer);
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("PrevTarget"), DetectedPlayer);
 				// 디버그 포인트와 라인 그리기
-				DrawDebugPoint(World, DetectedPlayer->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
-				DrawDebugLine(World, ControllingPawn->GetActorLocation(), DetectedPlayer->GetActorLocation(), FColor::Blue, false, 0.2f);
+				//DrawDebugPoint(World, DetectedPlayer->GetActorLocation(), 10.0f, FColor::Blue, false, 0.2f);
+				//DrawDebugLine(World, ControllingPawn->GetActorLocation(), DetectedPlayer->GetActorLocation(), FColor::Blue, false, 0.2f);
 				return;
 				//break;
 			}
@@ -87,15 +87,15 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	}
 
 	// 디버그 박스 표시
-	DrawDebugBox(
-		World,
-		Center + Forward * BoxExtent.X,
-		BoxExtent,
-		Rotation,
-		bBoxResult ? FColor::Green : FColor::Red,
-		false,
-		0.2f
-	);
+	//DrawDebugBox(
+	//	World,
+	//	Center + Forward * BoxExtent.X,
+	//	BoxExtent,
+	//	Rotation,
+	//	bBoxResult ? FColor::Green : FColor::Red,
+	//	false,
+	//	0.2f
+	//);
 
 	//BB->ClearValue(APE_AIController::TargetKey);
 }
