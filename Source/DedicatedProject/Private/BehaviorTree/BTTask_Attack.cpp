@@ -16,10 +16,14 @@ UBTTask_Attack::UBTTask_Attack()
 EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
+	PRINT_LOG(TEXT("Entered ExecuteTask"));
 
 	auto Enemy = Cast<AEnemy>(OwnerComp.GetAIOwner()->GetPawn());
 	if (nullptr == Enemy)
+	{
+		PRINT_LOG(TEXT("Enemy is NULL"));
 		return EBTNodeResult::Failed;
+	}
 	auto EnemyAnimInstance = Cast<UEnemy_AnimInstance>(Enemy->GetMesh()->GetAnimInstance());
 	if (nullptr == EnemyAnimInstance)
 	{
@@ -42,10 +46,12 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		Enemy->OnAttackEnd.AddLambda([this]()  -> void {
 			IsAttacking = false;
 		});
+		PRINT_LOG(TEXT("InProgress"));
 		return EBTNodeResult::InProgress;
 	}
 	else
 	{
+		PRINT_LOG(TEXT("Alreay Attacking"));
 		return EBTNodeResult::Failed;
 	}
 }

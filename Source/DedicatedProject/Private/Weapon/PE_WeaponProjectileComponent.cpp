@@ -115,8 +115,9 @@ void UPE_WeaponProjectileComponent::Fire_Enemy_Server_Implementation()
 		ItemSpawnParams.Owner = Enemy;									// 투사체의 소유자 설정
 		ItemSpawnParams.Instigator = Enemy;								// 투사체를 던진 적 설정
 
-		GetWorld()->SpawnActor<APE_BaseWeaponProjectile>
+		APE_BaseWeaponProjectile* Projectile = GetWorld()->SpawnActor<APE_BaseWeaponProjectile>
 			(ProjectileClass, SpawnLocation, SpawnRot, ItemSpawnParams);
+		if (Projectile) Projectile->SetVelocity(ShootDir, 1000.0f);
 
 		PRINT_LOG(TEXT("Enemy Fire Projectile"));
 	}

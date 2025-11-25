@@ -121,3 +121,11 @@ void APE_BaseWeaponProjectile::InitVelocity(const FVector& ShootDir)
 		ProjectileMovement->Velocity = ShootDir * ProjectileMovement->InitialSpeed;
 	}
 }
+
+void APE_BaseWeaponProjectile::SetVelocity(const FVector& ShootDir, float Speed)
+{
+	if (ProjectileMovement)
+	{
+		ProjectileMovement->Velocity = ShootDir * Speed;
+	}
+}

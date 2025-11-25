@@ -28,25 +28,15 @@ APE_AIController::APE_AIController()
 		BBAsset = BBObject.Object;
 	}
 
-	auto ControllingPawn = GetCharacter();
-	if (!ControllingPawn) return;
-
-	APlayerAI* PlayerEnemy = Cast<APlayerAI>(ControllingPawn);
-	if (PlayerEnemy != nullptr)
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTEnemyObject(TEXT("/Game/AI/BT_PECharacter.BT_PECharacter"));
+	if (BTEnemyObject.Succeeded())
 	{
-		static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/AI/BT_PEEnemy.BT_PEEnemy"));
-		if (BTObject.Succeeded())
-		{
-			BTAsset = BTObject.Object;
-		}
+		BTEnemyAsset = BTEnemyObject.Object;
 	}
-	else
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTPlayerAIObject(TEXT("/Game/AI/BT_PEEnemy.BT_PEEnemy"));
+	if (BTPlayerAIObject.Succeeded())
 	{
-		static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTObject(TEXT("/Game/AI/BT_PECharacter.BT_PECharacter"));
-		if (BTObject.Succeeded())
-		{
-			BTAsset = BTObject.Object;
-		}
+		BTPlayerAIAsset = BTPlayerAIObject.Object;
 	}
 
 	BBComp = GetBlackboardComponent();
@@ -59,15 +49,30 @@ void APE_AIController::OnPossess(APawn* InPawn)
 	// CollectWayPointsInCurrentNavVolume();
 	//CollectChildrenWayPoints();
 	//UE_LOG(LogTemp, Warning, TEXT("[OnPossess] %s possessed %s"), *GetName(), *InPawn->GetName());
+
+	if (Cast<APlayerAI>(InPawn))
+	{
+		BTAsset = BTPlayerAIAsset;
+		PRINT_LOG(TEXT("PlayerAIBT set completed"));
+	}
+	else
+	{
+		BTAsset = BTEnemyAsset;
+		PRINT_LOG(TEXT("EnemyBT set completed"));
+	}
 	
 	if (UseBlackboard(BBAsset, BBComp))
 	{
 		//AIController가 Pawn을 소유했을때, HomePos의 위치를 Pawn의 위치로 세팅해준다.
 		BBComp->SetValueAsVector(HomePosKey, InPawn->GetActorLocation());
 		BBComp->SetValueAsBool("bCanDetect", true);
-		if (!RunBehaviorTree(BTAsset))
+		if (BTAsset)
 		{
-			//
+			RunBehaviorTree(BTAsset);
+		}
+		else
+		{
+			PRINT_LOG(TEXT("BTAsset is NULL"));
 		}
 	}
 }
