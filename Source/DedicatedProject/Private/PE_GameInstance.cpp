@@ -249,10 +249,18 @@ void UPE_GameInstance::ResetLevelTravelCount()
     LevelTravelCount = 1;
 }
 
-void UPE_GameInstance::SaveStagePlayerData(FString ID, TArray<FItemData> PlayerData, int32 FuelData)
+void UPE_GameInstance::SaveStagePlayerData(FString ID, TArray<FItemData> PlayerData, int32 FuelData, int32 SkillData)
 {
     PlayerDataMap.Add(ID, PlayerData);
-    FuelQuantity = FuelData;
+    FuelDataMap.Add(ID, FuelData);
+    if (int32* FoundValue = SkillPointDataMap.Find(ID))
+    {
+        *FoundValue += SkillData;
+    }
+    else
+    {
+        SkillPointDataMap.Add(ID, 2 + SkillData);
+    }
 }
 
 TArray<FItemData> UPE_GameInstance::GetStagePlayerData(FString ID)
@@ -263,6 +271,26 @@ TArray<FItemData> UPE_GameInstance::GetStagePlayerData(FString ID)
     }
     
     return {};
+}
+
+int32 UPE_GameInstance::GetStageFuelData(FString ID) 
+{
+    if (int32* FoundData = FuelDataMap.Find(ID))
+    {
+        return *FoundData;
+    }
+
+    return 0;
+}
+
+int32 UPE_GameInstance::GetStageSkillPointData(FString ID)
+{
+    if (int32* FoundData = SkillPointDataMap.Find(ID))
+    {
+        return *FoundData;
+    }
+
+    return 0;
 }
 
 

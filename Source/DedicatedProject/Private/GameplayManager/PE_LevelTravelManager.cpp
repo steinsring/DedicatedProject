@@ -9,6 +9,7 @@
 #include "PE_GameInstance.h"
 #include "Player/PE_PlayerState.h"
 #include "Player/ProjectPlayer.h"
+#include "PE_GameState.h"
 
 
 // Sets default values
@@ -106,8 +107,17 @@ void APE_LevelTravelManager::LevelTravel()
 		return;
 	}
 
+	APE_GameState* GS = World->GetGameState<APE_GameState>();
+	if (!GS)
+	{
+		PRINT_ERROR_LOG(TEXT("Travel To Level : %s"), TEXT("GameState is Null"));
+		bTravelInProgress = false;
+		return;
+	}
+
 	// 현재 접속해 있는 모든 플레이어 데이터 저장----------------------------------------------
 	GameInstance->ClearPlayerDataMap();
+	GameInstance->ClearFuel();
 
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
@@ -120,8 +130,14 @@ void APE_LevelTravelManager::LevelTravel()
 		TArray<FItemData> PlayerInventoryData = PS->GetInventoryData();
 		int32 PlayerFuelData = PS->GetCurrentFuel();
 
+		int32 PlayerSkillData = 0;
+		if (GS->AlivePlayers.Contains(PS))
+		{
+			PlayerSkillData = 2;
+		}
+
 		const FString Key = PS->GetPlayerName(); // 나중엔 UniqueNetId로 하면 더 안전
-		GameInstance->SaveStagePlayerData(Key, PlayerInventoryData, PlayerFuelData);
+		GameInstance->SaveStagePlayerData(Key, PlayerInventoryData, PlayerFuelData, PlayerSkillData);
 	}
 
 	// 스테이지 정보를 GameInstance에서 가져와서 세팅--------------------------------
@@ -143,6 +159,7 @@ void APE_LevelTravelManager::LevelTravel()
 		GameInstance->ResetLevelTravelCount();
 		GameInstance->ClearPlayerDataMap();
 		GameInstance->ClearFuel();
+		GameInstance->ClearSkillPoint();
 		World->ServerTravel(FString::Printf(TEXT("%s?listen"), TEXT("/Game/Maps/Lobby")));
 	}
 }

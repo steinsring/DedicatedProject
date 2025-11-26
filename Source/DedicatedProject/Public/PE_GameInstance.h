@@ -58,12 +58,15 @@ public:
     // 스테이지 이동 ----------------------------------
 private:
     TMap<FString, TArray<struct FItemData>> PlayerDataMap;
-    int32 FuelQuantity = 0;
+    TMap<FString, int32> FuelDataMap;
+    TMap<FString, int32> SkillPointDataMap;
 
 public:
     void ClearPlayerDataMap() { PlayerDataMap.Empty(); }
-    void ClearFuel() { FuelQuantity = 0; }
-    void SaveStagePlayerData(FString ID, TArray<FItemData> PlayerData, int32 FuelData);
+    void ClearFuel() { FuelDataMap.Empty(); }
+    void ClearSkillPoint() { SkillPointDataMap.Empty(); }
+    void SaveStagePlayerData(FString ID, TArray<FItemData> PlayerData, int32 FuelData, int32 SkillData);
     TArray<FItemData> GetStagePlayerData(FString ID);
-    int32 GetStageFuelData() { return FuelQuantity; }
+    int32 GetStageFuelData(FString ID);
+    int32 GetStageSkillPointData(FString ID);
 };  

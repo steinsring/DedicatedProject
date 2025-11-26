@@ -68,12 +68,20 @@ void APE_GameMode::PostLogin(APlayerController* NewPlayer)
     { // PlayerState 초기화--------------------------------------------------------------
         const FString Key = PlayerState->GetPlayerName();
         TArray<FItemData> PlayerData = GI->GetStagePlayerData(Key);
-        const int32 PreviousFuel = GI->GetStageFuelData();
+        const int32 PreviousFuel = GI->GetStageFuelData(Key);
+        const int32 PreviousSkillPoint = GI->GetStageSkillPointData(Key);
 
         AllPlayerState.Add(PlayerState);
         const bool bIsFirstStage = PlayerData.IsEmpty();
         PlayerState->InitializeDefaultData(PlayerData, bIsFirstStage, PreviousFuel);
-		PlayerState->InitializeSkillPoint(10);
+        if (bIsFirstStage)
+        {
+            PlayerState->InitializeSkillPoint(2);
+        }
+        else
+        {
+            PlayerState->InitializeSkillPoint(PreviousSkillPoint);
+        }
     }
 
     //-------------------------------------------------------

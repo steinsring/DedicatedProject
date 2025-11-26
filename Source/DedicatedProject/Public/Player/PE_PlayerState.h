@@ -90,11 +90,6 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_FuelData)
 	int32 CurrentQuantity = 0;
 
-	UPROPERTY(ReplicatedUsing = OnRep_SkillPoint)
-	int32 SkillPoint = 10;
-
-	void UnlockSkill_Internal(E_Skills Skill);
-
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Events")
 	FOnFuelChanged OnFuelChanged;
@@ -115,6 +110,13 @@ public:
 	void UseFuel_Server(int32 Quantity);
 
 	FORCEINLINE int32 GetCurrentFuel() const { return CurrentQuantity; }
+	// SKill -------------------------------------------------------
+private:
+	UPROPERTY(ReplicatedUsing = OnRep_SkillPoint)
+	int32 SkillPoint = 2;
+
+	void UnlockSkill_Internal(E_Skills Skill);
+public:
 
 	UFUNCTION()
 	void PushSkillPointToComponent();
