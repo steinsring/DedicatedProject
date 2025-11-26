@@ -10,6 +10,7 @@
 #include "Enemy/Enemy.h"
 #include "Enemy/PE_AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "DedicatedProject.h"
 
@@ -105,7 +106,14 @@ void APE_BaseWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* 
 			UHealthComponent* HitHealthComp = HitCharacter->FindComponentByClass<UHealthComponent>();
 			if (HitHealthComp)
 			{
-				HitHealthComp->ApplyDamage(Damage);
+				if (Cast<AProjectPlayer>(HitCharacter))
+				{
+					HitHealthComp->ApplyDamage(5.0f);
+				}
+				else
+				{
+					HitHealthComp->ApplyDamage(Damage);
+				}
 			}
 
 			if (HasAuthority())
@@ -136,7 +144,14 @@ void APE_BaseWeaponProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* 
 				}
 			}
 
-			HitCharacter->PlayHitSound(OtherActor);
+			if (AProjectPlayer* Player = Cast<AProjectPlayer>(OtherActor))
+			{
+				if (HasAuthority())
+				{
+					// Player는 ACharacterCommon 상속이라 이 함수 사용 가능
+					Player->PlayHitSound_Multicast(Player);
+				}
+			}
 			PRINT_LOG(TEXT("Hit"));
 		}
 		// HitCharacter가 아니면(일반 액터) 아무것도 안 하고 그냥 Destroy로 내려감

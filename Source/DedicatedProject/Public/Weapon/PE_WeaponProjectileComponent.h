@@ -45,4 +45,14 @@ private:
 																// 클라에서 실행
 	UFUNCTION(Server, Reliable)
 	void Fire_Enemy_Server();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void PlayFireSound_Multicast(FVector Location);
+
+private:
+	UPROPERTY()
+	USoundBase* Bullet1;
+	
+	UPROPERTY()
+	USoundBase* Bullet2;
 };

@@ -29,6 +29,7 @@ protected:
 	float AttackPower = 0.0f;
 	float MaxSpeed = 0.0f;
 	float Speed = 0.0f;
+	float MaxHP = 100.0f;
 
 	TSet<AActor*> HitActors;
 
@@ -51,10 +52,11 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void PlayHitSound_Server(AActor* HitActor);
 
+	USoundBase* HitSound;
+
+public:
 	UFUNCTION(NetMulticast, Reliable)
 	void PlayHitSound_Multicast(AActor* HitActor);
-
-	USoundBase* HitSound;
 
 public:	
 	// Called every frame

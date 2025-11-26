@@ -21,6 +21,18 @@ UPE_WeaponProjectileComponent::UPE_WeaponProjectileComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	ProjectileClass = APE_BaseWeaponProjectile::StaticClass();
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> Bullet1_Obj(TEXT("/Game/Asset/Bullet1.Bullet1"));
+	if (Bullet1_Obj.Succeeded())
+	{
+		Bullet1 = Bullet1_Obj.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> Bullet2_Obj(TEXT("/Game/Asset/Bullet2.Bullet2"));
+	if (Bullet2_Obj.Succeeded())
+	{
+		Bullet2 = Bullet2_Obj.Object;
+	}
 }
 
 
@@ -45,11 +57,21 @@ void UPE_WeaponProjectileComponent::TickComponent(float DeltaTime, ELevelTick Ti
 void UPE_WeaponProjectileComponent::Fire(FVector TargetPoint)
 {
 	Fire_Server(TargetPoint);
+	USoundBase* SelectedBullet = FMath::RandBool() ? Bullet1 : Bullet2;
+	UGameplayStatics::PlaySoundAtLocation(this, SelectedBullet, GetComponentLocation());
 }
 
 void UPE_WeaponProjectileComponent::Fire_Enemy()
 {
 	Fire_Enemy_Server();
+	USoundBase* SelectedBullet = FMath::RandBool() ? Bullet1 : Bullet2;
+	UGameplayStatics::PlaySoundAtLocation(this, SelectedBullet, GetComponentLocation());
+}
+
+void UPE_WeaponProjectileComponent::PlayFireSound_Multicast_Implementation(FVector Location)
+{
+	USoundBase* SelectedBullet = FMath::RandBool() ? Bullet1 : Bullet2;
+	UGameplayStatics::PlaySoundAtLocation(this, SelectedBullet, Location);
 }
 
 void UPE_WeaponProjectileComponent::Fire_Server_Implementation(FVector TargetPoint)
@@ -75,6 +97,7 @@ void UPE_WeaponProjectileComponent::Fire_Server_Implementation(FVector TargetPoi
 		}
 
 		Projectile->InitVelocity(ShootDir);
+		PlayFireSound_Multicast(MuzzleLoc);
 	}
 	else
 	{
@@ -118,6 +141,7 @@ void UPE_WeaponProjectileComponent::Fire_Enemy_Server_Implementation()
 		APE_BaseWeaponProjectile* Projectile = GetWorld()->SpawnActor<APE_BaseWeaponProjectile>
 			(ProjectileClass, SpawnLocation, SpawnRot, ItemSpawnParams);
 		if (Projectile) Projectile->SetVelocity(ShootDir, 1000.0f);
+		PlayFireSound_Multicast(SpawnLocation);
 
 		PRINT_LOG(TEXT("Enemy Fire Projectile"));
 	}

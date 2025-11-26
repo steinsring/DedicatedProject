@@ -225,7 +225,7 @@ void USkillManagerComponent::ActivateAugmentSkill(E_Skills skill, float Multipli
 
 void USkillManagerComponent::AttackUp()
 {
-	float Multiplier = 1.5f;
+	float Multiplier = 3.0f;
 	PRINT_LOG(TEXT("Attack Up Activated"));
 	ActivateAugmentSkill(E_Skills::AttackUp, Multiplier);
 

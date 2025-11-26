@@ -23,6 +23,17 @@ ACharacterCommon::ACharacterCommon()
 	HealthComp = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthStat"));
 
 	IsAttacking = false;
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> HitSoundObject
+	(TEXT("/Game/Asset/Hit2.Hit2"));
+	if (HitSoundObject.Succeeded())
+	{
+		HitSound = HitSoundObject.Object;
+	}
+	else
+	{
+		PRINT_ERROR_LOG(TEXT("HitSound is NULL"));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -206,6 +217,11 @@ void ACharacterCommon::OnHitboxOverlap(UPrimitiveComponent* OverlappedComponent,
 		this,
 		nullptr
 	);
+
+	if (AProjectPlayer* Player = Cast<AProjectPlayer>(OtherActor))
+	{
+		PlayHitSound_Multicast(Player);
+	}
 }
 
 float ACharacterCommon::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

@@ -10,6 +10,17 @@
 #include "Player/ProjectPlayer.h"
 #include <Item/PE_ItemDataTable.h>
 
+APE_PlayerState::APE_PlayerState()
+{
+	static ConstructorHelpers::FObjectFinder<UDataTable> SkillDT(
+		TEXT("/Game/DataTable/DT_SkillDataTable.DT_SkillDataTable")
+	);
+	if (SkillDT.Succeeded())
+	{
+		SkillDataTable = SkillDT.Object;
+	}
+}
+
 void APE_PlayerState::InitializeDefaultData(TArray<FItemData> DefualtInventoryData, bool isFirstStage, int32 DefualtFuelData)
 {
 	check(HasAuthority());	//서버 전용
@@ -45,7 +56,8 @@ void APE_PlayerState::InitializeDefaultData(TArray<FItemData> DefualtInventoryDa
 		PRINT_LOG(TEXT("ItemDataTable is NULL"));
 	}
 
-	UDataTable* SkillDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_SkillDataTable.DT_SkillDataTable"));
+	Skills.Empty();
+	//SkillDataTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/DT_SkillDataTable.DT_SkillDataTable"));
 	if (SkillDataTable)
 	{
 		TArray<FPE_SkillDataTable*> AllSkills;

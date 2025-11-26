@@ -22,4 +22,7 @@ struct DEDICATEDPROJECT_API FPE_ToiletMechStats : public FTableRowBase
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float AttackPower = 1.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float MaxHP = 100.0f;
 };

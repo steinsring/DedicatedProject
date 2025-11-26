@@ -21,7 +21,7 @@ UHealthComponent::UHealthComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicatedByDefault(true); // 컴포넌트가 기본적으로 복제되도록 설정
 
-	MaxHealth = 100.0f;
+	//MaxHealth = 100.0f;
 	CurrentHealth = MaxHealth;
 }
 
@@ -30,7 +30,7 @@ void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CurrentHealth = MaxHealth; // 게임 시작 시 최대 체력으로 초기화
+	//CurrentHealth = MaxHealth; // 게임 시작 시 최대 체력으로 초기화
 }
 
 void UHealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -134,5 +134,14 @@ void UHealthComponent::ApplyDamage_Internal(float DamageAmount)
 float UHealthComponent::GetHPRatio()
 {
 	return (CurrentHealth < KINDA_SMALL_NUMBER) ? 0.0f : (CurrentHealth / MaxHealth);
+}
+
+void UHealthComponent::InitHealth(float NewMaxHealth)
+{
+	if (GetOwnerRole() != ROLE_Authority)
+		return;
+
+	MaxHealth = NewMaxHealth;
+	SetHP(NewMaxHealth);
 }
 

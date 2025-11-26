@@ -72,4 +72,16 @@ private:
 	TSubclassOf<class UPE_NotifyWindow> NotifyWidgetClass;
 public:
 	void CreateNotify();
+
+private:
+	UPROPERTY()
+	USoundBase* BGM1;
+	
+	UPROPERTY()
+	USoundBase* BGM2;
+	
+	UPROPERTY()
+	USoundBase* SelectedBGM;
+
+	void SetRandomBGM();
 };

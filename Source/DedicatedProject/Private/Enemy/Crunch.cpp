@@ -105,7 +105,13 @@ void ACrunch::BeginPlay()
 			AttackPower = StatsRow->AttackPower;
 			Speed = StatsRow->Speed;
 			MaxSpeed = StatsRow->MaxSpeed;
+			MaxHP = StatsRow->MaxHP;
 			UE_LOG(LogTemp, Warning, TEXT("Row 'Default' found in EnemyDataTable"));
+
+			if (HealthComp)
+			{
+				HealthComp->InitHealth(MaxHP);
+			}
 		}
 		else
 		{

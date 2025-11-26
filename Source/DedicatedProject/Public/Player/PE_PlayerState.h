@@ -24,6 +24,7 @@ private:
 	int32 MaxInventorySlotNumber = 6;										// 최대 인벤토리 슬롯 개수
 
 protected:
+	APE_PlayerState();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	// 플레이어 인벤토리 관련 서버 권위 데이터 -------------------------------------------------------
@@ -39,6 +40,9 @@ protected:
 
 	UPROPERTY(ReplicatedUsing = "OnRep_SkillState")
 	TArray<FPE_SkillDataTable> Skills;
+
+	UPROPERTY(VisibleAnywhere, Category = "Skill Data Table")
+	class UDataTable* SkillDataTable;
 
 	// -----------------------------------------------------------------
 public:

@@ -53,10 +53,13 @@ public:
 
 	FOnHPChangedDelegate OnHPChanged;
 
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void InitHealth(float NewMaxHealth);
+
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth, EditAnywhere, Category = "Actor Stat")
 	float CurrentHealth;
 
 	UPROPERTY(EditAnywhere, Category = "Actor Stat")
-	float MaxHealth;
+	float MaxHealth = 100.0f;
 };

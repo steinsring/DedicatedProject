@@ -19,6 +19,8 @@
 #include "Player/PE_PlayerState.h"
 #include "UI/PE_NotifyWindow.h"
 
+#include "Kismet/GameplayStatics.h"
+
 APE_PlayerController::APE_PlayerController()
 {
 	// Inventory UI 로드 ----------------------------------------------------------------------
@@ -63,6 +65,19 @@ APE_PlayerController::APE_PlayerController()
 	else 
 	{ 
 		PRINT_ERROR_LOG(TEXT("NotifyWidgetClass is NULL")); 
+	}
+
+	// BGM setting----------------------------------------------------------------------------
+	static ConstructorHelpers::FObjectFinder<USoundBase> BGM1_Obj(TEXT("/Game/Asset/BGM1.BGM1"));
+	if (BGM1_Obj.Succeeded())
+	{
+		BGM1 = BGM1_Obj.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> BGM2_Obj(TEXT("/Game/Asset/BGM2.BGM2"));
+	if (BGM2_Obj.Succeeded())
+	{
+		BGM2 = BGM2_Obj.Object;
 	}
 }
 
@@ -118,6 +133,12 @@ void APE_PlayerController::BeginPlay()
 	else
 	{
 		PRINT_ERROR_LOG(TEXT("CrossHairWidget Create Fail"));
+	}
+
+	SetRandomBGM();
+	if (SelectedBGM)
+	{
+		UGameplayStatics::PlaySound2D(this, SelectedBGM);
 	}
 }
 
@@ -239,4 +260,10 @@ void APE_PlayerController::CreateNotify()
 	NotifyWidget->AddToViewport();
 
 	InventoryWidget->CreateNotify(NotifyWidget);
+}
+
+void APE_PlayerController::SetRandomBGM()
+{
+	const bool RandBool = FMath::RandBool();
+	SelectedBGM = RandBool ? BGM1 : BGM2;
 }

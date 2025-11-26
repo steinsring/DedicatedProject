@@ -105,17 +105,6 @@ AToiletMechTest::AToiletMechTest()
 					("'/Game/DataTable/DT_ToiletMechStats.DT_ToiletMechStats'"));
 	if (DataTableAsset.Succeeded())
 		DataTable = DataTableAsset.Object;
-
-	static ConstructorHelpers::FObjectFinder<USoundBase> HitSoundObject
-	(TEXT("/Game/Asset/Sci-fi_UI_Pack/Audio/FX_Sounds/Sci-fi_UI_Pack_Notificationv.Sci-fi_UI_Pack_Notificationv"));
-	if (HitSoundObject.Succeeded())
-	{
-		HitSound = HitSoundObject.Object;
-	}
-	else
-	{
-		PRINT_ERROR_LOG(TEXT("ToiletMech HitSound is NULL"));
-	}
 }
 
 void AToiletMechTest::BeginPlay()
@@ -135,7 +124,13 @@ void AToiletMechTest::BeginPlay()
 			AttackPower = StatsRow->AttackPower;
 			MaxSpeed = StatsRow->MaxSpeed;
 			Speed = StatsRow->Speed;
+			MaxHP = StatsRow->MaxHP;
 			UE_LOG(LogTemp, Warning, TEXT("Row 'Default' found in EnemyDataTable"));
+
+			if (HealthComp)
+			{
+				HealthComp->InitHealth(MaxHP);
+			}
 		}
 		else
 		{

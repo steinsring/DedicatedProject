@@ -143,7 +143,7 @@ private:
 	AActor* HitActor;
 	FHitResult HitResult;
 	AProjectPlayer* Player;
-	float ElectricShockDamage = 10.0f;
+	float ElectricShockDamage = 50.0f;
 
 	TArray<AActor*> DetectedItems;
 
@@ -156,8 +156,8 @@ private:
 	float AttackUpDuration = 10.0f;
 	float DefenseUpDuration = 10.0f;
 	float SpeedUpDuration = 10.0f;
-	float SeeThroughDuration = 5.0f;
-	float SightHackingDuration = 5.0f;
+	float SeeThroughDuration = 10.0f;
+	float SightHackingDuration = 10.0f;
 
 	void StartSkillCoolTime(E_SkillType SkillType, E_Skills Skill);
 
