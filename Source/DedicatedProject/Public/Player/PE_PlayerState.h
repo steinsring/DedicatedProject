@@ -53,7 +53,7 @@ public:
 	// 인벤토리 데이터 설정 함수 -----------------------------------------------------------------------------
 	bool IsEmptySlot(const int32 SlotNumber);
 
-	void AddItem(const FName ItemID, const int32 ItemQuantity);
+	bool AddItem(const FName ItemID, const int32 ItemQuantity);
 
 	UFUNCTION(Server,Reliable)
 	void AddItem_Server(const FName ItemID, const int32 ItemQuantity);		// 아이템 획득 RPC
@@ -104,7 +104,7 @@ public:
 
 	bool IsEnoughFuel(int32 Quantity);
 
-	void AddFuel(FName ItemID);
+	bool AddFuel(FName ItemID);
 
 	UFUNCTION(Server, Reliable)
 	void AddFuel_Server(FName ItemID);

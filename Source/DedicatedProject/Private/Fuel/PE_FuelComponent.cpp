@@ -39,11 +39,11 @@ void UPE_FuelComponent::BeginPlay()
 	FuelWidgetInstance = Cast<UPE_FuelWidget>(GetWidget());
 }
 
-void UPE_FuelComponent::AddFuel(FName ItemID)
+bool UPE_FuelComponent::AddFuel(FName ItemID)
 {
 	AProjectPlayer* Chr = Cast<AProjectPlayer>(GetOwner());
 	APE_PlayerState* PS = Chr->GetPlayerState<APE_PlayerState>();
-	PS->AddFuel(ItemID);
+	return PS->AddFuel(ItemID);
 }
 
 void UPE_FuelComponent::UpdateFuel(int32 Quantity)

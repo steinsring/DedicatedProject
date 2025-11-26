@@ -13,7 +13,6 @@ void APE_BasePickup::Interact(AActor* Interactor)
 	{
 		PRINT_LOG(TEXT("Item : Pickup"));
 		Player->AddItemToInventory(PickupID, PickupQuantity);
-		PRINT_LOG(TEXT("Item : Destroy"));
 	}
 }
 

@@ -199,6 +199,9 @@ private:
 public:
 	void AddItemToInventory(FName ID, int32 Quantity);
 	FORCEINLINE UPE_InventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+
+	UFUNCTION(Server, Reliable)
+	void DestoryItem_Server(AActor* Item);
 	
 	// Throwable -------------------------------------------------------------------------
 private:

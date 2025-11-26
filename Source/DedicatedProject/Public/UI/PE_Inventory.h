@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include <Item/PE_ItemDataTable.h>
+#include <Components/TextBlock.h>
 #include "PE_Inventory.generated.h"
 
 class UPE_InventorySlot;
@@ -72,4 +73,14 @@ public:
 
 	// 알림창
 	void CreateNotify(class UPE_NotifyWindow* NotifyWidget);
+
+	// 스테이지 표시
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> CurrentStage = nullptr;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UTextBlock> MaxStage = nullptr;
+
+	void SetCurrentStage(int32 Num) { CurrentStage->SetText(FText::AsNumber(Num)); }
+	void SetMaxStage(int32 Num) { MaxStage->SetText(FText::AsNumber(Num)); }
 };

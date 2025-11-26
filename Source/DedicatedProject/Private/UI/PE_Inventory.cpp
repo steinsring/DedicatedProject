@@ -10,6 +10,7 @@
 #include "DedicatedProject.h"
 #include "Inventory/FItemData.h"
 #include "UI/PE_NotifyWindow.h"
+#include "PE_GameInstance.h"
 
 void UPE_Inventory::NativeConstruct()
 {
@@ -46,6 +47,26 @@ void UPE_Inventory::NativeConstruct()
 		}
 	}
 	*/
+
+	// GameInstance 값 가져와서 스테이지 UI 세팅
+	if (UWorld* World = GetWorld())
+	{
+		if (UPE_GameInstance* GI = World->GetGameInstance<UPE_GameInstance>())
+		{
+			const int32 CurrentLevel = GI->GetCurrentLevelCount();
+			const int32 MaxLevel = GI->GetMaxTravelLevelCount();
+
+			if (CurrentStage)
+			{
+				CurrentStage->SetText(FText::AsNumber(CurrentLevel));
+			}
+
+			if (MaxStage)
+			{
+				MaxStage->SetText(FText::AsNumber(MaxLevel));
+			}
+		}
+	}
 }
 
 void UPE_Inventory::SetInventoryData(const TArray<FItemData>& ServerInventoryData)
@@ -107,5 +128,41 @@ void UPE_Inventory::UseItem(const int SlotNumber)
 
 void UPE_Inventory::CreateNotify(UPE_NotifyWindow* NotifyWidget)
 {
+	if (!NotifyWindow || !NotifyWidget) return;
+
+	// 2초 뒤 위젯 자동 삭제 (Weak 포인터로 안전하게 잡기)
+	TWeakObjectPtr<UPE_NotifyWindow> WeakNotifyWidget = NotifyWidget;
+
+	if (UWorld* World = GetWorld())
+	{
+		FTimerHandle TimerHandle;
+		World->GetTimerManager().SetTimer(
+			TimerHandle,
+			FTimerDelegate::CreateLambda([WeakNotifyWidget]()
+				{
+					if (WeakNotifyWidget.IsValid())
+					{
+						WeakNotifyWidget->RemoveFromParent();
+					}
+				}),
+			2.0f,
+			false
+		);
+	}
+
+	// 🔴 여기서부터는 "최대 3개 유지" 처리
+
+	int32 ChildCount = NotifyWindow->GetChildrenCount();
+
+	if (ChildCount >= 3)
+	{
+		int32 LastIndex = ChildCount - 1;       // 🔹 마지막 위젯
+		UWidget* OldWidget = NotifyWindow->GetChildAt(LastIndex);
+
+		if (OldWidget)
+		{
+			NotifyWindow->RemoveChild(OldWidget);
+		}
+	}
 	NotifyWindow->AddChild(NotifyWidget);
 }

@@ -105,9 +105,19 @@ bool APE_PlayerState::IsEmptySlot(const int32 SlotNumber)
 	return false;
 }
 
-void APE_PlayerState::AddItem(const FName ItemID, const int32 ItemQuantity)
+bool APE_PlayerState::AddItem(const FName ItemID, const int32 ItemQuantity)
 {
-	AddItem_Server(ItemID, ItemQuantity);
+	for (int32 i = 0; i < InventoryData.Num(); i++)
+	{
+		// 아이템 획득이 가능한 조건
+		if (InventoryData[i].ItemID == ItemID || InventoryData[i].ItemID == NAME_None)
+		{
+			AddItem_Server(ItemID, ItemQuantity);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 // 여기서 아이템 이미 있으면 추가, 없으면 가장 가까운 빈 슬롯에 추가
@@ -192,12 +202,18 @@ bool APE_PlayerState::IsEnoughFuel(int32 Quantity)
 	if (CurrentQuantity >= Quantity)	return true;
 
 	PRINT_LOG(TEXT("Not Enough Fuel"));
+	APE_PlayerController* PC = Cast<APE_PlayerController>(GetPlayerController());
+	if (PC)
+	{
+		PC->CreateNotify();
+	}
 	return false;
 }
 
-void APE_PlayerState::AddFuel(FName ItemID)
+bool APE_PlayerState::AddFuel(FName ItemID)
 {
 	AddFuel_Server(ItemID);
+	return true;
 }
 
 void APE_PlayerState::AddFuel_Server_Implementation(FName ItemID)

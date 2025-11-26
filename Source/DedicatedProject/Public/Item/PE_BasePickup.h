@@ -23,5 +23,4 @@ protected:
 
 public:
 	virtual void Interact(class AActor* Interactor) override;
-
 };

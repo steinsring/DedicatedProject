@@ -27,7 +27,7 @@ protected:
 public:
 	UPE_FuelComponent();
 
-	void AddFuel(FName ItemID);
+	bool AddFuel(FName ItemID);
 	void UseFuel(int32 Quantity);
 	void UpdateFuel(int32 Quantity);
 

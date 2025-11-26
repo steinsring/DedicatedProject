@@ -738,12 +738,7 @@ void AProjectPlayer::Interact()
 		FocusedItem->Interact(this);
 	}
 	// 밑에 여러 작용 추가
-	// 알림창
-	APE_PlayerController* PC = Cast<APE_PlayerController>(GetController());
-	if (PC)
-	{
-		PC->CreateNotify();
-	}
+
 }
 
 void AProjectPlayer::InputAugmentSkill(const FInputActionValue& inputValue)
@@ -814,13 +809,29 @@ void AProjectPlayer::OnReleaseOverrideSkill(const FInputActionValue& inputValue)
 
 void AProjectPlayer::AddItemToInventory(FName ID, int32 Quantity)
 {
+	bool IsEquiped = false;
 	if (ID == "Fuel")
 	{
-		FuelComponent->AddFuel(ID);
+		IsEquiped = FuelComponent->AddFuel(ID);
 	}
 	else
 	{
-		InventoryComponent->AddItem(ID, Quantity, this);
+		IsEquiped = InventoryComponent->AddItem(ID, Quantity, this);
+	}
+
+	if (IsEquiped)
+	{
+		AActor* Item = Cast<AActor>(FocusedItem.GetObject());
+		DestoryItem_Server(Item);
+	}
+}
+	
+
+void AProjectPlayer::DestoryItem_Server_Implementation(AActor* Item)
+{
+	if (Item)
+	{
+		Item->Destroy();
 	}
 }
 
