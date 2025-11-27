@@ -62,13 +62,16 @@ void APE_LevelTravelManager::Interact(AActor* Interactor)
 		return;
 	}
 
-	if (!PS->IsEnoughFuel(RequiredFuel))
+	UPE_GameInstance* GI = GetGameInstance<UPE_GameInstance>();
+	int32 CurrentStage = GI->GetCurrentLevelCount();
+
+	if (!PS->IsEnoughFuel(RequiredFuel + CurrentStage * 2000))
 	{
 		PRINT_LOG(TEXT("Not Enought Fuel"));
 		return;
 	}
 
-	PS->UseFuel(RequiredFuel);	// 요구치 사용
+	PS->UseFuel(RequiredFuel + CurrentStage * 2000);	// 요구치 사용
 
 	if (HasAuthority())
 	{
